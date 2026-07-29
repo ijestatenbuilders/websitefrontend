@@ -1,0 +1,1273 @@
+/* ─── Page shell ──────────────────────────────────────────── */
+.bbc-page {
+    background: #f0f6ff;
+    display: flex;
+    flex-direction: column;
+    padding-top: 140px;
+}
+
+/* ─── Breadcrumb ──────────────────────────────────────────── */
+.bbc-breadcrumb {
+    background: #f0f6ff;
+    padding: 0.85rem 0 0;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
+
+.bbc-breadcrumb__inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.bbc-breadcrumb__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: rgba(30, 144, 255, 0.1);
+    border: 1px solid rgba(30, 144, 255, 0.2);
+    border-radius: 999px;
+    color: #1e90ff;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.3rem 0.85rem;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    margin-right: 0.25rem;
+}
+
+.bbc-breadcrumb__back:hover {
+    background: rgba(30, 144, 255, 0.18);
+    transform: translateX(-2px);
+}
+
+.bbc-breadcrumb__link {
+    background: none;
+    border: none;
+    color: #1e90ff;
+    font-size: 0.85rem;
+    cursor: pointer;
+    padding: 0;
+    font-family: inherit;
+    transition: color 0.2s;
+}
+
+.bbc-breadcrumb__link:hover {
+    color: #0d5bb5;
+    text-decoration: underline;
+}
+
+.bbc-breadcrumb__sep {
+    color: #94a3b8;
+    font-size: 0.85rem;
+}
+
+.bbc-breadcrumb__current {
+    color: #225499;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* ─── Two-column layout ───────────────────────────────────── */
+.bbc-layout {
+    max-width: 1500px;
+    margin: 2.5rem auto;
+    padding: 0 2rem 4rem;
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 2rem;
+    align-items: start;
+    flex: 1;
+}
+
+.bbc-right {
+    position: sticky;
+    top: 160px;
+    align-self: start;
+}
+
+/* Full width container for plot cards */
+.bbc-full-width-section {
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 0 2rem 2rem;
+}
+
+/* ─── Shared section wrapper ──────────────────────────────── */
+.bbc-section {
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    border-radius: 20px;
+    padding: 1.8rem 2rem;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.8),
+        0 8px 32px rgba(13, 88, 163, 0.08);
+    margin-bottom: 1.5rem;
+}
+
+.bbc-section__title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 1rem;
+    padding-bottom: 0.65rem;
+    border-bottom: 2px solid rgba(30, 144, 255, 0.15);
+}
+
+/* ─── Shared card (right col) ─────────────────────────────── */
+.bbc-card {
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    border-radius: 20px;
+    padding: 1.5rem 1.75rem;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.8),
+        0 8px 32px rgba(13, 88, 163, 0.08);
+    margin-bottom: 1.25rem;
+}
+
+/* ─── Image Slider ────────────────────────────────────────── */
+.bbc-slider {
+    margin-bottom: 1.5rem;
+}
+
+.bbc-slider__main {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    cursor: zoom-in;
+    box-shadow:
+        0 20px 60px rgba(13, 88, 163, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.bbc-slider__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.45s ease;
+}
+
+.bbc-slider__main:hover .bbc-slider__img {
+    transform: scale(1.03);
+}
+
+.bbc-slider__badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    background: linear-gradient(135deg, #1e90ff, #0d5bb5);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    letter-spacing: 0.04em;
+    box-shadow: 0 4px 14px rgba(30, 144, 255, 0.35);
+}
+
+.bbc-slider__type {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #0f172a;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    backdrop-filter: blur(8px);
+}
+
+.bbc-slider__counter {
+    position: absolute;
+    bottom: 14px;
+    right: 16px;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+    backdrop-filter: blur(6px);
+}
+
+.bbc-slider__arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #0f172a;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    transition: background 0.2s, transform 0.2s;
+    z-index: 2;
+}
+
+.bbc-slider__arrow:hover {
+    background: #fff;
+    transform: translateY(-50%) scale(1.1);
+}
+
+.bbc-slider__arrow--prev {
+    left: 14px;
+}
+
+.bbc-slider__arrow--next {
+    right: 14px;
+}
+
+/* Thumbnails */
+.bbc-slider__thumbs {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.bbc-slider__thumb {
+    width: 72px;
+    height: 56px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2.5px solid transparent;
+    cursor: pointer;
+    padding: 0;
+    background: none;
+    transition: border-color 0.2s, transform 0.2s;
+    flex-shrink: 0;
+}
+
+.bbc-slider__thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.bbc-slider__thumb:hover {
+    transform: translateY(-2px);
+    border-color: rgba(30, 144, 255, 0.5);
+}
+
+.bbc-slider__thumb--active {
+    border-color: #1e90ff;
+    box-shadow: 0 4px 14px rgba(30, 144, 255, 0.3);
+}
+
+/* ─── Description ─────────────────────────────────────────── */
+.bbc-description__text {
+    color: #475569;
+    line-height: 1.85;
+    font-size: 0.97rem;
+    margin: 0;
+}
+
+/* ─── Available Plots Section ─────────────────────────────── */
+.bbc-plots-section {
+    margin-bottom: 1.5rem;
+}
+
+.bbc-plots-header {
+    margin-bottom: 1.5rem;
+}
+
+.bbc-plots-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 0.4rem;
+    letter-spacing: -0.01em;
+}
+
+.bbc-plots-subtitle {
+    font-size: 0.92rem;
+    color: #64748b;
+    margin: 0;
+}
+
+.bbc-plots-subtitle strong {
+    color: #1e90ff;
+    font-weight: 700;
+}
+
+/* Filter Pills */
+.bbc-filter-pills {
+    display: flex;
+    gap: 0.6rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.bbc-filter-pill {
+    padding: 0.55rem 1.15rem;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1.5px solid rgba(30, 144, 255, 0.2);
+    border-radius: 999px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.25s ease;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.bbc-filter-pill:hover {
+    background: rgba(30, 144, 255, 0.1);
+    border-color: rgba(30, 144, 255, 0.4);
+    color: #1e90ff;
+    transform: translateY(-2px);
+}
+
+.bbc-filter-pill--active {
+    background: linear-gradient(135deg, #1e90ff, #0d5bb5);
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(30, 144, 255, 0.35);
+}
+
+.bbc-filter-pill--active:hover {
+    transform: translateY(-2px) scale(1.03);
+}
+
+/* Plot Cards Grid */
+.bbc-plots-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Individual Plot Card - Bluish Glassmorphism */
+.bbc-plot-card {
+    position: relative;
+    background: linear-gradient(135deg, rgba(30, 255, 236, 0.089), rgba(100, 255, 221, 0.089));
+    border: 1.5px solid rgba(21, 145, 103, 0.25);
+    border-radius: 18px;
+    padding: 0;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.6),
+        0 8px 32px rgba(30, 144, 255, 0.12);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.bbc-plot-card:hover {
+    transform: translateY(-6px) scale(1.02);
+    border-color: rgba(16, 122, 82, 0.384);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.8),
+        0 16px 48px rgba(30, 144, 255, 0.22);
+}
+
+.bbc-plot-card__badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: linear-gradient(135deg, #36bb72, #39be4f);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    box-shadow: 0 4px 14px rgba(79, 243, 120, 0.61);
+    z-index: 2;
+}
+
+.bbc-plot-card__image {
+    position: relative;
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+    border-radius: 18px 18px 0 0;
+}
+
+.bbc-plot-card__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.bbc-plot-card:hover .bbc-plot-card__image img {
+    transform: scale(1.08);
+}
+
+.bbc-plot-card__image-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(30, 144, 255, 0) 0%, rgba(30, 255, 169, 0.089) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.bbc-plot-card__image-overlay svg {
+    color: #fff;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+}
+
+.bbc-plot-card:hover .bbc-plot-card__image-overlay {
+    opacity: 1;
+}
+
+.bbc-plot-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0;
+    padding: 1.25rem 1.35rem 1rem;
+    padding-bottom: 1.25rem;
+    margin-bottom: 1.25rem;
+    border-bottom: 1px solid rgba(30, 144, 255, 0.15);
+}
+
+.bbc-plot-card__size {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #11a54f;
+    font-size: 1.15rem;
+    font-weight: 800;
+}
+
+.bbc-plot-card__price {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #124129;
+}
+
+.bbc-plot-card__features {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0 1.35rem;
+    margin-bottom: 1.15rem;
+    margin-top: 0.25rem;
+    flex: 1;
+}
+
+.bbc-plot-card__feature {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: #475569;
+}
+
+.bbc-plot-card__feature svg {
+    color: #22c55e;
+    flex-shrink: 0;
+}
+
+.bbc-plot-card__btn {
+    width: calc(100% - 2.7rem);
+    margin: 0 1.35rem 1.35rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.25rem;
+    background: linear-gradient(135deg, #15a75e9d, #208d51b0);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    box-shadow: 0 4px 16px rgba(30, 144, 255, 0.3);
+    transition: all 0.25s ease;
+    margin-top: auto;
+}
+
+.bbc-plot-card__btn:hover {
+    background: linear-gradient(135deg, #15a75ea8, #208d51b0);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(30, 144, 255, 0.4);
+}
+
+.bbc-plot-card__btn:active {
+    transform: translateY(0);
+}
+
+/* Empty State */
+.bbc-plots-empty {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1.5px dashed rgba(30, 144, 255, 0.2);
+    border-radius: 16px;
+    color: #64748b;
+    font-size: 0.95rem;
+}
+
+/* ─── Check Out More Commercials Button ───────────────────── */
+.bbc-more-commercials {
+    margin-bottom: 1.5rem;
+}
+
+.bbc-more-commercials__btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.5rem 1.75rem;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.5));
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    border-radius: 20px;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.8),
+        0 8px 32px rgba(13, 88, 163, 0.08);
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: relative;
+    overflow: hidden;
+}
+
+.bbc-more-commercials__btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(30, 144, 255, 0.15), transparent);
+    transition: left 0.5s ease;
+}
+
+.bbc-more-commercials__btn:hover::before {
+    left: 100%;
+}
+
+.bbc-more-commercials__btn:hover {
+    transform: translateY(-4px) scale(1.01);
+    border-color: rgba(30, 144, 255, 0.4);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.9),
+        0 16px 45px rgba(30, 144, 255, 0.18),
+        0 0 0 1px rgba(30, 144, 255, 0.2);
+}
+
+.bbc-more-commercials__btn:active {
+    transform: translateY(-2px) scale(1.005);
+}
+
+.bbc-more-commercials__icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #1e90ff, #0d5bb5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    flex-shrink: 0;
+    box-shadow: 0 6px 18px rgba(30, 144, 255, 0.3);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.bbc-more-commercials__btn:hover .bbc-more-commercials__icon {
+    transform: rotate(5deg) scale(1.08);
+    box-shadow: 0 8px 24px rgba(30, 144, 255, 0.4);
+}
+
+.bbc-more-commercials__content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
+    text-align: left;
+}
+
+.bbc-more-commercials__label {
+    font-size: 0.75rem;
+    color: #64748b;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.bbc-more-commercials__title {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.01em;
+}
+
+.bbc-more-commercials__arrow {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(30, 144, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1e90ff;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+}
+
+.bbc-more-commercials__btn:hover .bbc-more-commercials__arrow {
+    background: linear-gradient(135deg, #1e90ff, #0d5bb5);
+    color: #fff;
+    transform: translateX(4px);
+}
+
+/* ─── Title card ──────────────────────────────────────────── */
+.bbc-title-card__name {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 0.9rem;
+    line-height: 1.3;
+}
+
+.bbc-title-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.bbc-title-card__meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(30, 144, 255, 0.08);
+    border: 1px solid rgba(30, 144, 255, 0.15);
+    border-radius: 999px;
+    padding: 0.35rem 0.85rem;
+    font-size: 0.82rem;
+    color: #1e5fa0;
+    font-weight: 600;
+}
+
+/* ─── Available Sizes Card (Right Column) ─────────────────── */
+.bbc-sizes-card {
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    border-radius: 20px;
+    padding: 1.5rem 1.75rem;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.8),
+        0 8px 32px rgba(13, 88, 163, 0.08);
+}
+
+.bbc-sizes-card__title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 1rem;
+    padding-bottom: 0.65rem;
+    border-bottom: 2px solid rgba(30, 144, 255, 0.15);
+}
+
+.bbc-sizes__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+
+.bbc-size-btn {
+    padding: 1rem 1.25rem;
+    background: rgba(30, 144, 255, 0.06);
+    border: 1.5px solid rgba(30, 144, 255, 0.2);
+    border-radius: 14px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s ease;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.bbc-size-btn:hover {
+    background: rgba(30, 144, 255, 0.1);
+    border-color: rgba(30, 144, 255, 0.35);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(30, 144, 255, 0.15);
+}
+
+.bbc-size-btn--selected {
+    background: linear-gradient(135deg, rgba(30, 144, 255, 0.15), rgba(13, 91, 181, 0.1));
+    border-color: #1e90ff;
+    box-shadow: 0 4px 16px rgba(30, 144, 255, 0.25);
+}
+
+.bbc-size-btn__label {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.bbc-size-btn__status {
+    font-size: 0.78rem;
+    color: #22c55e;
+    font-weight: 600;
+}
+
+.bbc-sizes__note {
+    margin: 1rem 0 0;
+    padding: 0.75rem 1rem;
+    background: rgba(30, 144, 255, 0.08);
+    border: 1px solid rgba(30, 144, 255, 0.2);
+    border-radius: 12px;
+    font-size: 0.88rem;
+    color: #334155;
+}
+
+/* ─── Map card ────────────────────────────────────────────── */
+.bbc-map-card__title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.bbc-map-card__address {
+    font-size: 0.88rem;
+    color: #64748b;
+    margin: 0 0 1rem;
+    line-height: 1.5;
+}
+
+.bbc-map-card__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    justify-content: center;
+    padding: 0.75rem 1.25rem;
+    background: rgba(30, 144, 255, 0.1);
+    border: 1.5px solid rgba(30, 144, 255, 0.3);
+    border-radius: 12px;
+    color: #1e90ff;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+    font-family: inherit;
+}
+
+.bbc-map-card__btn:hover {
+    background: rgba(30, 144, 255, 0.18);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(30, 144, 255, 0.2);
+}
+
+/* ─── Contact card ────────────────────────────────────────── */
+.bbc-contact-card {
+    background: linear-gradient(135deg, #0d5bb5, #1e90ff);
+    border-color: transparent;
+    text-align: center;
+}
+
+.bbc-contact-card__title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 0.3rem;
+}
+
+.bbc-contact-card__sub {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.75);
+    margin: 0 0 1.1rem;
+}
+
+.bbc-contact-card__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.85rem 1.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1.5px solid rgba(255, 255, 255, 0.5);
+    border-radius: 12px;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+    backdrop-filter: blur(6px);
+}
+
+.bbc-contact-card__btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* ─── Contact Modal ───────────────────────────────────────── */
+.bbc-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 20, 50, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    animation: bbcFadeIn 0.25s ease;
+}
+
+@keyframes bbcFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.bbc-modal {
+    background: rgba(255, 255, 255, 0.96);
+    border-radius: 24px;
+    padding: 2.5rem 2.25rem 2rem;
+    width: 100%;
+    max-width: 440px;
+    position: relative;
+    box-shadow:
+        0 40px 100px rgba(13, 88, 163, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+    animation: bbcSlideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+}
+
+@keyframes bbcSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.bbc-modal__close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: rgba(0, 0, 0, 0.06);
+    border: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #64748b;
+    font-size: 0.85rem;
+    transition: background 0.2s, color 0.2s;
+}
+
+.bbc-modal__close:hover {
+    background: rgba(0, 0, 0, 0.12);
+    color: #0f172a;
+}
+
+.bbc-modal__icon-wrap {
+    width: 60px;
+    height: 60px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #1e90ff, #0d5bb5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.25rem;
+    box-shadow: 0 8px 24px rgba(30, 144, 255, 0.35);
+}
+
+.bbc-modal__icon {
+    color: #fff;
+}
+
+.bbc-modal__title {
+    font-size: 1.45rem;
+    font-weight: 800;
+    color: #0f172a;
+    text-align: center;
+    margin: 0 0 0.9rem;
+}
+
+.bbc-modal__contacts {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.bbc-modal__contact-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.9rem 1.1rem;
+    border-radius: 14px;
+    background: rgba(30, 144, 255, 0.05);
+    border: 1.5px solid rgba(30, 144, 255, 0.12);
+    text-decoration: none;
+    transition: background 0.2s, border-color 0.2s, transform 0.2s;
+}
+
+.bbc-modal__contact-item:hover {
+    background: rgba(30, 144, 255, 0.1);
+    border-color: rgba(30, 144, 255, 0.3);
+    transform: translateX(4px);
+}
+
+.bbc-modal__contact-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #1e90ff, #0d5bb5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(30, 144, 255, 0.3);
+}
+
+.bbc-modal__contact-label {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    font-weight: 500;
+    margin: 0 0 0.15rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+}
+
+.bbc-modal__contact-value {
+    font-size: 0.97rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+}
+
+.bbc-modal__footer {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin: 0;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* ─── Lightbox ────────────────────────────────────────────── */
+.bbc-lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(5, 10, 30, 0.92);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    animation: bbcFadeIn 0.2s ease;
+}
+
+.bbc-lightbox__img {
+    max-width: 90vw;
+    max-height: 85vh;
+    border-radius: 16px;
+    object-fit: contain;
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
+}
+
+.bbc-lightbox__close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #fff;
+    font-size: 1rem;
+    transition: background 0.2s;
+}
+
+.bbc-lightbox__close:hover {
+    background: rgba(255, 255, 255, 0.28);
+}
+
+.bbc-lightbox__arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #fff;
+    font-size: 1.1rem;
+    transition: background 0.2s;
+}
+
+.bbc-lightbox__arrow:hover {
+    background: rgba(255, 255, 255, 0.28);
+}
+
+.bbc-lightbox__arrow--prev {
+    left: 20px;
+}
+
+.bbc-lightbox__arrow--next {
+    right: 20px;
+}
+
+.bbc-lightbox__counter {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.88rem;
+    font-weight: 500;
+}
+
+/* ─── Responsive ──────────────────────────────────────────── */
+@media (max-width: 1200px) {
+    .bbc-plots-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 1024px) {
+    .bbc-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .bbc-right {
+        position: relative;
+        top: auto;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem;
+        align-items: start;
+    }
+
+    .bbc-right .bbc-card {
+        margin-bottom: 0;
+    }
+
+    .bbc-contact-card {
+        grid-column: 1 / -1;
+    }
+
+    .bbc-sizes-card {
+        grid-column: 1 / -1;
+    }
+
+    .bbc-sizes__grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .bbc-plots-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 900px) {
+    .bbc-filter-pills {
+        gap: 0.5rem;
+    }
+
+    .bbc-filter-pill {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .bbc-sizes__grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .bbc-plots-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .bbc-layout {
+        padding: 0 1rem 3rem;
+        margin-top: 1.5rem;
+    }
+
+    .bbc-breadcrumb__inner {
+        padding: 0 1rem;
+    }
+
+    .bbc-right {
+        grid-template-columns: 1fr;
+    }
+
+    .bbc-contact-card {
+        grid-column: auto;
+    }
+
+    .bbc-sizes-card {
+        grid-column: auto;
+    }
+
+    .bbc-section {
+        padding: 1.25rem 1.25rem;
+    }
+
+    .bbc-card {
+        padding: 1.25rem;
+    }
+
+    .bbc-title-card__name {
+        font-size: 1.15rem;
+    }
+
+    .bbc-slider__thumb {
+        width: 58px;
+        height: 46px;
+    }
+
+    .bbc-modal {
+        padding: 2rem 1.5rem 1.5rem;
+    }
+
+    .bbc-modal__title {
+        font-size: 1.2rem;
+    }
+
+    .bbc-lightbox__arrow--prev {
+        left: 8px;
+    }
+
+    .bbc-lightbox__arrow--next {
+        right: 8px;
+    }
+
+    .bbc-sizes__grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .bbc-filter-pills {
+        gap: 0.4rem;
+    }
+
+    .bbc-filter-pill {
+        padding: 0.45rem 0.9rem;
+        font-size: 0.82rem;
+    }
+
+    .bbc-plots-title {
+        font-size: 1.15rem;
+    }
+
+    .bbc-plots-subtitle {
+        font-size: 0.88rem;
+    }
+
+    .bbc-plot-card {
+        padding: 0;
+    }
+
+    .bbc-plot-card__image {
+        height: 160px;
+    }
+
+    .bbc-plot-card__header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+        padding: 1rem 1.15rem 0.85rem;
+    }
+
+    .bbc-plot-card__features {
+        padding: 0 1.15rem;
+    }
+
+    .bbc-plot-card__btn {
+        width: calc(100% - 2.3rem);
+        margin: 0 1.15rem 1.15rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .bbc-sizes__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .bbc-filter-pills {
+        justify-content: center;
+    }
+
+    .bbc-plots-header {
+        text-align: center;
+    }
+
+    .bbc-more-commercials__btn {
+        padding: 1.25rem 1.4rem;
+        gap: 1rem;
+    }
+
+    .bbc-more-commercials__icon {
+        width: 42px;
+        height: 42px;
+    }
+}
