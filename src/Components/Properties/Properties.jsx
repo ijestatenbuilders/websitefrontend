@@ -379,9 +379,5 @@ const BrowseProperties = ({ currentLocation = 'bahriatown' }) => {
         </section>
     );
 };
-            </div >
-        </section >
-    );
-};
 
 export default BrowseProperties;
