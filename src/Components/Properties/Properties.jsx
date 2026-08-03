@@ -35,20 +35,14 @@ const BrowseProperties = ({ currentLocation = 'bahriatown' }) => {
                     const data = await response.json();
                     // Remove 'All' from blockOptions
                     const blocks = data.blockOptions.filter(b => b !== 'All');
-
-                    // If no blocks or only 'All', use fallback
-                    if (blocks.length === 0) {
-                        setBlockOptions(getFallbackBlocks(currentLocation));
-                    } else {
-                        setBlockOptions(blocks);
-                    }
+                    setBlockOptions(blocks);
                 } else {
-                    setBlockOptions(getFallbackBlocks(currentLocation));
+                    console.error('Failed to fetch blocks');
+                    setBlockOptions([]);
                 }
             } catch (err) {
                 console.error('Error fetching blocks:', err);
-                // Use fallback blocks if API fails
-                setBlockOptions(getFallbackBlocks(currentLocation));
+                setBlockOptions([]);
             } finally {
                 setLoading(false);
             }
@@ -56,17 +50,6 @@ const BrowseProperties = ({ currentLocation = 'bahriatown' }) => {
 
         fetchBlocks();
     }, [currentLocation]);
-
-    // Fallback blocks in case API is not available
-    const getFallbackBlocks = (location) => {
-        const fallbackData = {
-            bahriatown: ['Safari Villas', 'Rafi Block', 'Johar Block', 'Tauheed Block', 'Shershah Block', 'Nishtar Block'],
-            dharaya: ['Phase 1', 'Phase 2', 'Phase 3', 'Phase 4', 'Phase 5', 'Phase 6'],
-            etihadtown: ['Block A', 'Block B', 'Block C', 'Block D', 'Block E', 'Block F'],
-            uniontown: ['Green Block', 'Blue Block', 'Red Block', 'Yellow Block', 'Orange Block', 'White Block']
-        };
-        return fallbackData[location] || [];
-    };
 
     // Generate blocks for each property type from API data
     const generateBlocksForType = (blocks, propertyType) => {
@@ -301,6 +284,31 @@ const BrowseProperties = ({ currentLocation = 'bahriatown' }) => {
                     <div style={{ textAlign: 'center', padding: '40px' }}>
                         <p>Loading properties...</p>
                     </div>
+                ) : blockOptions.length === 0 ? (
+                    <div style={{
+                        textAlign: 'center',
+                        padding: '60px 20px',
+                        background: 'rgba(255, 255, 255, 0.03)',
+                        borderRadius: '12px',
+                        border: '1px solid rgba(255, 255, 255, 0.1)'
+                    }}>
+                        <div style={{ fontSize: '48px', marginBottom: '20px', opacity: 0.3 }}>🏘️</div>
+                        <h3 style={{
+                            fontSize: '24px',
+                            marginBottom: '12px',
+                            color: 'rgba(255, 255, 255, 0.9)'
+                        }}>
+                            No Properties Available
+                        </h3>
+                        <p style={{
+                            color: 'rgba(255, 255, 255, 0.6)',
+                            maxWidth: '500px',
+                            margin: '0 auto',
+                            lineHeight: '1.6'
+                        }}>
+                            We're currently updating our property listings. Please check back soon or contact us directly for available properties.
+                        </p>
+                    </div>
                 ) : (
                     <div className="category-cards">
                         {Object.entries(categories).map(([key, category]) => {
@@ -369,6 +377,10 @@ const BrowseProperties = ({ currentLocation = 'bahriatown' }) => {
                 )}
             </div>
         </section>
+    );
+};
+            </div >
+        </section >
     );
 };
 

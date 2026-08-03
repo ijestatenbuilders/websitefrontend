@@ -40,9 +40,7 @@ function Upcoming({ currentLocation = 'bahriatown' }) {
                 setUpcomingProjects(projects);
             } catch (err) {
                 console.error('Error fetching projects:', err);
-                setError(err.message);
-                // Fallback to hardcoded data if API fails
-                setUpcomingProjects(getFallbackProjects(currentLocation));
+                setUpcomingProjects([]);
             } finally {
                 setLoading(false);
             }
@@ -50,26 +48,6 @@ function Upcoming({ currentLocation = 'bahriatown' }) {
 
         fetchProjects();
     }, [currentLocation]);
-
-    // Fallback data in case API is not available
-    const getFallbackProjects = (location) => {
-        const fallbackData = {
-            bahriatown: [
-                {
-                    id: 1,
-                    title: 'Business Bay Commercial',
-                    description:
-                        'Business Bay Commercial is a landmark commercial destination in Bahria Town Lahore, thoughtfully designed for businesses seeking visibility, accessibility, and long-term growth. Positioned within one of Lahores most prestigious and well-established communities, it offers a dynamic environment for retail outlets, corporate offices, restaurants, cafes, banks, clinics, and modern commercial ventures. Featuring contemporary architecture, wide boulevards, premium infrastructure, and a vibrant business ecosystem, Business Bay Commercial is built to meet the needs of todays entrepreneurs and investors. Its strategic location provides seamless connectivity to Canal Road, Raiwind Road, Multan Road, and the Lahore Ring Road, ensuring convenient access for customers, employees, and visitors.',
-                    image: projectImage,
-                    link: '/commercial/business-bay',
-                },
-            ],
-            dharaya: [],
-            etihadtown: [],
-            uniontown: [],
-        };
-        return fallbackData[location] || [];
-    };
 
     return (
         <section className="upcoming-projects" id='new'>
