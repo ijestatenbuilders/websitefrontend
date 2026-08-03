@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Upcoming.css';
 import projectImage from '../../Assets/images/upcoming-project-1.jpg';
+import { API_URL } from '../../services/api';
 
 function Upcoming({ currentLocation = 'bahriatown' }) {
     const navigate = useNavigate();
@@ -26,7 +27,7 @@ function Upcoming({ currentLocation = 'bahriatown' }) {
 
             try {
                 const response = await fetch(
-                    `http://localhost:8000/api/projects/?location=${currentLocation}`
+                    `${API_URL}/api/projects/?location=${currentLocation}`
                 );
 
                 if (!response.ok) {

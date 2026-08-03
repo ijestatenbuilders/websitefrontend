@@ -1,14 +1,17 @@
 /**
  * API service layer — all calls to the Django backend go through here.
- * Base URL is proxied through React dev server (see package.json "proxy").
+ * Change API_URL to switch between development and production.
  */
 
-const BASE = '/api';
+// Production backend URL
+export const API_URL = 'https://www.ijestateandbuilders.tech';
+
+const API_BASE = `${API_URL}/api`;
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 
 async function request(path, options = {}) {
-    const res = await fetch(`${BASE}${path}`, {
+    const res = await fetch(`${API_BASE}${path}`, {
         headers: { 'Content-Type': 'application/json', ...options.headers },
         ...options,
     });

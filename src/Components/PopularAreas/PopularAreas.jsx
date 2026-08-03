@@ -12,8 +12,10 @@ import img8 from '../../Assets/images/talwar.png';
 import img9 from '../../Assets/images/dha.jpg';
 import img10 from '../../Assets/images/etihad.png';
 import img11 from '../../Assets/images/union.jpg';
+import img12 from '../../Assets/images/dolmenwebp.webp';
 
 // Location-specific areas data
+// Each area has a `block` field — the nearest real block in the backend
 const areasByLocation = {
     bahriatown: [
         {
@@ -21,74 +23,86 @@ const areasByLocation = {
             image: img1,
             description: "The Clock Tower is the iconic landmark of Bahria Town Lahore. Inspired by Big Ben, it symbolizes elegance and modern living.",
             tags: ['Famous', 'Modern', 'Luxury'],
+            block: 'Tauheed Block',
         },
         {
             name: 'Talwar Chowk',
             image: img8,
             description: "Trafalgar Square in Bahria Town Lahore is a landmark inspired by London's famous square, adding beauty to the community.",
             tags: ['Popular', 'Modern', 'Iconic'],
+            block: 'Quaid Block',
         },
         {
             name: 'Eiffle Tower',
             image: img3,
             description: "The Eiffel Tower in Bahria Town Lahore is a beautiful replica of the famous Paris landmark, symbolizing elegance and charm.",
             tags: ['Affordable', 'Modern', 'Premium'],
+            block: 'Ghaznavi Block',
         },
         {
             name: 'Grand Mosque',
             image: img4,
             description: "The Grand Mosque in Bahria Town Lahore is a magnificent symbol of Islamic architecture and spirituality.",
             tags: ['Affordable', 'Modern', 'Established'],
+            block: 'Johar Block',
         },
         {
             name: 'Raiha CineGold Plex',
             image: img5,
             description: "Raiha CineGold Plex offers a modern cinema experience with comfortable seating and the latest movie screenings.",
             tags: ['Modern', 'Expensive', 'Luxury'],
+            block: 'Umar Block',
         },
         {
             name: 'Winterland & Carnival',
             image: img6,
             description: "Winterland and Carnival offer exciting rides, fun attractions, and entertainment for visitors of all ages.",
             tags: ['Affordable', 'Modern', 'Premium'],
+            block: 'Ghazi Block',
         },
         {
             name: 'Bahria Golf & Country Club',
             image: img7,
             description: "Bahria Golf and Country Club offers a premium golfing experience with beautiful landscapes and modern facilities.",
             tags: ['Affordable', 'Modern', 'Premium'],
+            block: 'Safari Villas',
         },
         {
             name: 'Bahria Town School & College',
             image: img2,
             description: "Bahria Town School & College provides quality education in a modern and supportive learning environment.",
             tags: ['Affordable', 'Modern', 'Premium'],
+            block: 'Jasmine Block',
         },
     ],
     dharaya: [
         {
-            name: 'DHA Golf Club',
-            image: img9,
-            description: "DHA Golf Club offers world-class golfing facilities with lush green courses and premium amenities.",
+            name: 'Dolmen Mall',
+            image: img12,
+            description: "Dolmen Malls is a premier chain of modern shopping centers in Pakistan operated by the Dolmen Group.",
             tags: ['Premium', 'Luxury', 'Sports'],
+            block: 'Overseas A',
         },
         {
-            name: 'DHA Commercial',
+            name: 'Golf & Country Club',
             image: img9,
             description: "DHA Commercial area is the heart of business and shopping, offering modern shops, restaurants, and offices.",
             tags: ['Popular', 'Modern', 'Business'],
+            block: 'BB Block',
         },
         {
             name: 'DHA Central Park',
             image: img9,
             description: "DHA Central Park provides a peaceful green space for families to enjoy outdoor activities and relaxation.",
             tags: ['Family', 'Modern', 'Recreation'],
+            block: 'Hussain Block',
         },
         {
             name: 'DHA Sports Complex',
             image: img9,
             description: "DHA Sports Complex features state-of-the-art facilities for various sports including cricket, football, and tennis.",
             tags: ['Sports', 'Modern', 'Premium'],
+            block: 'Sikandar Block',
         },
     ],
     etihadtown: [
@@ -97,18 +111,21 @@ const areasByLocation = {
             image: img10,
             description: "Etihad Mall is a modern shopping destination offering a wide range of brands, dining, and entertainment options.",
             tags: ['Shopping', 'Modern', 'Popular'],
+            block: 'Alamgir Block',
         },
         {
             name: 'Etihad Town Park',
             image: img10,
             description: "Etihad Town Park offers beautiful landscapes and recreational facilities for families and fitness enthusiasts.",
             tags: ['Family', 'Recreation', 'Modern'],
+            block: 'Alamgir Ext',
         },
         {
             name: 'Etihad Commercial Hub',
             image: img10,
             description: "Etihad Commercial Hub is a bustling business center with offices, shops, and restaurants.",
             tags: ['Business', 'Modern', 'Growing'],
+            block: 'New Shaheen Block',
         },
     ],
     uniontown: [
@@ -117,18 +134,21 @@ const areasByLocation = {
             image: img11,
             description: "Union Town Market is a vibrant shopping area offering local and branded stores for everyday needs.",
             tags: ['Shopping', 'Affordable', 'Popular'],
+            block: 'Tipu Extension',
         },
         {
             name: 'Union Town Mosque',
             image: img11,
             description: "Union Town Mosque is a beautiful place of worship serving the community with modern facilities.",
             tags: ['Religious', 'Modern', 'Community'],
+            block: 'Tipu Extension',
         },
         {
             name: 'Union Town School System',
             image: img11,
             description: "Union Town School System provides quality education with modern teaching methods and facilities.",
             tags: ['Education', 'Modern', 'Growing'],
+            block: 'Tipu Extension',
         },
     ],
 };
@@ -149,8 +169,14 @@ function PopularAreas({ currentLocation = 'bahriatown' }) {
 
     const locationDisplayName = locationNames[currentLocation] || 'Bahria Town Lahore';
 
-    const handleExplore = (areaName) => {
-        navigate('/listings', { state: { mode: 'area', selected: areaName } });
+    const handleExplore = (area) => {
+        navigate('/listings', {
+            state: {
+                mode: 'block',
+                selected: area.block,
+                propertyType: 'All',
+            }
+        });
     };
     return (
         <section className="popular-areas" id="areas">
@@ -187,13 +213,16 @@ function PopularAreas({ currentLocation = 'bahriatown' }) {
                             <button
                                 type="button"
                                 className="popular-areas__link"
-                                onClick={() => handleExplore(area.name)}
+                                onClick={() => handleExplore(area)}
                             >
                                 Explore Properties
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                                     <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
                                 </svg>
                             </button>
+                            {/* <p className="popular-areas__block-hint">
+                                <FaMapMarkerAlt size={10} /> {area.block}
+                            </p> */}
                         </div>
                     ))}
                 </div>

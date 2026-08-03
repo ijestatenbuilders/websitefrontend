@@ -295,3 +295,16 @@
         font-size: 1.35rem;
     }
 }
+
+/* Nearest block hint below Explore button */
+.popular-areas__block-hint {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-size: 0.75rem;
+    color: #64748b;
+    margin: 6px 0 0;
+    font-weight: 500;
+    opacity: 0.85;
+}

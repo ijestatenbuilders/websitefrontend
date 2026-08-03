@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../Navbar/Navbar';
 import Footer from '../Footer/Footer';
+import { API_URL } from '../../services/api';
 import './ContactUs.css';
 
 function ContactUs() {
@@ -31,7 +32,7 @@ function ContactUs() {
         setIsSubmitting(true);
 
         try {
-            const response = await fetch('http://localhost:8000/api/enquiries/', {
+            const response = await fetch(`${API_URL}/api/enquiries/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -154,7 +155,7 @@ function ContactUs() {
                                         </svg>
                                     </div>
                                     <h3 className="contact-card__title">Office Location</h3>
-                                    <p className="contact-card__text">Tipu Block Sector C, 257 Commercial Zone, 2nd Floor, Bahria Town Lahore, Pakistan</p>
+                                    <p className="contact-card__text">Tulip Block Sector C, 257 Commercial Zone, 2nd Floor, Bahria Town Lahore, Pakistan</p>
                                 </div>
 
                                 <div className="contact-card">

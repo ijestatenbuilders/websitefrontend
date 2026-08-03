@@ -65,15 +65,15 @@ function PriceRangeSlider({ min, max, values, onChange }) {
     const trackRef = useRef(null);
     const dragging = useRef(null); // 'min' | 'max' | null
 
-    const pct = (v) => ((v - min) / (max - min)) * 100;
+    const pct = (v) => Math.min(100, Math.max(0, ((v - min) / (max - min)) * 100));
 
     const valueFromEvent = useCallback((clientX) => {
         const rect = trackRef.current.getBoundingClientRect();
         const ratio = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
         const raw = min + ratio * (max - min);
-        // snap to nearest 5 Lakh step
+        // snap to nearest step, then clamp hard to [min, max]
         const step = max > 500 ? 25 : 5;
-        return Math.round(raw / step) * step;
+        return Math.min(max, Math.max(min, Math.round(raw / step) * step));
     }, [min, max]);
 
     const startDrag = (handle, e) => {
@@ -84,9 +84,9 @@ function PriceRangeSlider({ min, max, values, onChange }) {
             const clientX = ev.touches ? ev.touches[0].clientX : ev.clientX;
             const v = valueFromEvent(clientX);
             if (dragging.current === 'min') {
-                onChange([Math.min(v, values[1] - 5), values[1]]);
+                onChange([Math.min(Math.max(v, min), values[1] - 5), values[1]]);
             } else {
-                onChange([values[0], Math.max(v, values[0] + 5)]);
+                onChange([values[0], Math.max(Math.min(v, max), values[0] + 5)]);
             }
         };
         const up = () => {
@@ -293,6 +293,13 @@ function PropertyListings() {
                         setPriceRange(bounds);
                     }
                     priceSeeded.current = true;
+                } else {
+                    // Re-clamp current range within the new bounds so handles never go outside
+                    setPriceRange(prev => {
+                        const lo = Math.min(Math.max(prev[0], bounds[0]), bounds[1]);
+                        const hi = Math.max(Math.min(prev[1], bounds[1]), bounds[0]);
+                        return lo <= hi ? [lo, hi] : bounds;
+                    });
                 }
             })
             .catch(() => {

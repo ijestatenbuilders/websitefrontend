@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { BsFillHouseFill } from "react-icons/bs";
 import { PiBuildingApartmentFill } from "react-icons/pi";
 import { FaMapLocationDot } from "react-icons/fa6";
+import { API_URL } from '../../services/api';
 import './Properties.css';
 
 const BrowseProperties = ({ currentLocation = 'bahriatown' }) => {
@@ -27,7 +28,7 @@ const BrowseProperties = ({ currentLocation = 'bahriatown' }) => {
             setLoading(true);
             try {
                 const response = await fetch(
-                    `http://localhost:8000/api/filters/?location=${currentLocation}`
+                    `${API_URL}/api/filters/?location=${currentLocation}`
                 );
 
                 if (response.ok) {

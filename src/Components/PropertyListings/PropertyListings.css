@@ -530,12 +530,12 @@
 .prs__track-wrap {
     position: relative;
     height: 36px;
-    /* tall enough for easy touch targeting */
     display: flex;
     align-items: center;
     cursor: pointer;
-    margin: 0 10px;
-    /* leave room so handles don't clip */
+    margin: 0 13px;
+    /* leave room so handles don't clip at edges */
+    overflow: visible;
 }
 
 /* ── Rail (background bar) ── */
