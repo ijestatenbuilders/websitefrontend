@@ -310,12 +310,12 @@ const BrowseProperties = ({ currentLocation = 'bahriatown' }) => {
                             No Properties Available
                         </h3>
                         <p style={{
-                            color: '#e0e0e0',
+                            color: '#60a5fa',
                             fontSize: '16px',
                             maxWidth: '500px',
                             margin: '0 auto',
                             lineHeight: '1.8',
-                            textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)'
+                            fontWeight: '500'
                         }}>
                             We're currently updating our property listings. Please check back soon or contact us directly for available properties.
                         </p>
