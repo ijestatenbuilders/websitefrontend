@@ -287,24 +287,35 @@ const BrowseProperties = ({ currentLocation = 'bahriatown' }) => {
                 ) : blockOptions.length === 0 ? (
                     <div style={{
                         textAlign: 'center',
-                        padding: '60px 20px',
-                        background: 'rgba(255, 255, 255, 0.03)',
-                        borderRadius: '12px',
-                        border: '1px solid rgba(255, 255, 255, 0.1)'
+                        padding: '80px 30px',
+                        background: 'linear-gradient(135deg, rgba(30, 144, 255, 0.08) 0%, rgba(13, 91, 181, 0.08) 100%)',
+                        borderRadius: '16px',
+                        border: '2px solid rgba(30, 144, 255, 0.2)',
+                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+                        maxWidth: '700px',
+                        margin: '0 auto'
                     }}>
-                        <div style={{ fontSize: '48px', marginBottom: '20px', opacity: 0.3 }}>🏘️</div>
+                        <div style={{
+                            fontSize: '64px',
+                            marginBottom: '24px',
+                            filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2))'
+                        }}>🏘️</div>
                         <h3 style={{
-                            fontSize: '24px',
-                            marginBottom: '12px',
-                            color: 'rgba(255, 255, 255, 0.9)'
+                            fontSize: '28px',
+                            fontWeight: '600',
+                            marginBottom: '16px',
+                            color: '#ffffff',
+                            textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
                         }}>
                             No Properties Available
                         </h3>
                         <p style={{
-                            color: 'rgba(255, 255, 255, 0.6)',
+                            color: '#e0e0e0',
+                            fontSize: '16px',
                             maxWidth: '500px',
                             margin: '0 auto',
-                            lineHeight: '1.6'
+                            lineHeight: '1.8',
+                            textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)'
                         }}>
                             We're currently updating our property listings. Please check back soon or contact us directly for available properties.
                         </p>
