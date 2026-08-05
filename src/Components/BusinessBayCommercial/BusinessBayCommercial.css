@@ -1271,3 +1271,83 @@
         height: 42px;
     }
 }
+
+/* ─── Loading State ────────────────────────────────────────── */
+.bbc-loading {
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    padding: 3rem 2rem;
+}
+
+.bbc-loading__spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(30, 144, 255, 0.1);
+    border-top-color: #1e90ff;
+    border-radius: 50%;
+    animation: bbcSpin 0.8s linear infinite;
+}
+
+@keyframes bbcSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.bbc-loading p {
+    font-size: 1rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+/* ─── Error State ─────────────────────────────────────────── */
+.bbc-error {
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    text-align: center;
+    gap: 1rem;
+}
+
+.bbc-error h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+}
+
+.bbc-error p {
+    font-size: 1rem;
+    color: #64748b;
+    margin: 0 0 1.5rem;
+    max-width: 500px;
+}
+
+.bbc-error__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.85rem 1.75rem;
+    background: linear-gradient(135deg, #1e90ff, #0d5bb5);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    box-shadow: 0 4px 16px rgba(30, 144, 255, 0.3);
+    transition: all 0.25s ease;
+}
+
+.bbc-error__btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(30, 144, 255, 0.4);
+}
