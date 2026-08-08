@@ -8,6 +8,7 @@ import ContactUs from './Components/ContactUs/ContactUs';
 import CommercialDetail from './Components/CommercialDetail/CommercialDetail';
 import BusinessBayCommercial from './Components/BusinessBayCommercial/BusinessBayCommercial';
 import MapView from './Components/MapView/MapView';
+import NotFound from './Components/NotFound/NotFound';
 
 function App() {
   return (
@@ -22,6 +23,8 @@ function App() {
           <Route path="/commercial/business-bay" element={<BusinessBayCommercial />} />
           <Route path="/commercial/generic" element={<CommercialDetail />} />
           <Route path="/map" element={<MapView />} />
+          {/* 404 Catch-All Route - Must be last */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
     </BrowserRouter>
