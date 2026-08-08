@@ -277,6 +277,7 @@
     box-shadow: 0 4px 12px rgba(30, 144, 255, 0.3);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
+    text-transform: capitalize;
 }
 
 .prop-card__type-tag {
@@ -325,6 +326,7 @@
     margin: 0 0 8px;
     line-height: 1.3;
     font-family: 'Ubuntu', sans-serif;
+    text-transform: capitalize;
 }
 
 .prop-card__desc {
@@ -356,6 +358,7 @@
     letter-spacing: -0.02em;
     line-height: 1.1;
     text-align: center;
+    text-transform: capitalize;
 }
 
 .prop-card__price span {

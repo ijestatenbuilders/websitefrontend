@@ -199,6 +199,7 @@
     border-radius: 999px;
     letter-spacing: 0.04em;
     box-shadow: 0 4px 14px rgba(30, 144, 255, 0.35);
+    text-transform: capitalize;
 }
 
 .pd-slider__type {
@@ -344,6 +345,7 @@
     color: #0f172a;
     margin: 0 0 0.9rem;
     line-height: 1.3;
+    text-transform: capitalize;
 }
 
 .pd-title-card__meta {
@@ -400,6 +402,7 @@
     color: #0d5bb5;
     margin: 0 0 0.4rem;
     letter-spacing: -0.02em;
+    text-transform: capitalize;
 }
 
 .pd-price-card__note {
