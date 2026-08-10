@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import SEO from '../SEO/SEO';
 import Navbar from '../Navbar/Navbar';
 import Footer from '../Footer/Footer';
 import { fetchProperties, fetchFilterOptions } from '../../services/api';
@@ -368,124 +369,132 @@ function PropertyListings() {
                 : `Browsing ${selected} properties across all sizes. Filter by size below.`;
 
     return (
-        <div className="listings-page">
-            <Navbar variant="listings" />
+        <>
+            <SEO
+                title={`${selected || 'All'} Properties for Sale in Lahore | IJ Estate & Builders`}
+                description={`Browse ${propertyType || 'residential and commercial'} properties in ${searchLocation || selected || 'Lahore'}. Find houses, apartments, plots, and commercial spaces with IJ Estate & Builders.`}
+                keywords={`properties for sale ${searchLocation || selected || 'Lahore'}, ${propertyType || 'real estate'} ${searchLocation || selected || 'Lahore'}, buy property Pakistan, houses for sale, apartments Lahore`}
+                canonicalUrl="/listings"
+            />
+            <div className="listings-page">
+                <Navbar variant="listings" />
 
-            {/* ── Hero ── */}
-            <div className="listings-hero">
-                <div className="listings-hero__inner">
-                    <button className="listings-hero__back" onClick={() => navigate(-1)}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                            <path d="M19 12H5M11 6l-6 6 6 6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                        Back
-                    </button>
-                    <p className="listings-hero__breadcrumb">
-                        <button className="listings-hero__breadcrumb-link" onClick={() => navigate('/')}>Home</button>
-                        <span>›</span>
-                        <button className="listings-hero__breadcrumb-link" onClick={() => { navigate('/'); setTimeout(() => { const el = document.getElementById('properties'); if (el) el.scrollIntoView({ behavior: 'smooth' }); }, 100); }}>Properties</button>
-                        <span>›</span>
-                        <strong>
-                            {isFromSearch
-                                ? (LOCATION_LABELS[searchLocation] ?? searchLocation)
-                                : selected}
-                        </strong>
-                    </p>
-                    <h1 className="listings-hero__title">{heroTitle}</h1>
-                    <p className="listings-hero__subtitle">{heroSubtitle}</p>
-                </div>
-            </div>
-
-            {/* ── Body ── */}
-            <div className="listings-body">
-
-                {/* ── Filter pills ── */}
-                <div className="listings-filter">
-                    <p className="listings-filter__label">
-                        Filter <VscSettingsCompact className="settings-icon" size={16} />
-                    </p>
-                    <div className="listings-filter__pills">
-                        {pills.map((pill) => (
-                            <button
-                                key={pill}
-                                type="button"
-                                className={`listings-filter__pill ${activeFilter === pill ? 'listings-filter__pill--active' : ''}`}
-                                onClick={() => setActiveFilter(pill)}
-                            >
-                                {pill}
-                            </button>
-                        ))}
+                {/* ── Hero ── */}
+                <div className="listings-hero">
+                    <div className="listings-hero__inner">
+                        <button className="listings-hero__back" onClick={() => navigate(-1)}>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <path d="M19 12H5M11 6l-6 6 6 6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                            Back
+                        </button>
+                        <p className="listings-hero__breadcrumb">
+                            <button className="listings-hero__breadcrumb-link" onClick={() => navigate('/')}>Home</button>
+                            <span>›</span>
+                            <button className="listings-hero__breadcrumb-link" onClick={() => { navigate('/'); setTimeout(() => { const el = document.getElementById('properties'); if (el) el.scrollIntoView({ behavior: 'smooth' }); }, 100); }}>Properties</button>
+                            <span>›</span>
+                            <strong>
+                                {isFromSearch
+                                    ? (LOCATION_LABELS[searchLocation] ?? searchLocation)
+                                    : selected}
+                            </strong>
+                        </p>
+                        <h1 className="listings-hero__title">{heroTitle}</h1>
+                        <p className="listings-hero__subtitle">{heroSubtitle}</p>
                     </div>
                 </div>
 
-                {/* ── Price range slider ── */}
-                {!loading && properties.length > 0 && (
-                    <PriceRangeSlider
-                        min={priceBounds[0]}
-                        max={priceBounds[1]}
-                        values={priceRange}
-                        onChange={setPriceRange}
-                    />
-                )}
+                {/* ── Body ── */}
+                <div className="listings-body">
 
-                {/* ── Results count ── */}
-                <div className="listings-meta">
-                    <p className="listings-meta__count">
-                        {loading ? 'Loading properties…' : (
+                    {/* ── Filter pills ── */}
+                    <div className="listings-filter">
+                        <p className="listings-filter__label">
+                            Filter <VscSettingsCompact className="settings-icon" size={16} />
+                        </p>
+                        <div className="listings-filter__pills">
+                            {pills.map((pill) => (
+                                <button
+                                    key={pill}
+                                    type="button"
+                                    className={`listings-filter__pill ${activeFilter === pill ? 'listings-filter__pill--active' : ''}`}
+                                    onClick={() => setActiveFilter(pill)}
+                                >
+                                    {pill}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* ── Price range slider ── */}
+                    {!loading && properties.length > 0 && (
+                        <PriceRangeSlider
+                            min={priceBounds[0]}
+                            max={priceBounds[1]}
+                            values={priceRange}
+                            onChange={setPriceRange}
+                        />
+                    )}
+
+                    {/* ── Results count ── */}
+                    <div className="listings-meta">
+                        <p className="listings-meta__count">
+                            {loading ? 'Loading properties…' : (
+                                <>
+                                    Showing <strong>{filteredProperties.length}</strong> {filteredProperties.length === 1 ? 'property' : 'properties'}
+                                    {activeFilter !== 'All' && <> for <strong>{activeFilter}</strong></>}
+                                    {isPriceFiltered && <> · <span style={{ color: '#1E90FF' }}>price filtered</span></>}
+                                </>
+                            )}
+                        </p>
+                    </div>
+
+                    {error && !loading && (
+                        <div className="listings-empty">
+                            <div className="listings-empty__icon">⚠️</div>
+                            <p className="listings-empty__text">{error}</p>
+                        </div>
+                    )}
+
+                    {/* ── Cards grid ── */}
+                    <div className="listings-grid">
+                        {loading ? (
+                            <div className="listings-empty">
+                                <div className="listings-empty__icon">⏳</div>
+                                <p className="listings-empty__text">Loading properties…</p>
+                            </div>
+                        ) : (
                             <>
-                                Showing <strong>{filteredProperties.length}</strong> {filteredProperties.length === 1 ? 'property' : 'properties'}
-                                {activeFilter !== 'All' && <> for <strong>{activeFilter}</strong></>}
-                                {isPriceFiltered && <> · <span style={{ color: '#1E90FF' }}>price filtered</span></>}
+                                {/* BBC plot cards first — only for Commercial */}
+                                {isCommercial && filteredBbcPlots.map((plot) => (
+                                    <BbcPlotCard
+                                        key={plot.id}
+                                        plot={plot}
+                                        onContact={() => navigate('/commercial/business-bay')}
+                                    />
+                                ))}
+
+                                {/* Backend property cards */}
+                                {filteredProperties.map((property) => (
+                                    <PropertyCard key={property.id} property={property} />
+                                ))}
+
+                                {/* Empty state — only if no BBC cards AND no backend cards */}
+                                {filteredProperties.length === 0 && !isCommercial && (
+                                    <div className="listings-empty">
+                                        <div className="listings-empty__icon">🏠</div>
+                                        <p className="listings-empty__text">No properties found</p>
+                                        <p className="listings-empty__sub">Try adjusting the price range or filter above.</p>
+                                    </div>
+                                )}
                             </>
                         )}
-                    </p>
-                </div>
-
-                {error && !loading && (
-                    <div className="listings-empty">
-                        <div className="listings-empty__icon">⚠️</div>
-                        <p className="listings-empty__text">{error}</p>
                     </div>
-                )}
-
-                {/* ── Cards grid ── */}
-                <div className="listings-grid">
-                    {loading ? (
-                        <div className="listings-empty">
-                            <div className="listings-empty__icon">⏳</div>
-                            <p className="listings-empty__text">Loading properties…</p>
-                        </div>
-                    ) : (
-                        <>
-                            {/* BBC plot cards first — only for Commercial */}
-                            {isCommercial && filteredBbcPlots.map((plot) => (
-                                <BbcPlotCard
-                                    key={plot.id}
-                                    plot={plot}
-                                    onContact={() => navigate('/commercial/business-bay')}
-                                />
-                            ))}
-
-                            {/* Backend property cards */}
-                            {filteredProperties.map((property) => (
-                                <PropertyCard key={property.id} property={property} />
-                            ))}
-
-                            {/* Empty state — only if no BBC cards AND no backend cards */}
-                            {filteredProperties.length === 0 && !isCommercial && (
-                                <div className="listings-empty">
-                                    <div className="listings-empty__icon">🏠</div>
-                                    <p className="listings-empty__text">No properties found</p>
-                                    <p className="listings-empty__sub">Try adjusting the price range or filter above.</p>
-                                </div>
-                            )}
-                        </>
-                    )}
                 </div>
-            </div>
 
-            <Footer />
-        </div>
+                <Footer />
+            </div>
+        </>
     );
 }
 

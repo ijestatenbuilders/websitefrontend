@@ -335,6 +335,7 @@ const navLinks = [
   { label: 'Home', href: '#home' },
   { label: 'Properties', href: '#properties' },
   { label: 'New Projects', href: '#new' },
+  { label: 'Forums', href: '/forums', external: true },
   { label: 'About Us', href: '#about' },
   { label: 'Contact Us', href: '#contact' },
 ];
@@ -344,26 +345,29 @@ const navLinks = [
 ═══════════════════════════════════════════════════════════ */
 function Navbar({ variant = 'default' }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(variant === 'scrolled' ? true : false);
   const [activeLink, setActiveLink] = useState('home');
   const [modalOpen, setModalOpen] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
   const isHero = variant === 'hero';
+  const forceScrolled = variant === 'scrolled';
   const onListings = location.pathname === '/listings';
   const onDetailPage = location.pathname.startsWith('/property/');
   const onAbout = location.pathname === '/about';
   const onContact = location.pathname === '/contact';
   const onCommercial = location.pathname.startsWith('/commercial/');
   const onMap = location.pathname === '/map';
+  const onForums = location.pathname === '/forums';
 
   useEffect(() => {
+    if (forceScrolled) return; // Don't listen to scroll if forced scrolled
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
     handleScroll();
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [forceScrolled]);
 
   // Lock body scroll when modal open
   useEffect(() => {
@@ -374,8 +378,16 @@ function Navbar({ variant = 'default' }) {
   const toggleMenu = () => setMenuOpen(o => !o);
   const closeMenu = () => setMenuOpen(false);
 
-  const handleLinkClick = (e, href) => {
+  const handleLinkClick = (e, href, external = false) => {
     e.preventDefault();
+
+    // Handle external/route links (Forums)
+    if (external) {
+      navigate(href);
+      closeMenu();
+      return;
+    }
+
     const sectionId = href.replace('#', '');
     closeMenu();
 
@@ -384,7 +396,7 @@ function Navbar({ variant = 'default' }) {
 
     setActiveLink(sectionId);
 
-    if (onListings || onDetailPage || onAbout || onContact || onCommercial || onMap) {
+    if (onListings || onDetailPage || onAbout || onContact || onCommercial || onMap || onForums) {
       navigate('/', { state: { scrollTo: sectionId } });
       return;
     }
@@ -427,17 +439,19 @@ function Navbar({ variant = 'default' }) {
           <ul className="navbar__links navbar__links--desktop">
             {navLinks.map((link) => {
               const sectionId = link.href.replace('#', '');
-              const isActive = (onListings || onDetailPage)
-                ? sectionId === 'properties'
-                : onAbout ? sectionId === 'about'
-                  : onContact ? sectionId === 'contact'
-                    : activeLink === sectionId;
+              const isActive = link.external
+                ? onForums
+                : (onListings || onDetailPage)
+                  ? sectionId === 'properties'
+                  : onAbout ? sectionId === 'about'
+                    : onContact ? sectionId === 'contact'
+                      : activeLink === sectionId;
               return (
                 <li key={link.href}>
                   <a
                     href={link.href}
                     className={`navbar__link ${isActive ? 'navbar__link--active' : ''}`}
-                    onClick={(e) => handleLinkClick(e, link.href)}
+                    onClick={(e) => handleLinkClick(e, link.href, link.external)}
                   >
                     {link.label}
                   </a>
@@ -483,13 +497,15 @@ function Navbar({ variant = 'default' }) {
             <ul className="navbar__links navbar__links--mobile">
               {navLinks.map((link) => {
                 const sectionId = link.href.replace('#', '');
-                const isActive = onListings ? sectionId === 'properties' : activeLink === sectionId;
+                const isActive = link.external
+                  ? onForums
+                  : onListings ? sectionId === 'properties' : activeLink === sectionId;
                 return (
                   <li key={link.href}>
                     <a
                       href={link.href}
                       className={`navbar__link ${isActive ? 'navbar__link--active' : ''}`}
-                      onClick={(e) => handleLinkClick(e, link.href)}
+                      onClick={(e) => handleLinkClick(e, link.href, link.external)}
                     >
                       {link.label}
                     </a>
