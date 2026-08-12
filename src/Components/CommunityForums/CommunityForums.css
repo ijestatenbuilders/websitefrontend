@@ -348,6 +348,12 @@
     background: linear-gradient(135deg, #1e90ff, #0d5bb5);
     color: #ffffff;
     box-shadow: 0 4px 15px rgba(30, 144, 255, 0.3);
+    cursor: default;
+}
+
+.cf-tab-active:hover {
+    color: #ffffff;
+    background: linear-gradient(135deg, #1e90ff, #0d5bb5);
 }
 
 /* Categories */
@@ -690,7 +696,7 @@
     border: 1px solid rgba(30, 144, 255, 0.2);
     max-height: 400px;
     overflow-y: auto;
-    z-index: 99999;
+    z-index: 999998;
     animation: slideDown 0.3s ease;
 }
 
@@ -767,7 +773,7 @@
 .cf-modal-backdrop {
     position: fixed;
     inset: 0;
-    z-index: 999000;
+    z-index: 9999999;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -940,6 +946,7 @@
     color: #e2eeff;
     padding: 0.8rem;
     font-weight: 500;
+    border-radius: 8px;
 }
 
 .cf-form-select option:hover,
@@ -1080,4 +1087,253 @@
         width: 100%;
         justify-content: center;
     }
+}
+
+/* Thread excerpt */
+.cf-thread-excerpt {
+    font-size: 0.95rem;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+/* Thread category badge (inline) */
+.cf-thread-category-badge {
+    padding: 0.3rem 0.9rem;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+/* Loading / Error / Empty states */
+.cf-loading,
+.cf-error,
+.cf-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 4rem 2rem;
+    text-align: center;
+    color: #666;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 20px;
+    font-size: 1.1rem;
+}
+
+.cf-loading svg,
+.cf-error svg,
+.cf-empty svg {
+    font-size: 2.5rem;
+    color: #1e90ff;
+}
+
+.cf-error svg {
+    color: #ef4444;
+}
+
+/* Spinner animation */
+.cf-spin {
+    animation: cfSpin 0.8s linear infinite;
+}
+
+@keyframes cfSpin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Form error message */
+.cf-form-error {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.9rem 1.2rem;
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    border-radius: 10px;
+    color: #fca5a5;
+    font-size: 0.9rem;
+}
+
+/* ── Dropdown popup (Chrome/Edge support for rounded selects) ── */
+.cf-form-select {
+    border-radius: 12px;
+}
+
+/* Wraps select in a container so we can apply border-radius to the popup panel */
+.cf-form-group--select {
+    position: relative;
+}
+
+/* The native dropdown popup itself can't be fully styled cross-browser,
+   but wrapping in a styled container and using border-radius on the select
+   gives a polished look in Chromium. We also add a subtle inner shadow. */
+.cf-form-select:focus {
+    border-radius: 12px 12px 0 0;
+}
+
+/* ── Plus icon inside "Start a Discussion" / "New Thread" button ──
+   Make it light whitish-blue so it pops against the gradient bg      */
+.cf-btn-primary svg,
+.cf-modal-actions .cf-btn-primary svg {
+    color: rgba(200, 230, 255, 0.92);
+    filter: drop-shadow(0 0 4px rgba(120, 190, 255, 0.5));
+}
+
+/* ── Modal icon container – also lighten the Plus there ── */
+.cf-modal-icon svg {
+    color: rgba(160, 210, 255, 0.95);
+}
+
+/* ── Custom Category Dropdown ────────────────────────────────────────────── */
+
+.cf-custom-select {
+    position: relative;
+    width: 100%;
+    user-select: none;
+}
+
+/* Trigger button */
+.cf-custom-select__trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 1rem 1.2rem;
+    border: 1px solid rgba(96, 165, 250, 0.25);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.06);
+    color: #e2eeff;
+    font-size: 1rem;
+    font-family: 'Ubuntu', sans-serif;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-align: left;
+}
+
+.cf-custom-select__trigger:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(96, 165, 250, 0.45);
+}
+
+.cf-custom-select__trigger--open {
+    border-color: #60a5fa;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px 12px 0 0;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.18);
+}
+
+.cf-custom-select__icon {
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.cf-custom-select__label {
+    flex: 1;
+    font-weight: 500;
+}
+
+.cf-custom-select__arrow {
+    display: flex;
+    align-items: center;
+    transition: transform 0.25s ease;
+    flex-shrink: 0;
+}
+
+.cf-custom-select__arrow--up {
+    transform: rotate(180deg);
+}
+
+/* Dropdown panel */
+.cf-custom-select__panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 9999999;
+    background: linear-gradient(160deg, rgba(18, 30, 70, 0.98) 0%, rgba(10, 20, 52, 0.98) 100%);
+    border: 1px solid rgba(96, 165, 250, 0.3);
+    border-top: none;
+    border-radius: 0 0 14px 14px;
+    overflow: hidden;
+    box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    animation: cfDropIn 0.18s ease;
+}
+
+@keyframes cfDropIn {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Each option */
+.cf-custom-select__option {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.85rem 1.2rem;
+    border: none;
+    background: transparent;
+    color: rgba(200, 220, 255, 0.8);
+    font-size: 0.97rem;
+    font-family: 'Ubuntu', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.18s ease, color 0.18s ease;
+    text-align: left;
+    border-bottom: 1px solid rgba(96, 165, 250, 0.07);
+}
+
+.cf-custom-select__option:last-child {
+    border-bottom: none;
+}
+
+.cf-custom-select__option:hover {
+    background: rgba(96, 165, 250, 0.12);
+    color: #fff;
+}
+
+.cf-custom-select__option--active {
+    background: rgba(96, 165, 250, 0.18);
+    color: #fff;
+}
+
+.cf-custom-select__opt-icon {
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.cf-custom-select__opt-label {
+    flex: 1;
+}
+
+.cf-custom-select__opt-check {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    color: #60a5fa;
 }

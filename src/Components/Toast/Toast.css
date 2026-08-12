@@ -1,0 +1,106 @@
+/* Toast – slides in from the very top of the viewport */
+
+.toast {
+    position: fixed;
+    top: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(-120%);
+    z-index: 99999999;
+
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    min-width: 300px;
+    max-width: 520px;
+    padding: 1rem 1.4rem;
+
+    border-radius: 50px;
+    border: 1px solid transparent;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(14px);
+    font-family: 'Ubuntu', sans-serif;
+    font-size: 0.97rem;
+    font-weight: 600;
+    white-space: nowrap;
+
+    animation: toastSlideIn 0.42s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes toastSlideIn {
+    from {
+        transform: translateX(-50%) translateY(-120%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Slide out triggered by adding .toast--leaving class (not used here –
+   we simply unmount after duration, the animation looks clean enough) */
+
+/* Types */
+.toast--success {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.92), rgba(5, 150, 105, 0.88));
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.toast--error {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.92), rgba(185, 28, 28, 0.88));
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.toast--info {
+    background: linear-gradient(135deg, rgba(30, 144, 255, 0.92), rgba(13, 91, 181, 0.88));
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Icon */
+.toast__icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+
+/* Message */
+.toast__message {
+    flex: 1;
+    line-height: 1.4;
+    white-space: normal;
+}
+
+/* Close button */
+.toast__close {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 50%;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #fff;
+    font-size: 0.75rem;
+    flex-shrink: 0;
+    transition: background 0.2s ease;
+}
+
+.toast__close:hover {
+    background: rgba(255, 255, 255, 0.35);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .toast {
+        min-width: calc(100vw - 2rem);
+        max-width: calc(100vw - 2rem);
+        border-radius: 16px;
+        top: 1rem;
+    }
+}

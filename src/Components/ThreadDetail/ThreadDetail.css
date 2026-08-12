@@ -416,3 +416,189 @@
         padding: 1.5rem;
     }
 }
+
+/* Loading / Error states */
+.td-state-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+}
+
+.td-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.2rem;
+    color: #666;
+    font-size: 1.1rem;
+    text-align: center;
+}
+
+.td-state svg {
+    font-size: 2.5rem;
+    color: #1e90ff;
+}
+
+.td-state-error svg {
+    color: #ef4444;
+}
+
+/* Spinner */
+.td-spin {
+    animation: tdSpin 0.8s linear infinite;
+}
+
+@keyframes tdSpin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Category badge on thread header */
+.td-badge-category {
+    background: linear-gradient(135deg, rgba(30, 144, 255, 0.15), rgba(13, 91, 181, 0.1));
+    color: #0d5bb5;
+    border: 1px solid rgba(30, 144, 255, 0.3);
+}
+
+/* Replies title with icon */
+.td-replies-title {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #050f2e;
+    margin-bottom: 1.5rem;
+}
+
+.td-replies-title svg {
+    color: #1e90ff;
+    font-size: 1.5rem;
+}
+
+/* No replies state */
+.td-no-replies {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 3rem;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 20px;
+    color: #888;
+    font-size: 1rem;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.td-no-replies svg {
+    font-size: 2.5rem;
+    color: #1e90ff;
+    opacity: 0.5;
+}
+
+/* Reply avatar + number wrapper */
+.td-reply-avatar-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.td-reply-number {
+    position: absolute;
+    bottom: -4px;
+    right: -4px;
+    background: #1e90ff;
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 1px 4px;
+    border-radius: 8px;
+    line-height: 1.4;
+}
+
+/* Form group in reply form */
+.td-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.td-form-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #555;
+}
+
+/* Name input field */
+.td-reply-input {
+    width: 100%;
+    padding: 1rem 1.2rem;
+    border: 2px solid rgba(30, 144, 255, 0.2);
+    border-radius: 15px;
+    font-size: 1rem;
+    font-family: 'Ubuntu', sans-serif;
+    transition: all 0.3s ease;
+    background: #fff;
+    color: #050f2e;
+}
+
+.td-reply-input:focus {
+    outline: none;
+    border-color: #1e90ff;
+    box-shadow: 0 0 0 4px rgba(30, 144, 255, 0.1);
+}
+
+.td-reply-input::placeholder {
+    color: #aaa;
+    font-family: 'Ubuntu', sans-serif;
+}
+
+/* Reply form row */
+.td-reply-form-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+/* Submit button disabled */
+.td-submit-btn:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Error and success messages */
+.td-form-error {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.9rem 1.2rem;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 12px;
+    color: #dc2626;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.td-form-success {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.9rem 1.2rem;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: 12px;
+    color: #059669;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
