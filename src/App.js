@@ -12,6 +12,7 @@ import MapView from './Components/MapView/MapView';
 import CommunityForums from './Components/CommunityForums/CommunityForums';
 import ThreadDetail from './Components/ThreadDetail/ThreadDetail';
 import NotFound from './Components/NotFound/NotFound';
+import ProjectPromo from './Components/ProjectPromo/ProjectPromo';
 
 function App() {
   return (
@@ -32,6 +33,9 @@ function App() {
             {/* 404 Catch-All Route - Must be last */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+
+          {/* Floating promo card — shown on all pages except the project page itself */}
+          <ProjectPromo />
         </div>
       </BrowserRouter>
     </HelmetProvider>

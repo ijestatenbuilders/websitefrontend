@@ -8,6 +8,7 @@ import PopularAreas from '../PopularAreas/PopularAreas';
 import Footer from '../Footer/Footer';
 import ScrollToTop from '../ScrollToTop/ScrollToTop';
 import LocationTransition from '../LocationTransition/LocationTransition';
+import ProjectPromoSection from '../ProjectPromo/ProjectPromoSection';
 import './LandingPage.css';
 
 const typeOptions = [
@@ -425,6 +426,7 @@ function LandingPage() {
 
         <BrowseProperties currentLocation={currentLocation} />
         <Upcoming currentLocation={currentLocation} />
+        <ProjectPromoSection />
         <PopularAreas currentLocation={currentLocation} />
         <Footer />
         <ScrollToTop />

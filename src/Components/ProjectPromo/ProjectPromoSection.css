@@ -1,0 +1,464 @@
+/* ── Inline Promo Section ───────────────────────────────────────────────── */
+
+.pps-section {
+    position: relative;
+    /* Mid-tone: cool slate-blue to soft periwinkle — not pitch black, not white */
+    background: linear-gradient(145deg,
+            #e8eeff 0%,
+            #dce8ff 30%,
+            #ccdaff 65%,
+            #b8ccf8 100%);
+    overflow: hidden;
+    padding: 6rem 2rem;
+}
+
+/* Background decorations */
+.pps-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.pps-bg__circle {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(30, 100, 255, 0.1) 0%, transparent 70%);
+}
+
+.pps-bg__circle--1 {
+    width: 600px;
+    height: 600px;
+    top: -200px;
+    right: -100px;
+}
+
+.pps-bg__circle--2 {
+    width: 400px;
+    height: 400px;
+    bottom: -150px;
+    left: -80px;
+    background: radial-gradient(circle, rgba(99, 157, 255, 0.12) 0%, transparent 70%);
+}
+
+.pps-bg__line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, rgba(99, 157, 255, 0.12), transparent);
+}
+
+/* Inner layout */
+.pps-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 420px;
+    gap: 5rem;
+    align-items: center;
+}
+
+/* ── Left: Content ── */
+
+.pps-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    background: rgba(30, 100, 255, 0.1);
+    border: 1px solid rgba(30, 100, 255, 0.22);
+    border-radius: 20px;
+    padding: 0.4rem 1rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #1a4faa;
+    margin-bottom: 1.5rem;
+}
+
+.pps-eyebrow__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #0ea5e9;
+    box-shadow: 0 0 7px #0ea5e9;
+    animation: ppsBlink 1.6s ease infinite;
+}
+
+@keyframes ppsBlink {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.25;
+    }
+}
+
+.pps-title {
+    font-size: clamp(2.2rem, 4vw, 3.2rem);
+    font-weight: 800;
+    line-height: 1.1;
+    color: #0a1f4e;
+    margin: 0 0 1.2rem;
+    text-shadow: 0 2px 12px rgba(13, 55, 140, 0.08);
+}
+
+.pps-title--accent {
+    background: linear-gradient(135deg, #1e6aff, #1e90ff, #5b5ef4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.pps-desc {
+    font-size: 1.05rem;
+    line-height: 1.75;
+    color: #2d4a7a;
+    margin: 0 0 2rem;
+    max-width: 500px;
+}
+
+/* Highlights */
+.pps-highlights {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+
+.pps-highlight {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    font-size: 0.97rem;
+    color: #1e3a6a;
+}
+
+.pps-highlight__icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: rgba(30, 100, 255, 0.1);
+    border: 1px solid rgba(30, 100, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    color: #1565c0;
+    flex-shrink: 0;
+}
+
+/* Actions */
+.pps-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.pps-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.95rem 2rem;
+    background: linear-gradient(135deg, #1e6aff, #0d5bb5);
+    border: none;
+    border-radius: 50px;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(30, 100, 255, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    transition: all 0.28s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.pps-cta::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.pps-cta:hover::before {
+    left: 100%;
+}
+
+.pps-cta:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 40px rgba(30, 100, 255, 0.4);
+}
+
+.pps-cta-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.95rem 2rem;
+    background: rgba(255, 255, 255, 0.55);
+    border: 1.5px solid rgba(30, 100, 255, 0.25);
+    border-radius: 50px;
+    color: #1a4faa;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.28s ease;
+    backdrop-filter: blur(8px);
+}
+
+.pps-cta-secondary:hover {
+    background: rgba(255, 255, 255, 0.75);
+    border-color: rgba(30, 100, 255, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(30, 100, 255, 0.12);
+}
+
+/* ── Right: Visual Card ── */
+
+.pps-visual {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pps-card {
+    position: relative;
+    width: 100%;
+    max-width: 380px;
+    border-radius: 28px;
+    padding: 2.5rem 2rem;
+    /* Card is white-frosted glass — stands out against the tinted bg */
+    background: rgba(255, 255, 255, 0.72);
+    border: 1.5px solid rgba(99, 157, 255, 0.3);
+    box-shadow:
+        0 24px 60px rgba(13, 55, 181, 0.14),
+        0 4px 16px rgba(30, 100, 255, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(24px);
+    text-align: center;
+    overflow: hidden;
+}
+
+.pps-card__tag {
+    display: inline-block;
+    padding: 0.35rem 1rem;
+    border-radius: 20px;
+    background: rgba(30, 100, 255, 0.1);
+    border: 1px solid rgba(30, 100, 255, 0.22);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #1a4faa;
+    margin-bottom: 1.5rem;
+}
+
+.pps-card__icon-wrap {
+    width: 80px;
+    height: 80px;
+    border-radius: 22px;
+    background: linear-gradient(135deg, rgba(30, 100, 255, 0.12), rgba(13, 91, 181, 0.08));
+    border: 1.5px solid rgba(30, 100, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.2rem;
+    animation: ppsFloat 4s ease-in-out infinite;
+}
+
+@keyframes ppsFloat {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+.pps-card__icon {
+    font-size: 2rem;
+    color: #1565c0;
+}
+
+.pps-card__name {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #0a1f4e;
+    margin: 0 0 0.5rem;
+}
+
+.pps-card__location {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    font-size: 0.9rem;
+    color: #4a6fa5;
+    margin: 0;
+}
+
+.pps-card__divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(30, 100, 255, 0.2), transparent);
+    margin: 1.5rem 0;
+}
+
+/* Stats row */
+.pps-card__stats {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.pps-card__stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.pps-card__stat-value {
+    font-size: 1.4rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #1e6aff, #5b5ef4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.pps-card__stat-label {
+    font-size: 0.72rem;
+    color: #6080b0;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
+.pps-card__stat-sep {
+    width: 1px;
+    height: 36px;
+    background: rgba(30, 100, 255, 0.15);
+}
+
+/* Subtle glow behind card */
+.pps-card__glow {
+    position: absolute;
+    inset: -2px;
+    border-radius: 30px;
+    background: linear-gradient(135deg,
+            rgba(30, 100, 255, 0.08),
+            rgba(91, 94, 244, 0.06),
+            rgba(30, 100, 255, 0.08));
+    z-index: -1;
+    animation: ppsGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes ppsGlow {
+    from {
+        opacity: 0.3;
+    }
+
+    to {
+        opacity: 0.7;
+    }
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+    .pps-inner {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+    }
+
+    .pps-visual {
+        order: -1;
+    }
+
+    .pps-card {
+        max-width: 340px;
+    }
+
+    .pps-title {
+        font-size: 2.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .pps-section {
+        padding: 3.5rem 1.5rem;
+    }
+
+    /* Compact card on mobile */
+    .pps-card {
+        padding: 1.6rem 1.4rem;
+        border-radius: 20px;
+        max-width: 100%;
+    }
+
+    .pps-card__icon-wrap {
+        width: 60px;
+        height: 60px;
+        border-radius: 16px;
+        /* disable float animation on mobile — less distracting */
+        animation: none;
+    }
+
+    .pps-card__icon {
+        font-size: 1.5rem;
+    }
+
+    .pps-card__name {
+        font-size: 1.1rem;
+    }
+
+    .pps-card__tag {
+        margin-bottom: 1rem;
+    }
+
+    .pps-card__divider {
+        margin: 1rem 0;
+    }
+
+    .pps-card__stat-value {
+        font-size: 1.15rem;
+    }
+
+    /* Hide glow on mobile — less distracting */
+    .pps-card__glow {
+        display: none;
+    }
+
+    .pps-actions {
+        flex-direction: column;
+    }
+
+    .pps-cta,
+    .pps-cta-secondary {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .pps-title {
+        font-size: 1.9rem;
+    }
+
+    .pps-desc {
+        font-size: 0.97rem;
+    }
+}
