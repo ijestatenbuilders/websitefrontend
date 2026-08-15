@@ -6,7 +6,7 @@ const AIChat = ({ isOpen, onClose }) => {
   const [messages, setMessages] = useState([
     {
       type: 'ai',
-      text: 'Hello! 👋 I\'m your AI property assistant. I can help you find the perfect property based on your needs. Just tell me what you\'re looking for - budget, size, features like cinema or pool, location preferences, etc.',
+      text: 'Hello! 👋 I\'m Aira, your AI property assistant. I can help you find the perfect property based on your needs. Just tell me what you\'re looking for - budget, size, features like cinema or pool, location preferences, etc.',
       timestamp: new Date(),
     }
   ]);
@@ -144,7 +144,7 @@ const AIChat = ({ isOpen, onClose }) => {
               <div className="ai-status-indicator"></div>
             </div>
             <div className="ai-header-text">
-              <h3>AI Property Assistant</h3>
+              <h3>Aira - AI Assistant</h3>
               <p>Online • Ready to help</p>
             </div>
           </div>
@@ -266,7 +266,7 @@ const AIChat = ({ isOpen, onClose }) => {
             </button>
           </div>
           <div className="ai-chat-footer-text">
-            Powered by Groq AI • Free & Ultra-Fast ⚡
+            Powered by Aira AI • Free & Ultra-Fast ⚡
           </div>
         </div>
       </div>
