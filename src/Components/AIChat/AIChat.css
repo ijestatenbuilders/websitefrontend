@@ -8,7 +8,7 @@
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
+  right: 0px;
   bottom: 0;
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(8px);
@@ -30,11 +30,11 @@
 /* Main Sidebar */
 .ai-chat-sidebar {
   position: fixed;
-  top: 0;
-  right: -500px;
+  top: 20px;
+  right: 20px !important;
   width: 450px;
   max-width: 95vw;
-  height: 100vh;
+  height: 95.5vh;
   background: linear-gradient(180deg,
       rgba(17, 24, 39, 0.98) 0%,
       rgba(31, 41, 55, 0.98) 100%);
@@ -47,6 +47,7 @@
   flex-direction: column;
   transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
+  border-radius: 20px;
 
   /* Hardware acceleration for buttery smooth sliding */
   transform: translateZ(0);
@@ -709,7 +710,7 @@
 @media (max-width: 768px) {
   .ai-chat-sidebar {
     width: 100vw;
-    right: -100vw;
+    right: 7px !important;
   }
 
   .ai-chat-sidebar.open {
