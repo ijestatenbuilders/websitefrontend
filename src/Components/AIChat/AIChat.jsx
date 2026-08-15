@@ -266,7 +266,7 @@ const AIChat = ({ isOpen, onClose }) => {
             </button>
           </div>
           <div className="ai-chat-footer-text">
-            Powered by Aira AI • Free & Ultra-Fast ⚡
+            Aira AI • Your Personal Property Consultant ⚡
           </div>
         </div>
       </div>

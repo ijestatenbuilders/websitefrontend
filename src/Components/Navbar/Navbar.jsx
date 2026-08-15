@@ -487,7 +487,7 @@ function Navbar({ variant = 'default' }) {
                 <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-              <span>AI</span>
+              <span>Aira</span>
             </button>
 
             {/* Find Property → opens modal */}
@@ -550,7 +550,7 @@ function Navbar({ variant = 'default' }) {
                 <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-              <span>AI</span>
+              <span>Aira</span>
             </button>
             <a href="#find" className="navbar__cta" onClick={openModal}>
               Find Property
