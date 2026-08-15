@@ -1160,3 +1160,142 @@
     }
   }
 }
+
+
+/* ═══════════════════════════════════════════════════════════
+   AI ASSISTANT BUTTON
+═══════════════════════════════════════════════════════════ */
+.navbar__ai-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.75rem 1.25rem;
+  background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow:
+    0 4px 15px rgba(139, 92, 246, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+}
+
+.navbar__ai-btn::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent);
+  animation: aiShine 3s linear infinite;
+}
+
+@keyframes aiShine {
+  0% {
+    transform: translate(-100%, -100%) rotate(45deg);
+  }
+
+  100% {
+    transform: translate(100%, 100%) rotate(45deg);
+  }
+}
+
+.navbar__ai-btn:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 6px 20px rgba(139, 92, 246, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.navbar__ai-btn svg {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+.navbar__ai-btn span:not(.navbar__ai-pulse) {
+  position: relative;
+  z-index: 1;
+}
+
+/* Pulsing indicator */
+.navbar__ai-pulse {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  background: #10b981;
+  border-radius: 50%;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  animation: aiPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  z-index: 2;
+}
+
+@keyframes aiPulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  }
+
+  50% {
+    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+  }
+}
+
+.navbar__ai-btn--desktop {
+  display: none;
+}
+
+.navbar__ai-btn--mobile {
+  width: 100%;
+  justify-content: center;
+  padding: 1rem 1.25rem;
+  font-size: 1rem;
+}
+
+/* Scrolled state */
+.navbar--scrolled .navbar__ai-btn {
+  background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Desktop view */
+@media (min-width: 769px) {
+  .navbar__ai-btn--desktop {
+    display: flex;
+  }
+
+  .navbar__ai-btn--mobile {
+    display: none;
+  }
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .navbar__ai-btn--desktop {
+    display: none;
+  }
+
+  .navbar__ai-btn--mobile {
+    display: flex;
+  }
+}
+
+
+/* Hide Find Property button temporarily */
+.navbar__cta {
+  display: none !important;
+}
