@@ -12,8 +12,12 @@ const AIChat = ({ isOpen, onClose }) => {
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isAnimatingOut, setIsAnimatingOut] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
   const navigate = useNavigate();
 
   const scrollToBottom = () => {
@@ -29,9 +33,87 @@ const AIChat = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     if (isOpen && inputRef.current) {
+      setIsAnimatingOut(false);
       setTimeout(() => inputRef.current?.focus(), 300);
     }
   }, [isOpen]);
+
+  // Handle closing with animation
+  const handleClose = () => {
+    setIsAnimatingOut(true);
+    setTimeout(() => {
+      onClose();
+    }, 300); // Match animation duration
+  };
+
+  // Voice Recording Functions
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorderRef.current = new MediaRecorder(stream);
+      audioChunksRef.current = [];
+
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        audioChunksRef.current.push(event.data);
+      };
+
+      mediaRecorderRef.current.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        await transcribeAudio(audioBlob);
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      mediaRecorderRef.current.start();
+      setIsRecording(true);
+    } catch (error) {
+      console.error('Error accessing microphone:', error);
+      alert('Please allow microphone access to use voice input.');
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
+  const transcribeAudio = async (audioBlob) => {
+    setIsLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append('audio', audioBlob, 'recording.webm');
+
+      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+      const response = await fetch(`${apiUrl}/api/ai/transcribe/`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.text) {
+        setInputMessage(data.text);
+        // Auto-send the transcribed message
+        setTimeout(() => {
+          handleSendMessage(data.text);
+        }, 100);
+      } else {
+        throw new Error(data.error || 'Transcription failed');
+      }
+    } catch (error) {
+      console.error('Transcription error:', error);
+      const errorMessage = {
+        type: 'ai',
+        text: 'Sorry, I couldn\'t understand the audio. Please try again or type your message.',
+        timestamp: new Date(),
+        isError: true,
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Auto-resize textarea smoothly
   const handleInputChange = (e) => {
@@ -45,12 +127,13 @@ const AIChat = ({ isOpen, onClose }) => {
     textarea.style.height = `${newHeight}px`;
   };
 
-  const handleSendMessage = async () => {
-    if (!inputMessage.trim() || isLoading) return;
+  const handleSendMessage = async (messageText = null) => {
+    const textToSend = messageText || inputMessage;
+    if (!textToSend.trim() || isLoading) return;
 
     const userMessage = {
       type: 'user',
-      text: inputMessage,
+      text: textToSend,
       timestamp: new Date(),
     };
 
@@ -71,7 +154,7 @@ const AIChat = ({ isOpen, onClose }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message: inputMessage }),
+        body: JSON.stringify({ message: textToSend }),
       });
 
       const data = await response.json();
@@ -94,7 +177,7 @@ const AIChat = ({ isOpen, onClose }) => {
       console.error('AI Chat Error:', error);
       const errorMessage = {
         type: 'ai',
-        text: 'I apologize, but I encountered an error. Please make sure the AI service is properly configured with a valid API key, or try again later.',
+        text: 'I apologize, but I encountered an error. Please try again later.',
         timestamp: new Date(),
         isError: true,
       };
@@ -128,8 +211,11 @@ const AIChat = ({ isOpen, onClose }) => {
 
   return (
     <>
-      <div className="ai-chat-overlay" onClick={onClose} />
-      <div className={`ai-chat-sidebar ${isOpen ? 'open' : ''}`}>
+      <div
+        className={`ai-chat-overlay ${isAnimatingOut ? 'fade-out' : ''}`}
+        onClick={handleClose}
+      />
+      <div className={`ai-chat-sidebar ${isOpen ? 'open' : ''} ${isAnimatingOut ? 'closing' : ''}`}>
         {/* Header */}
         <div className="ai-chat-header">
           <div className="ai-chat-header-content">
@@ -148,7 +234,7 @@ const AIChat = ({ isOpen, onClose }) => {
               <p>Online • Ready to help</p>
             </div>
           </div>
-          <button className="ai-close-btn" onClick={onClose}>
+          <button className="ai-close-btn" onClick={handleClose}>
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             </svg>
@@ -243,20 +329,39 @@ const AIChat = ({ isOpen, onClose }) => {
         {/* Input */}
         <div className="ai-chat-input-container">
           <div className="ai-chat-input-wrapper">
+            <button
+              className={`ai-voice-btn ${isRecording ? 'recording' : ''}`}
+              onClick={isRecording ? stopRecording : startRecording}
+              disabled={isLoading}
+              title={isRecording ? "Stop recording" : "Voice input (Urdu/English)"}
+            >
+              {isRecording ? (
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor" />
+                </svg>
+              ) : (
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 1C10.3431 1 9 2.34315 9 4V12C9 13.6569 10.3431 15 12 15C13.6569 15 15 13.6569 15 12V4C15 2.34315 13.6569 1 12 1Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M19 10V12C19 15.866 15.866 19 12 19C8.13401 19 5 15.866 5 12V10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M12 19V23" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M8 23H16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              )}
+            </button>
             <textarea
               ref={inputRef}
               value={inputMessage}
               onChange={handleInputChange}
               onKeyPress={handleKeyPress}
-              placeholder="Ask me anything..."
+              placeholder={isRecording ? "Recording..." : "Ask me anything..."}
               rows="1"
-              disabled={isLoading}
+              disabled={isLoading || isRecording}
               autoComplete="off"
               spellCheck="true"
             />
             <button
               className="ai-send-btn"
-              onClick={handleSendMessage}
+              onClick={() => handleSendMessage()}
               disabled={!inputMessage.trim() || isLoading}
               title="Send message"
             >
@@ -266,7 +371,7 @@ const AIChat = ({ isOpen, onClose }) => {
             </button>
           </div>
           <div className="ai-chat-footer-text">
-            Aira AI • Your Personal Property Consultant ⚡
+            Aira AI • Your Personal Property Consultant ⚡ {isRecording && <span className="recording-indicator">● Recording</span>}
           </div>
         </div>
       </div>
