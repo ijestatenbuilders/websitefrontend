@@ -99,13 +99,21 @@ const AIChat = ({ isOpen, onClose }) => {
           handleSendMessage(data.text);
         }, 100);
       } else {
-        throw new Error(data.error || 'Transcription failed');
+        // Show error message from backend
+        const errorMsg = data.error || 'Transcription failed';
+        const errorMessage = {
+          type: 'ai',
+          text: `🎤 ${errorMsg}\n\nPlease try:\n• Speaking more clearly\n• Speaking louder\n• Getting closer to the microphone\n• Saying complete sentences`,
+          timestamp: new Date(),
+          isError: true,
+        };
+        setMessages(prev => [...prev, errorMessage]);
       }
     } catch (error) {
       console.error('Transcription error:', error);
       const errorMessage = {
         type: 'ai',
-        text: 'Sorry, I couldn\'t understand the audio. Please try again or type your message.',
+        text: '🎤 Could not transcribe audio. Please check your internet connection and try again, or type your message instead.',
         timestamp: new Date(),
         isError: true,
       };
