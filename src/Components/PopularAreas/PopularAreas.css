@@ -1,18 +1,32 @@
-/* ── Section wrapper — identical background to .browse-properties ── */
 .popular-areas {
-    padding: 60px 105px;
+    padding: 70px 90px;
     position: relative;
     overflow: hidden;
-    margin: 40px 50px;
-    border-radius: 28px;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.14));
-    border: 1px solid rgba(255, 255, 255, 0.45);
+    margin: 50px 30px 40px;
+    border-radius: 32px;
+    background: radial-gradient(ellipse 100% 70% at 50% -10%, rgba(224, 242, 254, 0.7) 0%, rgba(240, 249, 255, 0.45) 40%, rgba(255, 255, 255, 0.6) 100%);
+    border: 1.5px solid rgba(255, 255, 255, 0.85);
     box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.7),
-        0 18px 45px rgba(13, 88, 163, 0.16),
-        0 0 0 1px rgba(255, 255, 255, 0.16);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
+        inset 0 2px 4px rgba(255, 255, 255, 0.9),
+        0 24px 60px rgba(2, 132, 199, 0.14),
+        0 0 0 1px rgba(56, 189, 248, 0.18);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+}
+
+.popular-parallax-grid {
+    position: absolute;
+    inset: -20% -10%;
+    width: 120%;
+    height: 140%;
+    pointer-events: none;
+    background-image:
+        linear-gradient(rgba(2, 132, 199, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(2, 132, 199, 0.05) 1px, transparent 1px);
+    background-size: 55px 55px;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 0%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 0%, transparent 100%);
+    z-index: 0;
 }
 
 .popular-areas::before,
@@ -24,21 +38,21 @@
 }
 
 .popular-areas::before {
-    inset: -10% auto auto -8%;
-    width: 320px;
-    height: 320px;
-    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.85), rgba(142, 209, 255, 0.55) 35%, rgba(30, 144, 255, 0.18) 65%, transparent 78%);
-    filter: blur(18px);
-    animation: paFluidDrift 2s ease-in-out infinite alternate;
+    inset: -12% auto auto -6%;
+    width: 380px;
+    height: 380px;
+    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.95), rgba(56, 189, 248, 0.35) 40%, rgba(2, 132, 199, 0.15) 70%, transparent 80%);
+    filter: blur(22px);
+    animation: paFluidDrift 9s ease-in-out infinite alternate;
 }
 
 .popular-areas::after {
-    inset: auto -10% -8% auto;
-    width: 320px;
-    height: 320px;
-    background: radial-gradient(circle at 70% 40%, rgba(255, 255, 255, 0.7), rgba(122, 191, 255, 0.35) 40%, rgba(20, 122, 255, 0.16) 70%, transparent 80%);
-    filter: blur(16px);
-    animation: paFluidDrift 2s ease-in-out infinite alternate-reverse;
+    inset: auto -8% -10% auto;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle at 70% 40%, rgba(255, 255, 255, 0.9), rgba(251, 191, 36, 0.22) 35%, rgba(2, 132, 199, 0.14) 68%, transparent 82%);
+    filter: blur(24px);
+    animation: paFluidDrift 10s ease-in-out infinite alternate-reverse;
 }
 
 .popular-areas__container {
@@ -48,71 +62,174 @@
     z-index: 1;
 }
 
+.popular-header-wrap {
+    text-align: center;
+    margin-bottom: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.popular-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    border-radius: 999px;
+    background: rgba(2, 132, 199, 0.1);
+    border: 1px solid rgba(2, 132, 199, 0.28);
+    font-size: 0.74rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    color: #0284c7;
+    text-transform: uppercase;
+    box-shadow: 0 2px 10px rgba(2, 132, 199, 0.1);
+}
+
+.popular-eyebrow-pulse {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #0284c7;
+    box-shadow: 0 0 10px #0284c7;
+    animation: badgePulse 2s infinite ease-in-out;
+}
+
 .popular-areas__title {
     text-align: center;
-    font-size: 2rem;
-    margin-bottom: 50px;
-    color: #1E90FF;
-    width: fit-content;
-    margin-left: auto;
-    margin-right: auto;
-    padding-bottom: 10px;
-    border-bottom: 3px solid #1E90FF;
+    font-size: 2.35rem;
+    font-weight: 900;
+    margin: 0;
+    color: #0f2744;
+    letter-spacing: -0.025em;
+    position: relative;
+    padding-bottom: 12px;
+    font-family: 'Outfit', 'Inter', sans-serif;
+}
+
+.popular-areas__title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 64px;
+    height: 3.5px;
+    border-radius: 3px;
+    background: linear-gradient(90deg, #38bdf8, #0284c7, #fbbf24);
+    box-shadow: 0 0 12px rgba(2, 132, 199, 0.4);
+}
+
+.popular-areas__subtitle {
+    font-size: 0.98rem;
+    color: #475569;
+    font-weight: 500;
+    max-width: 620px;
+    margin: 10px auto 0;
+    text-align: center;
+    line-height: 1.65;
 }
 
 .popular-areas__grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 35px;
+    gap: 30px;
+    perspective: 1200px;
+}
+
+/* ── Card reveal wrapper for spring zoom-in ── */
+.popular-areas__card-reveal {
+    display: flex;
+    height: 100%;
 }
 
 .popular-areas__card {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.14));
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    border-radius: 18px;
-    padding: 22px 18px 22px;
+    width: 100%;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.92) 0%, rgba(240, 249, 255, 0.72) 100%);
+    border: 1.5px solid rgba(255, 255, 255, 0.95);
+    border-radius: 22px;
+    padding: 18px 18px 22px;
     box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.6),
-        0 16px 35px rgba(15, 82, 173, 0.12),
-        0 0 0 1px rgba(255, 255, 255, 0.22);
+        inset 0 1px 0 rgba(255, 255, 255, 0.95),
+        0 14px 36px rgba(15, 82, 173, 0.10),
+        0 0 0 1px rgba(2, 132, 199, 0.12);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     position: relative;
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    transform-style: preserve-3d;
+    will-change: transform;
     transition:
-        transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-        box-shadow 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 0.35s ease,
+        border-color 0.35s ease;
 }
 
 .popular-areas__card::before {
     content: '';
     position: absolute;
-    inset: 180px 0 0 0;
-    background: linear-gradient(120deg, rgba(255, 255, 255, 0.18), transparent 45%, rgba(30, 144, 255, 0.07));
+    inset: 0;
+    background: radial-gradient(circle 320px at var(--pa-mouse-x, 50%) var(--pa-mouse-y, 50%), rgba(255, 255, 255, 0.7), transparent 70%);
     pointer-events: none;
-    border-radius: 0 0 18px 18px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 2;
 }
 
 .popular-areas__card:hover {
-    transform: translateY(-5px) scale(1.012);
     box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.65),
-        0 24px 50px rgba(15, 82, 173, 0.18),
-        0 0 0 1px rgba(255, 255, 255, 0.32),
-        0 0 40px rgba(30, 144, 255, 0.16),
-        0 0 80px rgba(30, 144, 255, 0.08);
+        inset 0 1px 0 #ffffff,
+        0 26px 65px rgba(2, 132, 199, 0.24),
+        0 0 0 1.5px rgba(56, 189, 248, 0.6);
+    border-color: rgba(56, 189, 248, 0.6);
+}
+
+.popular-areas__card:hover::before {
+    opacity: 1;
 }
 
 /* ── Card image ── */
 .popular-areas__img-wrap {
     width: calc(100% + 36px);
-    margin: -22px -18px 18px;
-    height: 180px;
+    margin: -18px -18px 18px;
+    height: 190px;
     overflow: hidden;
     flex-shrink: 0;
     border-radius: 0;
+    position: relative;
+    background: #0f172a;
+}
+
+.popular-areas__floating-tag {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 100px;
+    background: rgba(15, 23, 42, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: #ffffff;
+    font-size: 0.70rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+.popular-areas__img-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.08) 0%, transparent 40%, rgba(15, 23, 42, 0.45) 100%);
+    pointer-events: none;
+    z-index: 1;
 }
 
 .popular-areas__img {
@@ -120,96 +237,104 @@
     height: 100%;
     object-fit: cover;
     display: block;
-    transition: transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    will-change: transform;
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .popular-areas__card:hover .popular-areas__img {
-    transform: scale(1.07);
+    transform: scale(1.1);
 }
 
 .popular-areas__card-icon {
-    color: #1E90FF;
-    margin-bottom: 0px;
+    color: #0284c7;
+    margin-bottom: 6px;
     display: flex;
     flex-direction: row;
     gap: 10px;
     align-items: center;
     position: relative;
     z-index: 1;
-    margin-top: -10px;
+}
+
+.popular-areas__card-icon svg {
+    filter: drop-shadow(0 2px 6px rgba(2, 132, 199, 0.35));
 }
 
 .popular-areas__card-name {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #1a1a1a;
-    margin-top: 15px;
-    font-family: 'Ubuntu', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+    font-family: 'Outfit', 'Inter', sans-serif;
+    letter-spacing: -0.01em;
 }
 
 .popular-areas__card-desc {
     font-size: 0.875rem;
-    color: #4b5563;
-    line-height: 1.65;
-    margin: 0 0 15px;
+    color: #475569;
+    line-height: 1.6;
+    margin: 0 0 16px;
     flex: 1;
 }
 
 .popular-areas__tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
     margin-bottom: 20px;
 }
 
 .popular-areas__tag {
-    font-size: 0.80rem;
-    font-weight: 500;
+    font-size: 0.76rem;
+    font-weight: 700;
     letter-spacing: 0.03em;
-    padding: 4px 13px;
+    padding: 4px 12px;
     border-radius: 999px;
-    margin-left: auto;
-    margin-right: auto;
-    background: rgba(30, 144, 255, 0.1);
-    border: 1px solid rgba(30, 144, 255, 0.25);
-    color: #1E90FF;
+    background: rgba(2, 132, 199, 0.08);
+    border: 1px solid rgba(2, 132, 199, 0.22);
+    color: #0284c7;
+    transition: all 0.25s ease;
+}
+
+.popular-areas__card:hover .popular-areas__tag {
+    background: rgba(2, 132, 199, 0.14);
+    border-color: rgba(2, 132, 199, 0.4);
+    color: #0369a1;
 }
 
 .popular-areas__link {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 8px;
     align-self: stretch;
-    padding: 0.65rem 1.2rem;
+    padding: 0.72rem 1.3rem;
     border-radius: 999px;
-    background: linear-gradient(135deg, rgba(30, 144, 255, 0.88), rgba(76, 175, 255, 0.82));
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 50%, #38bdf8 100%);
+    background-size: 200% auto;
     border: none;
-    color: #fff;
+    color: #ffffff;
     width: 100%;
-    font-size: 0.85rem;
-    font-weight: 600;
+    font-size: 0.86rem;
+    font-weight: 700;
     letter-spacing: 0.02em;
     text-decoration: none;
     cursor: pointer;
-    font-family: 'Ubuntu', sans-serif;
+    font-family: 'Inter', sans-serif;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 4px 12px rgba(30, 144, 255, 0.09);
-    transition:
-        background 0.28s ease,
-        color 0.28s ease,
-        box-shadow 0.28s ease,
-        transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.45),
+        0 6px 18px rgba(2, 132, 199, 0.28);
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .popular-areas__link:hover {
-    background: linear-gradient(135deg, rgba(30, 144, 255, 0.88), rgba(76, 175, 255, 0.82));
-    color: #fff;
-    border-color: transparent;
+    background-position: right center;
+    color: #ffffff;
     box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.22),
-        0 8px 22px rgba(30, 144, 255, 0.28);
+        inset 0 1px 0 rgba(255, 255, 255, 0.6),
+        0 10px 28px rgba(2, 132, 199, 0.42);
     transform: translateY(-2px);
 }
 
@@ -217,43 +342,58 @@
     transform: translateY(0);
 }
 
-/* ── Fluid drift keyframes (scoped to avoid conflicts) ── */
+/* ── Fluid drift keyframes ── */
 @keyframes paFluidDrift {
     0% {
         transform: translate3d(0, 0, 0) scale(1);
     }
-
     50% {
         transform: translate3d(24px, -20px, 0) scale(1.08);
     }
-
     100% {
         transform: translate3d(-18px, 16px, 0) scale(0.96);
     }
 }
 
 /* ── Responsive ── */
-@media (max-width: 1024px) {
+@media (max-width: 1340px) {
     .popular-areas {
-        padding: 50px 60px;
-        margin: 30px 10px;
+        padding: 55px 50px;
+        margin: 35px 20px;
+    }
+
+    .popular-areas__grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
+    .popular-areas {
+        padding: 45px 35px;
+        margin: 30px 15px;
+    }
+
+    .popular-areas__grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+}
+
+@media (max-width: 820px) {
     .popular-areas {
         padding: 40px 20px;
-        margin: 30px 10px;
+        margin: 25px 10px;
     }
 
     .popular-areas__title {
         font-size: 1.6rem;
-        margin-bottom: 36px;
+        margin-bottom: 30px;
     }
 
     .popular-areas__grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 18px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
     }
 
     .popular-areas__card-name {
@@ -265,8 +405,8 @@
     }
 
     .popular-areas__card {
-        padding-left: 12px;
-        padding-right: 12px;
+        padding-left: 14px;
+        padding-right: 14px;
     }
 
     .popular-areas__img-wrap {
@@ -277,13 +417,12 @@
         font-size: 0.78rem;
         padding: 4px 10px;
     }
-
 }
 
 @media (max-width: 540px) {
     .popular-areas {
-        padding: 32px 20px;
-        margin: 20px 10px;
+        padding: 32px 18px;
+        margin: 20px 8px;
     }
 
     .popular-areas__grid {

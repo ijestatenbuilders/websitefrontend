@@ -1,6 +1,8 @@
+import { useState, useRef, useEffect } from 'react';
 import './PopularAreas.css';
 import { useNavigate } from 'react-router-dom';
 import { FaMapMarkerAlt } from 'react-icons/fa';
+import { useReveal } from '../../utils/useReveal';
 import img1 from '../../Assets/images/clocktower.jfif';
 import img2 from '../../Assets/images/school.png';
 import img3 from '../../Assets/images/eiffletower.png';
@@ -155,6 +157,14 @@ const areasByLocation = {
 
 function PopularAreas({ currentLocation = 'bahriatown' }) {
     const navigate = useNavigate();
+    const revealRef = useReveal();
+
+    // DOM refs for RAF-driven scroll parallax
+    const gridRef = useRef(null);
+    const headerRef = useRef(null);
+    const bgGridRef = useRef(null);
+    const cardInnerRefs = useRef([]);
+    const imgRefs = useRef([]);
 
     // Get areas for the current location
     const areas = areasByLocation[currentLocation] || areasByLocation.bahriatown;
@@ -169,6 +179,64 @@ function PopularAreas({ currentLocation = 'bahriatown' }) {
 
     const locationDisplayName = locationNames[currentLocation] || 'Bahria Town Lahore';
 
+    // Internal RAF loop — background parallax & tilt on inner elements (never overrides entrance transform)
+    useEffect(() => {
+        let animId;
+        let scrollSmooth = window.scrollY;
+        let scrollTarget = window.scrollY;
+        const LERP = 0.08;
+
+        const onScroll = () => { scrollTarget = window.scrollY; };
+        window.addEventListener('scroll', onScroll, { passive: true });
+
+        const loop = () => {
+            scrollSmooth += (scrollTarget - scrollSmooth) * LERP;
+            const sy = scrollSmooth;
+
+            if (bgGridRef.current) {
+                bgGridRef.current.style.transform = `translate3d(0, ${((sy - 2800) * 0.07).toFixed(2)}px, 0)`;
+            }
+            if (headerRef.current) {
+                headerRef.current.style.transform = `translate3d(0, ${((sy - 2850) * -0.038).toFixed(2)}px, 0)`;
+            }
+
+            imgRefs.current.forEach((img) => {
+                if (!img) return;
+                img.style.transform = `scale(1.06) translate3d(0, ${((sy - 2900) * 0.025).toFixed(2)}px, 0)`;
+            });
+
+            animId = requestAnimationFrame(loop);
+        };
+
+        animId = requestAnimationFrame(loop);
+        return () => {
+            window.removeEventListener('scroll', onScroll);
+            cancelAnimationFrame(animId);
+        };
+    }, []);
+
+    const handleCardMouseMove = (index, e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width - 0.5;
+        const y = (e.clientY - rect.top) / rect.height - 0.5;
+        const rx = (-y * 9).toFixed(2);
+        const ry = (x * 10).toFixed(2);
+        const px = e.clientX - rect.left;
+        const py = e.clientY - rect.top;
+
+        if (cardInnerRefs.current[index]) {
+            cardInnerRefs.current[index].style.transform = `perspective(1000px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-6px)`;
+            cardInnerRefs.current[index].style.setProperty('--pa-mouse-x', `${px}px`);
+            cardInnerRefs.current[index].style.setProperty('--pa-mouse-y', `${py}px`);
+        }
+    };
+
+    const handleCardMouseLeave = (index) => {
+        if (cardInnerRefs.current[index]) {
+            cardInnerRefs.current[index].style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
+        }
+    };
+
     const handleExplore = (area) => {
         navigate('/listings', {
             state: {
@@ -178,51 +246,81 @@ function PopularAreas({ currentLocation = 'bahriatown' }) {
             }
         });
     };
+
     return (
-        <section className="popular-areas" id="areas">
+        <section className="popular-areas" id="areas" ref={revealRef}>
+            {/* Parallax Blueprint Grid */}
+            <div
+                className="popular-parallax-grid"
+                ref={bgGridRef}
+                aria-hidden="true"
+            />
+
             <div className="popular-areas__container">
-                <h2 className="popular-areas__title">Popular Areas in {locationDisplayName}</h2>
+                <div className="popular-header-wrap" ref={headerRef} data-reveal="fade-up">
+                    <div className="popular-eyebrow">
+                        <span className="popular-eyebrow-pulse" />
+                        <span>LANDMARKS & PRIME LOCALES</span>
+                    </div>
+                    <h2 className="popular-areas__title">Popular Areas in {locationDisplayName}</h2>
+                    <p className="popular-areas__subtitle">
+                        Explore iconic architectural wonders, vibrant commercial squares, and high-yield lifestyle communities.
+                    </p>
+                </div>
 
-                <div className="popular-areas__grid">
-                    {areas.map((area) => (
-                        <div key={area.name} className="popular-areas__card">
-
-                            {/* Image */}
-                            <div className="popular-areas__img-wrap">
-                                <img
-                                    src={area.image}
-                                    alt={area.name}
-                                    className="popular-areas__img"
-                                />
-                            </div>
-
-                            {/* Icon + Name */}
-                            <div className="popular-areas__card-icon">
-                                <FaMapMarkerAlt size={18} />
-                                <h3 className="popular-areas__card-name">{area.name}</h3>
-                            </div>
-
-                            <p className="popular-areas__card-desc">{area.description}</p>
-
-                            <div className="popular-areas__tags">
-                                {area.tags.map((tag) => (
-                                    <span key={tag} className="popular-areas__tag">{tag}</span>
-                                ))}
-                            </div>
-
-                            <button
-                                type="button"
-                                className="popular-areas__link"
-                                onClick={() => handleExplore(area)}
+                <div className="popular-areas__grid" ref={gridRef}>
+                    {areas.map((area, index) => (
+                        <div
+                            key={area.name}
+                            className="popular-areas__card-reveal"
+                            data-reveal="pop-scale"
+                            data-delay={index % 8}
+                        >
+                            <div
+                                className="popular-areas__card"
+                                ref={(el) => { cardInnerRefs.current[index] = el; }}
+                                onMouseMove={(e) => handleCardMouseMove(index, e)}
+                                onMouseLeave={() => handleCardMouseLeave(index)}
                             >
-                                Explore Properties
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                    <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
-                            </button>
-                            {/* <p className="popular-areas__block-hint">
-                                <FaMapMarkerAlt size={10} /> {area.block}
-                            </p> */}
+                                {/* Image with parallax viewport translation & floating tag */}
+                                <div className="popular-areas__img-wrap">
+                                    <span className="popular-areas__floating-tag">
+                                        ✦ {area.tags[0] || 'Prime'}
+                                    </span>
+                                    <img
+                                        src={area.image}
+                                        alt={area.name}
+                                        className="popular-areas__img"
+                                        ref={(el) => { imgRefs.current[index] = el; }}
+                                    />
+                                    <div className="popular-areas__img-overlay" />
+                                </div>
+
+                                {/* Icon + Name */}
+                                <div className="popular-areas__card-icon">
+                                    <FaMapMarkerAlt size={18} />
+                                    <h3 className="popular-areas__card-name">{area.name}</h3>
+                                </div>
+
+                                <p className="popular-areas__card-desc">{area.description}</p>
+
+                                <div className="popular-areas__tags">
+                                    {area.tags.map((tag) => (
+                                        <span key={tag} className="popular-areas__tag">{tag}</span>
+                                    ))}
+                                </div>
+
+                                <button
+                                    type="button"
+                                    className="popular-areas__link"
+                                    onClick={() => handleExplore(area)}
+                                >
+                                    <span>Explore Properties</span>
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                        <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                     ))}
                 </div>
@@ -232,3 +330,4 @@ function PopularAreas({ currentLocation = 'bahriatown' }) {
 }
 
 export default PopularAreas;
+

@@ -1,22 +1,33 @@
 .footer {
     position: relative;
     overflow: hidden;
-    margin: 0 40px 30px;
-    border-radius: 28px;
-    padding: 50px 80px 30px;
+    margin: 40px 40px 30px;
+    border-radius: 32px;
+    padding: 60px 85px 35px;
 
-    background: linear-gradient(135deg,
-            rgba(15, 28, 60, 0.445) 0%,
-            rgba(10, 32, 82, 0.404) 50%,
-            rgba(18, 38, 75, 0.473) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.13);
+    background: radial-gradient(ellipse 100% 80% at 50% -20%, #0c234a 0%, #07152d 50%, #030b18 100%);
+    border: 1.5px solid rgba(56, 189, 248, 0.25);
     box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.12),
-        inset 0 -1px 0 rgba(255, 255, 255, 0.05),
-        0 24px 60px rgba(8, 25, 65, 0.45),
-        0 0 0 1px rgba(255, 255, 255, 0.06);
-    backdrop-filter: blur(32px) saturate(160%) brightness(0);
-    -webkit-backdrop-filter: blur(32px) saturate(160%) brightness(0.88);
+        inset 0 1px 0 rgba(255, 255, 255, 0.2),
+        0 24px 70px rgba(2, 6, 23, 0.6),
+        0 0 0 1px rgba(56, 189, 248, 0.15);
+    backdrop-filter: blur(32px);
+    -webkit-backdrop-filter: blur(32px);
+}
+
+.footer-parallax-grid {
+    position: absolute;
+    inset: -20% -10%;
+    width: 120%;
+    height: 140%;
+    pointer-events: none;
+    background-image:
+        linear-gradient(rgba(56, 189, 248, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(56, 189, 248, 0.06) 1px, transparent 1px);
+    background-size: 55px 55px;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 0%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 0%, transparent 100%);
+    z-index: 0;
 }
 
 /* ── Fluid blob decorations ── */
@@ -25,43 +36,39 @@
     pointer-events: none;
     z-index: 0;
     border-radius: 50%;
-    filter: blur(18px);
+    filter: blur(24px);
 }
 
 .footer__blob--tl {
-    inset: -10% auto auto -8%;
-    width: 340px;
-    height: 340px;
+    inset: -12% auto auto -8%;
+    width: 380px;
+    height: 380px;
     background: radial-gradient(circle at 30% 30%,
-            rgba(100, 170, 255, 0.329),
-            rgba(60, 130, 255, 0.14) 35%,
-            rgba(30, 89, 200, 0.137) 65%,
-            transparent 78%);
-    animation: footerDrift 3.5s ease-in-out infinite alternate;
+            rgba(56, 189, 248, 0.25),
+            rgba(2, 132, 199, 0.15) 45%,
+            transparent 75%);
+    animation: footerDrift 8s ease-in-out infinite alternate;
 }
 
 .footer__blob--br {
-    inset: auto -10% -8% auto;
-    width: 340px;
-    height: 340px;
+    inset: auto -10% -10% auto;
+    width: 400px;
+    height: 400px;
     background: radial-gradient(circle at 70% 40%,
-            rgba(100, 170, 255, 0.329),
-            rgba(60, 130, 255, 0.14) 35%,
-            rgba(30, 89, 200, 0.137) 65%,
-            transparent 78%);
-    filter: blur(16px);
-    animation: footerDrift 4s ease-in-out infinite alternate-reverse;
+            rgba(251, 191, 36, 0.18),
+            rgba(2, 132, 199, 0.12) 45%,
+            transparent 75%);
+    filter: blur(22px);
+    animation: footerDrift 9s ease-in-out infinite alternate-reverse;
 }
 
 @keyframes footerDrift {
     0% {
         transform: translate3d(0, 0, 0) scale(1);
     }
-
     50% {
         transform: translate3d(24px, -20px, 0) scale(1.08);
     }
-
     100% {
         transform: translate3d(-18px, 16px, 0) scale(0.96);
     }
@@ -72,15 +79,15 @@
     position: relative;
     z-index: 1;
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1.1fr 0.9fr 1.2fr;
     align-items: start;
-    gap: 48px 40px;
-    padding-bottom: 30px;
+    gap: 48px 50px;
+    padding-bottom: 35px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .footer__col--brand {
-    max-width: 280px;
+    max-width: 320px;
 }
 
 .footer__col--contact {
@@ -97,42 +104,44 @@
 .footer__brand {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
     text-decoration: none;
-    margin-bottom: 18px;
+    margin-bottom: 20px;
 }
 
 .footer__logo {
-    width: 52px;
-    height: 52px;
+    width: 54px;
+    height: 54px;
     border-radius: 50%;
     object-fit: cover;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+    border: 2px solid rgba(56, 189, 248, 0.4);
+    box-shadow: 0 4px 18px rgba(2, 132, 199, 0.3);
 }
 
 .footer__brand-name {
     display: block;
-    font-size: 1.1rem;
-    font-weight: 700;
+    font-size: 1.25rem;
+    font-weight: 800;
     color: #ffffff;
     letter-spacing: -0.02em;
     line-height: 1.1;
+    font-family: 'Outfit', 'Inter', sans-serif;
 }
 
 .footer__brand-sub {
     display: block;
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.87);
-    letter-spacing: 0.04em;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #38bdf8;
+    letter-spacing: 0.06em;
 }
 
 .footer__tagline {
-    font-size: 0.88rem;
-    color: rgba(255, 255, 255, 0.87);
+    font-size: 0.90rem;
+    color: #94a3b8;
     line-height: 1.7;
     margin: 0 0 24px;
-    max-width: 280px;
+    max-width: 300px;
 }
 
 /* ── Social buttons ── */

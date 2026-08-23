@@ -1,0 +1,314 @@
+/* ══════════════════════════════════════════════════════════
+   PARALLAX FLOATING OBJECTS & 3D AMBIENT SPATIAL TOKENS
+   High-performance GPU-composited styling (120fps buttery smooth)
+   ══════════════════════════════════════════════════════════ */
+
+.parallax-ambient-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 2;
+  perspective: 1200px;
+  /* Isolate this entire layer onto its own compositor layer */
+  contain: layout style paint;
+  transform: translateZ(0);
+}
+
+.parallax-token {
+  position: absolute;
+  pointer-events: none;
+  /* Each token gets its own GPU compositor layer */
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  /* Prevent layout thrashing from siblings */
+  contain: layout style;
+}
+
+/* ── 3D Isometric Wireframe Cube ────────────────────────── */
+.iso-cube {
+  position: relative;
+  width: 46px;
+  height: 46px;
+  transform-style: preserve-3d;
+}
+
+.cube-face {
+  position: absolute;
+  width: 46px;
+  height: 46px;
+  border: 1.5px solid rgba(56, 189, 248, 0.45);
+  background: rgba(14, 165, 233, 0.06);
+  box-shadow: inset 0 0 12px rgba(56, 189, 248, 0.15), 0 0 10px rgba(56, 189, 248, 0.2);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.cube-face--front  { transform: rotateY(0deg) translateZ(23px); }
+.cube-face--back   { transform: rotateY(180deg) translateZ(23px); }
+.cube-face--right  { transform: rotateY(90deg) translateZ(23px); }
+.cube-face--left   { transform: rotateY(-90deg) translateZ(23px); }
+.cube-face--top    { transform: rotateX(90deg) translateZ(23px); }
+.cube-face--bottom { transform: rotateX(-90deg) translateZ(23px); }
+
+.iso-cube--gold .cube-face {
+  border-color: rgba(251, 191, 36, 0.55);
+  background: rgba(245, 158, 11, 0.08);
+  box-shadow: inset 0 0 12px rgba(251, 191, 36, 0.2), 0 0 12px rgba(251, 191, 36, 0.25);
+}
+
+/* ── Hexagonal Spatial Node ──────────────────────────────── */
+.hex-spatial-node {
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(6, 182, 212, 0.1));
+  border: 1.5px solid rgba(16, 185, 129, 0.5);
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.25);
+}
+
+.hex-inner {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #065f46;
+  letter-spacing: 0.05em;
+  text-align: center;
+}
+
+/* ── Holographic Compass Reticle ─────────────────────────── */
+.holographic-compass {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 2px dashed rgba(14, 165, 233, 0.45);
+  box-shadow: 0 0 24px rgba(14, 165, 233, 0.2), inset 0 0 14px rgba(14, 165, 233, 0.1);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.compass-dial {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(56, 189, 248, 0.6);
+}
+
+.compass-pointer {
+  position: absolute;
+  width: 2px;
+  height: 28px;
+  background: linear-gradient(to bottom, #38bdf8, transparent);
+  border-radius: 2px;
+}
+
+/* ── Floating Glass Keycard ──────────────────────────────── */
+.glass-keycard {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  box-shadow: 0 14px 32px rgba(217, 119, 6, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #78350f;
+  white-space: nowrap;
+}
+
+.keycard-sparkle {
+  color: #f59e0b;
+  font-size: 0.9rem;
+}
+
+/* ── Spatial GPS Chip ────────────────────────────────────── */
+.spatial-gps-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 100px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  box-shadow: 0 10px 24px rgba(13, 88, 163, 0.1);
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #0369a1;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.spatial-gps-chip--gold {
+  border-color: rgba(245, 158, 11, 0.4);
+  color: #92400e;
+}
+
+.gps-icon {
+  font-size: 0.8rem;
+}
+
+/* ── Glowing Compass & Gyro Rings ────────────────────────── */
+.glow-compass-ring {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  border: 2px dashed rgba(56, 189, 248, 0.4);
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.25), inset 0 0 15px rgba(56, 189, 248, 0.15);
+  position: relative;
+}
+
+.glow-compass-ring::after {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(125, 211, 252, 0.6);
+}
+
+.blueprint-gyroscope {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  transform-style: preserve-3d;
+  animation: gyroSpin 20s linear infinite;
+}
+
+@keyframes gyroSpin {
+  0% { transform: rotateX(25deg) rotateY(0deg); }
+  100% { transform: rotateX(25deg) rotateY(360deg); }
+}
+
+.gyro-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(59, 130, 246, 0.4);
+  box-shadow: 0 0 16px rgba(59, 130, 246, 0.25);
+}
+
+.gyro-ring--inner {
+  inset: 16px;
+  border-color: rgba(251, 191, 36, 0.5);
+  transform: rotateX(60deg);
+}
+
+/* ── Wireframe Blueprint Diamond ─────────────────────────── */
+.wireframe-diamond {
+  width: 36px;
+  height: 36px;
+  border: 2px solid rgba(245, 158, 11, 0.5);
+  background: rgba(251, 191, 36, 0.08);
+  box-shadow: 0 0 18px rgba(245, 158, 11, 0.3);
+  backdrop-filter: blur(4px);
+}
+
+.wireframe-diamond--cyan {
+  border-color: rgba(6, 182, 212, 0.55);
+  background: rgba(6, 182, 212, 0.08);
+  box-shadow: 0 0 18px rgba(6, 182, 212, 0.35);
+}
+
+/* ── Glowing Luminous Ambient Orbs ───────────────────────── */
+.parallax-token--orb-cyan {
+  top: 15%;
+  left: 6%;
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.14) 0%, rgba(14, 165, 233, 0.04) 55%, transparent 70%);
+  filter: blur(28px);
+}
+
+.parallax-token--orb-gold {
+  top: 35%;
+  right: 5%;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(251, 191, 36, 0.12) 0%, rgba(217, 119, 6, 0.03) 55%, transparent 70%);
+  filter: blur(32px);
+}
+
+/* ── Spatial Coordinate Chips ────────────────────────────── */
+.spatial-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 16px;
+  border-radius: 100px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow:
+    0 12px 28px rgba(13, 88, 163, 0.12),
+    0 0 0 1px rgba(56, 189, 248, 0.2);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.chip-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.chip-dot--gold { background: #f59e0b; box-shadow: 0 0 8px #f59e0b; }
+.chip-dot--blue { background: #0284c7; box-shadow: 0 0 8px #0284c7; }
+.chip-dot--emerald { background: #10b981; box-shadow: 0 0 8px #10b981; }
+
+.chip-text {
+  font-family: 'Outfit', 'Inter', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #0f2744;
+  white-space: nowrap;
+}
+
+/* ── Absolute Token Anchor Points Across Viewport Height ──── */
+.parallax-token--cube-1 { top: 180px; left: 7%; }
+.parallax-token--ring-1 { top: 320px; right: 8%; }
+.parallax-token--gps-hero { top: 480px; left: 10%; }
+.parallax-token--prop-badge-left { top: 1020px; left: 4%; }
+.parallax-token--prop-badge-right { top: 1180px; right: 5%; }
+.parallax-token--diamond-1 { top: 1350px; left: 8%; }
+.parallax-token--hex-node { top: 1480px; right: 6%; }
+.parallax-token--promo-ring { top: 2000px; right: 7%; }
+.parallax-token--cube-2 { top: 2200px; left: 5%; }
+.parallax-token--keycard { top: 2360px; right: 9%; }
+.parallax-token--pop-badge { top: 2800px; right: 6%; }
+.parallax-token--pop-compass { top: 2950px; left: 6%; }
+.parallax-token--diamond-2 { top: 3120px; left: 8%; }
+.parallax-token--pop-gps { top: 3300px; right: 7%; }
+
+/* ── Responsive adjustments ──────────────────────────────── */
+@media (max-width: 900px) {
+  .parallax-token--cube-1,
+  .parallax-token--cube-2,
+  .parallax-token--diamond-1,
+  .parallax-token--diamond-2,
+  .parallax-token--hex-node,
+  .parallax-token--pop-compass {
+    display: none;
+  }
+  .spatial-chip, .glass-keycard, .spatial-gps-chip {
+    padding: 5px 12px;
+  }
+  .chip-text {
+    font-size: 0.65rem;
+  }
+}

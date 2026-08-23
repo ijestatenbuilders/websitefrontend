@@ -1,7 +1,9 @@
+import { useEffect, useRef } from 'react';
 import './Footer.css';
 import logo from '../../Assets/images/logo.jpg';
 import { FaFacebookF, FaInstagram, FaWhatsapp, FaYoutube } from 'react-icons/fa';
 import { FaMapLocationDot, FaPhone, FaEnvelope } from 'react-icons/fa6';
+import { useReveal } from '../../utils/useReveal';
 
 const quickLinks = [
     { label: 'Home', href: '#home' },
@@ -29,6 +31,33 @@ const socials = [
 ];
 
 function Footer() {
+    const revealRef = useReveal();
+    const bgGridRef = useRef(null);
+
+    useEffect(() => {
+        let animId;
+        let scrollSmooth = window.scrollY;
+        let scrollTarget = window.scrollY;
+        const LERP = 0.08;
+
+        const onScroll = () => { scrollTarget = window.scrollY; };
+        window.addEventListener('scroll', onScroll, { passive: true });
+
+        const loop = () => {
+            scrollSmooth += (scrollTarget - scrollSmooth) * LERP;
+            if (bgGridRef.current) {
+                bgGridRef.current.style.transform = `translate3d(0, ${((scrollSmooth - 3300) * 0.06).toFixed(2)}px, 0)`;
+            }
+            animId = requestAnimationFrame(loop);
+        };
+        animId = requestAnimationFrame(loop);
+
+        return () => {
+            window.removeEventListener('scroll', onScroll);
+            cancelAnimationFrame(animId);
+        };
+    }, []);
+
     const handleScroll = (e, href) => {
         e.preventDefault();
         const id = href.replace('#', '');
@@ -40,7 +69,10 @@ function Footer() {
     };
 
     return (
-        <footer className="footer" id="contact">
+        <footer className="footer" id="contact" ref={revealRef}>
+            {/* Parallax Blueprint Grid */}
+            <div className="footer-parallax-grid" ref={bgGridRef} aria-hidden="true" />
+
             {/* top fluid blobs */}
             <div className="footer__blob footer__blob--tl" aria-hidden="true" />
             <div className="footer__blob footer__blob--br" aria-hidden="true" />
@@ -48,7 +80,7 @@ function Footer() {
             <div className="footer__inner">
 
                 {/* ── Brand column ── */}
-                <div className="footer__col footer__col--brand">
+                <div className="footer__col footer__col--brand" data-reveal="fade-up" data-delay="1">
                     <a href="#home" className="footer__brand" onClick={(e) => handleScroll(e, '#home')}>
                         <img src={logo} alt="IJ Estates logo" className="footer__logo" />
                         <div>
@@ -70,7 +102,7 @@ function Footer() {
                 </div>
 
                 {/* ── Quick links ── */}
-                <div className="footer__col">
+                <div className="footer__col" data-reveal="fade-up" data-delay="2">
                     <h4 className="footer__col-title">Quick Links</h4>
                     <ul className="footer__list">
                         {quickLinks.map(({ label, href }) => (
@@ -84,11 +116,8 @@ function Footer() {
                     </ul>
                 </div>
 
-                {/* ── Properties ── */}
-                {/* Removed — only Brand | Quick Links | Get In Touch */}
-
                 {/* ── Contact ── */}
-                <div className="footer__col footer__col--contact">
+                <div className="footer__col footer__col--contact" data-reveal="fade-up" data-delay="3">
                     <h4 className="footer__col-title">Get In Touch</h4>
                     <ul className="footer__contact-list">
                         <li>
@@ -121,7 +150,7 @@ function Footer() {
                 </div>
 
                 {/* Shown on mobile only — full-width newsletter row */}
-                <div className="footer__col footer__col--newsletter-mobile">
+                <div className="footer__col footer__col--newsletter-mobile" data-reveal="fade-up" data-delay="4">
                     <p className="footer__newsletter-label">Stay updated with new listings</p>
                     <form className="footer__newsletter-form" onSubmit={(e) => e.preventDefault()}>
                         <input
@@ -137,7 +166,7 @@ function Footer() {
             </div>
 
             {/* ── Bottom bar ── */}
-            <div className="footer__bottom">
+            <div className="footer__bottom" data-reveal="fade-up" data-delay="2">
                 <p className="footer__copy">© {new Date().getFullYear()} | IJ Estate & Builders | All rights reserved.</p>
                 <div className="footer__bottom-links">
                     <a href="#" className="footer__bottom-link">Privacy Policy</a>

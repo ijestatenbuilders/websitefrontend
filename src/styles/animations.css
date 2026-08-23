@@ -1,0 +1,130 @@
+/* ══════════════════════════════════════════════════════════════
+   SCROLL REVEAL ANIMATION SYSTEM — BUTTER-SMOOTH 60fps
+   GPU-composited ONLY (transform + opacity) — zero layout thrash
+   No filter:blur, no box-shadow transitions in reveal — pure perf.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Base state: all revealable elements start hidden ── */
+[data-reveal] {
+  opacity: 0;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+/* ── Pure Scale Pop-Out (Small -> Full Size — spring zoom, GPU only) ── */
+[data-reveal="pop-scale"] {
+  transform: scale3d(0.4, 0.4, 1) translate3d(0, 18px, 0);
+  opacity: 0;
+  transition:
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+[data-reveal="pop-scale"].is-revealed {
+  opacity: 1;
+  transform: scale3d(1, 1, 1) translate3d(0, 0, 0);
+}
+
+/* ── Fade Up (default) ── */
+[data-reveal="fade-up"] {
+  transform: translate3d(0, 40px, 0);
+  transition:
+    opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+[data-reveal="fade-up"].is-revealed {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* ── Slide from Left ── */
+[data-reveal="slide-left"] {
+  transform: translate3d(-50px, 0, 0);
+  transition:
+    opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+[data-reveal="slide-left"].is-revealed {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* ── Slide from Right ── */
+[data-reveal="slide-right"] {
+  transform: translate3d(50px, 0, 0);
+  transition:
+    opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+[data-reveal="slide-right"].is-revealed {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* ── Pop In (scale + slight translate) ── */
+[data-reveal="pop"] {
+  transform: scale3d(0.8, 0.8, 1);
+  transition:
+    opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+[data-reveal="pop"].is-revealed {
+  opacity: 1;
+  transform: scale3d(1, 1, 1);
+}
+
+/* ── Zoom Fade (scale + fade, no bounce) ── */
+[data-reveal="zoom-fade"] {
+  transform: scale3d(0.9, 0.9, 1);
+  transition:
+    opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+[data-reveal="zoom-fade"].is-revealed {
+  opacity: 1;
+  transform: scale3d(1, 1, 1);
+}
+
+/* ── Perspective Pop (3D card flip up) ── */
+[data-reveal="perspective-pop"] {
+  transform: perspective(900px) rotateX(18deg) scale3d(0.92, 0.92, 1) translate3d(0, 24px, 0);
+  transform-origin: center bottom;
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+[data-reveal="perspective-pop"].is-revealed {
+  opacity: 1;
+  transform: perspective(900px) rotateX(0deg) scale3d(1, 1, 1) translate3d(0, 0, 0);
+}
+
+/* ── Cascade Up (for grids — stagger via delay) ── */
+[data-reveal="cascade-up"] {
+  transform: translate3d(0, 45px, 0);
+  transition:
+    opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+[data-reveal="cascade-up"].is-revealed {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* ── Stagger delays — tight 70ms gaps for rapid sequential pop ── */
+[data-delay="0"]  { transition-delay: 0ms !important; }
+[data-delay="1"]  { transition-delay: 70ms !important; }
+[data-delay="2"]  { transition-delay: 140ms !important; }
+[data-delay="3"]  { transition-delay: 210ms !important; }
+[data-delay="4"]  { transition-delay: 280ms !important; }
+[data-delay="5"]  { transition-delay: 350ms !important; }
+[data-delay="6"]  { transition-delay: 420ms !important; }
+[data-delay="7"]  { transition-delay: 490ms !important; }
+[data-delay="8"]  { transition-delay: 560ms !important; }
+[data-delay="9"]  { transition-delay: 630ms !important; }
+[data-delay="10"] { transition-delay: 700ms !important; }
+[data-delay="11"] { transition-delay: 770ms !important; }
+[data-delay="12"] { transition-delay: 840ms !important; }
+[data-delay="13"] { transition-delay: 910ms !important; }
+[data-delay="14"] { transition-delay: 980ms !important; }
+[data-delay="15"] { transition-delay: 1050ms !important; }

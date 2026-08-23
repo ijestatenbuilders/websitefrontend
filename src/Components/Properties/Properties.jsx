@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BsFillHouseFill } from "react-icons/bs";
 import { PiBuildingApartmentFill } from "react-icons/pi";
 import { FaMapLocationDot } from "react-icons/fa6";
 import { API_URL } from '../../services/api';
+import { useReveal } from '../../utils/useReveal';
 import './Properties.css';
 
 const BrowseProperties = ({ currentLocation = 'bahriatown' }) => {
     const navigate = useNavigate();
+    const revealRef = useReveal();
     const [activeTabs, setActiveTabs] = useState({
         homes: 'popular',
         plots: 'popular',
@@ -15,6 +17,64 @@ const BrowseProperties = ({ currentLocation = 'bahriatown' }) => {
     });
     const [blockOptions, setBlockOptions] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [cardTilts, setCardTilts] = useState({});
+
+    // DOM refs for RAF-driven scroll parallax
+    const bgGridRef = useRef(null);
+    const headerRef = useRef(null);
+    const cardRefs = useRef({});
+
+    const handleCardTiltMove = (key, e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width - 0.5;
+        const y = (e.clientY - rect.top) / rect.height - 0.5;
+        setCardTilts(prev => ({
+            ...prev,
+            [key]: {
+                rx: -y * 12,
+                ry: x * 14,
+                px: (e.clientX - rect.left),
+                py: (e.clientY - rect.top),
+            }
+        }));
+    };
+
+    const handleCardTiltLeave = (key) => {
+        setCardTilts(prev => ({
+            ...prev,
+            [key]: { rx: 0, ry: 0, px: 0, py: 0 }
+        }));
+    };
+
+    // Internal RAF loop — scroll parallax directly to DOM
+    useEffect(() => {
+        let animId;
+        let scrollSmooth = window.scrollY;
+        let scrollTarget = window.scrollY;
+        const LERP = 0.08;
+        const onScroll = () => { scrollTarget = window.scrollY; };
+        window.addEventListener('scroll', onScroll, { passive: true });
+        const loop = () => {
+            scrollSmooth += (scrollTarget - scrollSmooth) * LERP;
+            const sy = scrollSmooth;
+            if (bgGridRef.current)
+                bgGridRef.current.style.transform = `translate3d(0, ${((sy - 800) * 0.07).toFixed(2)}px, 0)`;
+            if (headerRef.current)
+                headerRef.current.style.transform = `translate3d(0, ${((sy - 850) * -0.042).toFixed(2)}px, 0)`;
+            Object.entries(cardRefs.current).forEach(([key, card], index) => {
+                if (!card) return;
+                const tilt = card._tilt || { rx: 0, ry: 0 };
+                const offset = (index - 1) * 12;
+                card.style.transform = `translate3d(0, ${((sy - 1000) * -0.033 + offset).toFixed(2)}px, 0) perspective(1000px) rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg)`;
+            });
+            animId = requestAnimationFrame(loop);
+        };
+        animId = requestAnimationFrame(loop);
+        return () => {
+            window.removeEventListener('scroll', onScroll);
+            cancelAnimationFrame(animId);
+        };
+    }, []);
 
     const propertyTypeByCategory = {
         homes: 'House',
@@ -276,9 +336,18 @@ const BrowseProperties = ({ currentLocation = 'bahriatown' }) => {
     const tabOrder = ['popular', 'size']; // 'areaSize' commented out
 
     return (
-        <section className="browse-properties" id="properties">
+        <section className="browse-properties" id="properties" ref={revealRef}>
+            {/* Parallax Blueprint Grid Layer */}
+            <div className="properties-parallax-grid" ref={bgGridRef} aria-hidden="true" />
+            
             <div className="browse-container">
-                <h2 className="browse-title">Properties</h2>
+                <div className="browse-header-wrap" ref={headerRef} data-reveal="zoom-fade">
+                    <div className="browse-eyebrow">
+                        <span className="browse-eyebrow-pulse" />
+                        <span>PREMIER DIRECTORY // LAHORE DEVELOPMENTS</span>
+                    </div>
+                    <h2 className="browse-title">Properties</h2>
+                </div>
 
                 {loading ? (
                     <div style={{ textAlign: 'center', padding: '40px' }}>
@@ -322,13 +391,32 @@ const BrowseProperties = ({ currentLocation = 'bahriatown' }) => {
                     </div>
                 ) : (
                     <div className="category-cards">
-                        {Object.entries(categories).map(([key, category]) => {
+                        {Object.entries(categories).map(([key, category], index) => {
                             const Icon = category.icon;
                             const currentTab = activeTabs[key];
                             const currentItems = category.tabs[currentTab];
+                            const tilt = cardTilts[key] || { rx: 0, ry: 0, px: 0, py: 0 };
+                            const parallaxOffset = (index - 1) * 12; // Slight natural staggered offset
 
                             return (
-                                <div key={key} className="category-card">
+                                <div
+                                    key={key}
+                                    className="category-card"
+                                    data-reveal="cascade-up"
+                                    data-delay={index}
+                                    ref={(el) => {
+                                        if (el) {
+                                            cardRefs.current[key] = el;
+                                            el._tilt = cardTilts[key] || { rx: 0, ry: 0 };
+                                        }
+                                    }}
+                                    onMouseMove={(e) => handleCardTiltMove(key, e)}
+                                    onMouseLeave={() => handleCardTiltLeave(key)}
+                                    style={{
+                                        '--mouse-x': `${tilt.px}px`,
+                                        '--mouse-y': `${tilt.py}px`,
+                                    }}
+                                >
                                     <div className="category-icon">
                                         <Icon size={41} />
                                     </div>
@@ -343,16 +431,15 @@ const BrowseProperties = ({ currentLocation = 'bahriatown' }) => {
                                             >
                                                 {tabKey === 'popular' && 'Popular'}
                                                 {tabKey === 'size' && 'Size'}
-                                                {/* {tabKey === 'areaSize' && 'Area Size'} */}
                                             </button>
                                         ))}
                                     </div>
 
                                     <div className="properties-grid">
                                         {currentItems && currentItems.length > 0 ? (
-                                            currentItems.map((item, index) => (
+                                            currentItems.map((item, i) => (
                                                 <div
-                                                    key={index}
+                                                    key={i}
                                                     className="property-item"
                                                     onClick={() => handleItemClick(item, currentTab, key)}
                                                     style={{ cursor: (currentTab === 'popular' || currentTab === 'size') ? 'pointer' : 'default' }}
@@ -377,7 +464,7 @@ const BrowseProperties = ({ currentLocation = 'bahriatown' }) => {
                                                 type="button"
                                                 className={`dot ${currentTab === tabKey ? 'active' : ''}`}
                                                 onClick={() => handleTabChange(key, tabKey)}
-                                                aria-label={`Show ${tabKey === 'popular' ? 'Popular' : tabKey === 'size' ? 'Size' : 'Area Size'} tab`}
+                                                aria-label={`Show ${tabKey === 'popular' ? 'Popular' : 'Size'} tab`}
                                             />
                                         ))}
                                     </div>
