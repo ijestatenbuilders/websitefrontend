@@ -491,16 +491,27 @@ export default function RealEstate3DCanvas({ theme = 'light' }) {
       const w = mount.clientWidth;
       const h = mount.clientHeight;
       camera.aspect = w / h;
-      if (w < 768) {
-        camera.position.set(0, 0, 19);
-        jellyRibbon.scale.set(0.7, 0.7, 0.7);
-        jellyRibbon.position.set(0, 0, -2);
+      if (w < 480) {
+        // Tiny phones: pull the camera way back + shrink the whole group hard so
+        // the jelly reads as a super-small, fully-visible ambient accent behind
+        // the content (never cut off, never hidden).
+        camera.position.set(0, 0, 34);
+        worldGroup.scale.setScalar(q.groupScale * 0.32);
+        jellyRibbon.scale.set(0.4, 0.4, 0.4);
+        jellyRibbon.position.set(0, 0.5, -2);
+      } else if (w < 768) {
+        camera.position.set(0, 0, 30);
+        worldGroup.scale.setScalar(q.groupScale * 0.42);
+        jellyRibbon.scale.set(0.45, 0.45, 0.45);
+        jellyRibbon.position.set(0, 0.4, -2);
       } else if (w < 1200) {
         camera.position.set(0, 0, 16);
+        worldGroup.scale.setScalar(q.groupScale);
         jellyRibbon.scale.set(0.88, 0.88, 0.88);
         jellyRibbon.position.set(3.2, -0.4, -2.5);
       } else {
         camera.position.set(0, 0, 15);
+        worldGroup.scale.setScalar(q.groupScale);
         jellyRibbon.scale.set(1.0, 1.0, 1.0);
         jellyRibbon.position.set(4.5, -0.5, -2.5);
       }
