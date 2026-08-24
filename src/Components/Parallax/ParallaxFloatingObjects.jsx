@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { getDeviceTier } from '../../utils/perf';
 import './ParallaxFloatingObjects.css';
 
 /**
@@ -8,9 +9,16 @@ import './ParallaxFloatingObjects.css';
  */
 function ParallaxFloatingObjects() {
   const elementsRef = useRef({});
+  // These ambient tokens are a desktop-only flourish. On phones they clutter
+  // the screen and cost a whole extra RAF loop, so we drop them entirely.
+  const enabled = getDeviceTier() === 'high';
 
   useEffect(() => {
+    if (!enabled) return;
     let animId;
+    let paused = document.hidden;
+    const onVisibility = () => { paused = document.hidden; };
+    document.addEventListener('visibilitychange', onVisibility);
 
     // Smoothed values (lerped each frame)
     let scrollSmooth = window.scrollY;
@@ -40,6 +48,9 @@ function ParallaxFloatingObjects() {
     };
 
     const renderLoop = () => {
+      animId = requestAnimationFrame(renderLoop);
+      if (paused) return;                        // tab hidden → skip work
+
       // Smooth lerp toward targets
       scrollSmooth += (scrollTarget - scrollSmooth) * LERP;
       mouseXSmooth += (mouseXTarget - mouseXSmooth) * LERP;
@@ -76,8 +87,6 @@ function ParallaxFloatingObjects() {
       set(el.popCompass, mx * -22, (sy - 2600) * -0.22, `rotate(${(sy * 0.08).toFixed(1)}deg)`);
       set(el.diamond2,   mx * -18, (sy - 2850) * -0.22, `rotate(${(sy * 0.07 - 25).toFixed(1)}deg)`);
       set(el.popGps,     mx * 24,  (sy - 3050) * -0.16);
-
-      animId = requestAnimationFrame(renderLoop);
     };
 
     animId = requestAnimationFrame(renderLoop);
@@ -85,9 +94,12 @@ function ParallaxFloatingObjects() {
     return () => {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('mousemove', onMouse);
+      document.removeEventListener('visibilitychange', onVisibility);
       cancelAnimationFrame(animId);
     };
-  }, []);
+  }, [enabled]);
+
+  if (!enabled) return null;
 
   return (
     <div className="parallax-ambient-layer" aria-hidden="true">

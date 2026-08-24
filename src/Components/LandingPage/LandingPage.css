@@ -1432,3 +1432,50 @@
 .hero-landmark-badge--mosque {
   animation: heroPopOutSnappy 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) 0.76s both;
 }
+/* ══════════════════════════════════════════════════════════════════
+   PERFORMANCE & MOBILE READABILITY PASS
+   Calmer, faster hero on phones + low-end devices.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* Phones: remove the floating landmark badges & pills. They overlap the
+   headline and search bar and are the main source of visual clutter /
+   overdraw on small screens. The 3D jelly (shrunk in JS) stays as a subtle
+   ambient accent behind readable content. */
+@media (max-width: 768px) {
+  .hero-landmark-badge,
+  .hero-floating-pill {
+    display: none !important;
+  }
+
+  /* Softer film grain — less busy, cheaper to composite. */
+  .landing-grain-overlay {
+    opacity: 0.35;
+  }
+
+  /* Stronger contrast so the headline & statement stay readable over the canvas. */
+  .landing-page__hero-statement {
+    color: #0f172a;
+    text-shadow: 0 1px 10px rgba(255, 255, 255, 0.6);
+  }
+  .landing-page__hero--dark .landing-page__hero-statement {
+    color: #e2e8f0;
+    text-shadow: 0 1px 12px rgba(2, 6, 23, 0.7);
+  }
+}
+
+/* Accessibility + battery: honour the OS "reduce motion" setting everywhere. */
+@media (prefers-reduced-motion: reduce) {
+  .landing-grain-overlay,
+  .landing-marquee-track,
+  .kinetic-char-wrap .char-primary,
+  .kinetic-char-wrap .char-secondary,
+  .agency-pulse-dot,
+  .hero-landmark-badge,
+  .hero-floating-pill {
+    animation: none !important;
+    transition: none !important;
+  }
+  html {
+    scroll-behavior: auto !important;
+  }
+}

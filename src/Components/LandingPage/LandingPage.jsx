@@ -12,6 +12,7 @@ import ProjectPromoSection from '../ProjectPromo/ProjectPromoSection';
 import RealEstate3DCanvas from '../Hero3DRealEstate/RealEstate3DCanvas';
 import ParallaxFloatingObjects from '../Parallax/ParallaxFloatingObjects';
 import PagePreloader from '../Preloader/PagePreloader';
+import { isTouch, prefersReducedMotion } from '../../utils/perf';
 import eiffelImg from '../../Assets/images/eiffletower.png';
 import mosqueImg from '../../Assets/images/background.jpeg';
 import buildingImg from '../../Assets/images/upcoming-project-1.jpg';
@@ -111,8 +112,20 @@ function LandingPage() {
   const _lastScrollTime = useRef(Date.now());
 
   useEffect(() => {
+    // Reduced motion: leave the hero static & readable — no loop at all.
+    if (prefersReducedMotion()) return;
+
     let animId;
     const LERP = 0.085; // smooth responsive easing
+    const touch = isTouch();
+
+    // Cache the hero height so we can skip all hero DOM writes once it is
+    // scrolled off-screen (reading offsetHeight every frame would thrash layout).
+    let heroHeight = heroMainRef.current?.offsetHeight || window.innerHeight;
+    const onResize = () => {
+      heroHeight = heroMainRef.current?.offsetHeight || window.innerHeight;
+    };
+    window.addEventListener('resize', onResize, { passive: true });
 
     const onScroll = () => {
       const now = Date.now();
@@ -130,7 +143,8 @@ function LandingPage() {
     };
 
     window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('mousemove', onMouse, { passive: true });
+    // No mouse parallax on touch devices — pointer never moves, so it is pure waste.
+    if (!touch) window.addEventListener('mousemove', onMouse, { passive: true });
 
     const loop = () => {
       const s = _scroll.current;
@@ -143,8 +157,12 @@ function LandingPage() {
       m.y += (m.rawY / window.innerHeight - m.y) * LERP;
 
       const sy = s.smooth;
-      const mx = m.x - 0.5;
-      const my = m.y - 0.5;
+      const mx = touch ? 0 : m.x - 0.5;
+      const my = touch ? 0 : m.y - 0.5;
+
+      // Skip every hero transform once the hero has scrolled off-screen.
+      const heroVisible = sy < heroHeight + 120;
+      if (heroVisible) {
 
       // Aura glow follower
       a.x += (m.rawX - a.x) * 0.14;
@@ -226,6 +244,8 @@ function LandingPage() {
         heroSearchRef.current.style.transform = `translate3d(${(mx * 4).toFixed(2)}px, ${(-sy * 0.07).toFixed(2)}px, 0)`;
       }
 
+      } // end heroVisible guard
+
       // Marquee velocity skew (smooth decay)
       s.velocity *= 0.92;
       s.smoothVelocity += (s.velocity - s.smoothVelocity) * 0.15;
@@ -240,7 +260,8 @@ function LandingPage() {
 
     return () => {
       window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('mousemove', onMouse);
+      window.removeEventListener('resize', onResize);
+      if (!touch) window.removeEventListener('mousemove', onMouse);
       cancelAnimationFrame(animId);
     };
   }, []);
