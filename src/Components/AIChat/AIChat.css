@@ -902,6 +902,11 @@
 .ai-orb-ring.r1 { opacity: .55; }
 .ai-orb-ring.r2 { opacity: .3; border-color: rgba(2,132,199,.4); }
 
+/* When listening, the orb is a tap target to send immediately */
+.ai-orb-wrap.tappable { cursor: pointer; }
+.ai-orb-wrap.tappable .ai-orb { box-shadow: 0 12px 40px rgba(2,132,199,.45), 0 0 0 3px rgba(56,189,248,.35); }
+.ai-orb-wrap.tappable:hover .ai-orb { transform: scale(1.04); }
+
 /* status-driven animations on the orb */
 .status-speaking .ai-orb { animation: orbSpeak 1s ease-in-out infinite; }
 .status-listening .ai-orb-ring { animation: orbListen 1.8s ease-out infinite; }
@@ -970,4 +975,71 @@
 @media (prefers-color-scheme: dark) {
   .ai-call-caption { background: rgba(15,23,42,.6); color: #e2e8f0; border-color: rgba(30,64,80,.6); }
   .ai-call-status-label { color: #38bdf8; }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   MULTILINGUAL SUPPORT — Urdu / Punjabi (RTL + native font) & lang pill
+   ══════════════════════════════════════════════════════════════════ */
+
+/* Auto-direction text (dir="auto") picks RTL for Urdu/Arabic script; give it a
+   font that renders Nastaʿlīq / Naskh nicely on Windows & most platforms. */
+.message-bubble p[dir],
+.ai-call-caption {
+  font-family: 'Outfit', 'Inter', 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq',
+    'Urdu Typesetting', 'Segoe UI', sans-serif;
+}
+.message-bubble p[dir]:lang(ur),
+.message-bubble p[dir]:lang(pa) { line-height: 1.9; font-size: 1rem; }
+
+/* Live "language detected" pill on the call screen */
+.ai-call-lang-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  font-size: .78rem;
+  font-weight: 700;
+  color: #0369a1;
+  background: rgba(2, 132, 199, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  border-radius: 999px;
+  padding: .3rem .8rem;
+  letter-spacing: .01em;
+  font-family: 'Outfit', 'Inter', sans-serif;
+  animation: aiMessageSlideIn .3s ease both;
+}
+.ai-lang-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, .7);
+  animation: aiPulseDot 1.6s ease-in-out infinite;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   UI POLISH PASS — softer depth, snappier interactions
+   ══════════════════════════════════════════════════════════════════ */
+
+/* Give AI bubbles a subtle gradient + crisper edge */
+.ai-message.ai .message-bubble {
+  background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+}
+.message-bubble:hover {
+  transform: translateY(-1px);
+}
+.ai-message.user .message-bubble:hover {
+  box-shadow: 0 10px 26px rgba(2, 132, 199, 0.34), inset 0 1px 0 rgba(255,255,255,.3);
+}
+.ai-message.ai .message-bubble:hover {
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.09), inset 0 1px 0 #ffffff;
+}
+
+/* Header badge that reflects language ability */
+.ai-header-badge { white-space: nowrap; }
+
+/* Slightly larger, more tappable call language pill on mobile */
+@media (max-width: 600px) {
+  .ai-call-lang-pill { font-size: .82rem; }
+}
+
+@media (prefers-color-scheme: dark) {
+  .ai-call-lang-pill { background: rgba(56,189,248,.14); color: #7dd3fc; border-color: rgba(56,189,248,.4); }
 }

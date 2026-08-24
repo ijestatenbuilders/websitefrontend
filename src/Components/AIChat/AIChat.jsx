@@ -12,13 +12,24 @@ const QUICK_SUGGESTIONS = [
   '🏡 5 Marla house with a pool in Bahria Town',
   '🏢 Commercial plots in Business Bay',
   '💰 Best options under 3.5 Crore',
-  '🌤️ What\'s the weather in Lahore today?'
+  '🗣️ Bahria Town mein ghar dikhayein'
 ];
 
 const GREETING = {
   role: 'assistant',
-  text: "Hello! 👋 I'm Aira, your AI property consultant at IJ Estates. Ask me about our listings — by area, budget, size or features — or tap the phone to talk to me live. I can also help with everyday questions like the weather.",
+  text: "Hello! 👋 I'm **Aira**, your AI property consultant at IJ Estates. Ask me about our listings — by area, budget, size or features — or tap the phone to talk to me live.\n\nYou can talk to me in **English, Urdu or Punjabi** — میں آپ کی زبان میں جواب دوں گی. 🌟",
   timestamp: new Date(),
+};
+
+// Human-friendly label for a Whisper language code / name.
+const LANG_LABEL = (raw = '') => {
+  const l = raw.toLowerCase();
+  if (l.startsWith('ur') || l.includes('urdu')) return '🇵🇰 Urdu';
+  if (l.startsWith('pa') || l.includes('punjab')) return '🇵🇰 Punjabi';
+  if (l.startsWith('hi') || l.includes('hindi')) return '🇮🇳 Hindi';
+  if (l.startsWith('en') || l.includes('english')) return '🇬🇧 English';
+  if (!l || l === 'unknown') return '';
+  return raw.charAt(0).toUpperCase() + raw.slice(1);
 };
 
 // Lightweight markdown -> HTML (bold, bullets, line breaks). Enough for AI replies.
@@ -45,6 +56,7 @@ const AIChat = ({ isOpen, onClose }) => {
   const [speakerOn, setSpeakerOn] = useState(true);
   const [caption, setCaption] = useState('');
   const [level, setLevel] = useState(0);                // mic volume 0..1 for orb
+  const [detectedLang, setDetectedLang] = useState('');// language Whisper heard, for UI + TTS
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -56,6 +68,7 @@ const AIChat = ({ isOpen, onClose }) => {
   const streamRef = useRef(null);
   const audioCtxRef = useRef(null);
   const rafRef = useRef(null);
+  const ttsAudioRef = useRef(null);      // currently-playing neural TTS audio
   const callActiveRef = useRef(false);
   const mutedRef = useRef(false);
   const speakerRef = useRef(true);
@@ -79,7 +92,10 @@ const AIChat = ({ isOpen, onClose }) => {
   }, [isOpen, mode]);
 
   // ── Core API call (shared by chat + call) ────────────────────────────────
-  const askAira = useCallback(async (text, priorMessages) => {
+  // `voice` = true tells the backend to keep replies short and spoken; `replyScript`
+  // ('urdu'|'hindi'|'english') controls which script it answers in so our neural
+  // TTS voice reads it naturally.
+  const askAira = useCallback(async (text, priorMessages, voice = false, replyScript = 'urdu') => {
     const history = priorMessages
       .filter(m => m.role === 'user' || m.role === 'assistant')
       .slice(-8)
@@ -88,7 +104,7 @@ const AIChat = ({ isOpen, onClose }) => {
     const res = await fetch(`${API_URL}/api/ai/chat/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: text, history }),
+      body: JSON.stringify({ message: text, history, voice, reply_script: replyScript }),
     });
     const data = await res.json();
     if (!res.ok && !data.response) throw new Error(data.error || 'Failed');
@@ -135,33 +151,73 @@ const AIChat = ({ isOpen, onClose }) => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); }
   };
 
-  // ── TEXT TO SPEECH (Aira speaks) ──────────────────────────────────────────
-  const speak = useCallback((text) => new Promise((resolve) => {
-    if (!speakerRef.current || !('speechSynthesis' in window)) { resolve(); return; }
-    window.speechSynthesis.cancel();
-    // Strip markdown / emojis so speech sounds clean.
-    const clean = text
-      .replace(/\*\*/g, '')
-      .replace(/[#*_`>]/g, '')
-      .replace(/[\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}]/gu, '')
-      .trim();
-    if (!clean) { resolve(); return; }
-    const u = new SpeechSynthesisUtterance(clean);
-    u.rate = 1.02; u.pitch = 1.05; u.lang = 'en-US';
-    const voices = window.speechSynthesis.getVoices();
-    const preferred = voices.find(v => /female|zira|samantha|aria|google us english/i.test(v.name))
-      || voices.find(v => v.lang?.startsWith('en'));
-    if (preferred) u.voice = preferred;
-    u.onend = resolve;
-    u.onerror = resolve;
-    window.speechSynthesis.speak(u);
-  }), []);
+  // ── TEXT TO SPEECH — natural neural voice served by the backend ────────────
+  // The browser's built-in speech engine sounds robotic (esp. for Urdu). Instead
+  // we fetch human-sounding neural audio (Microsoft Edge voices via edge-tts) from
+  // our own /api/ai/tts/ endpoint and play it. Free, no API key, fluent in Urdu.
+
+  // Map the language the user spoke → the script Aira should reply in. Because the
+  // server has real Urdu/Hindi voices, we always use each language's native script.
+  const scriptForLang = useCallback((hint) => {
+    const h = (hint || '').toLowerCase();
+    if (h.startsWith('ur') || h.includes('urdu') || h.startsWith('pa') || h.includes('punjab')) return 'urdu';
+    if (h.startsWith('hi') || h.includes('hindi')) return 'hindi';
+    return 'english';
+  }, []);
+
+  const stopSpeaking = useCallback(() => {
+    const a = ttsAudioRef.current;
+    if (a) { try { a.pause(); a.src = ''; } catch (_) {} ttsAudioRef.current = null; }
+    window.speechSynthesis?.cancel();
+  }, []);
+
+  // Fetch neural audio for `text` in `lang` and play it. Resolves when playback
+  // finishes (or on any failure) so the call loop always continues to listening.
+  const speak = useCallback(async (text, lang = 'english') => {
+    if (!speakerRef.current || !text?.trim()) return;
+    stopSpeaking();
+    let url;
+    try {
+      const res = await fetch(`${API_URL}/api/ai/tts/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, lang }),
+      });
+      if (!res.ok || !speakerRef.current) return;
+      const blob = await res.blob();
+      if (!blob.size) return;
+      url = URL.createObjectURL(blob);
+    } catch (e) {
+      console.warn('[Aira] TTS request failed', e);
+      return;
+    }
+    await new Promise((resolve) => {
+      const audio = new Audio(url);
+      ttsAudioRef.current = audio;
+      const done = () => {
+        audio.onended = null; audio.onerror = null;
+        if (url) URL.revokeObjectURL(url);
+        if (ttsAudioRef.current === audio) ttsAudioRef.current = null;
+        resolve();
+      };
+      audio.onended = done;
+      audio.onerror = done;
+      audio.play().catch(done);
+    });
+  }, [stopSpeaking]);
 
   // ── VOICE CAPTURE with silence auto-stop (call feel) ──────────────────────
   const startListening = useCallback(async () => {
     if (!callActiveRef.current || mutedRef.current) return;
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          channelCount: 1,
+        },
+      });
       streamRef.current = stream;
 
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -188,14 +244,26 @@ const AIChat = ({ isOpen, onClose }) => {
 
       recorder.start();
       setCallStatus('listening');
-      setCaption('Listening…');
+      setCaption('Listening… (tap the circle when you\'re done)');
 
-      // Silence detection: stop ~1.4s after speech ends, hard cap 12s.
+      // Robust voice-activity detection so we don't cut people off OR stop before
+      // they even start talking:
+      //  • WARMUP_MS: ignore the first moments (mic opening / greeting echo).
+      //  • Require SUSTAINED speech (several consecutive loud frames) before we
+      //    treat it as "the user spoke" — a single click/noise spike won't count.
+      //  • MIN_MS: never stop the recording before this, so a short startup blip
+      //    can't end the turn instantly.
+      //  • SILENCE_MS: after real speech, stop once they pause this long.
       let spoke = false;
+      let voiceFrames = 0;
       let silenceStart = null;
       const started = Date.now();
-      const SPEAK_THRESHOLD = 0.045;
-      const SILENCE_MS = 1400;
+      const SPEAK_THRESHOLD = 0.035;
+      const NEED_FRAMES = 4;
+      const SILENCE_MS = 1500;
+      const MIN_MS = 900;
+      const WARMUP_MS = 350;
+      const MAX_MS = 15000;
 
       const tick = () => {
         if (!mediaRecorderRef.current || mediaRecorderRef.current.state !== 'recording') return;
@@ -206,12 +274,21 @@ const AIChat = ({ isOpen, onClose }) => {
         setLevel(Math.min(1, rms * 4));
 
         const now = Date.now();
-        if (rms > SPEAK_THRESHOLD) { spoke = true; silenceStart = null; }
-        else if (spoke) {
-          if (silenceStart === null) silenceStart = now;
-          else if (now - silenceStart > SILENCE_MS) { stopListening(); return; }
+        const elapsed = now - started;
+        if (elapsed < WARMUP_MS) { rafRef.current = requestAnimationFrame(tick); return; }
+
+        if (rms > SPEAK_THRESHOLD) {
+          voiceFrames++;
+          if (voiceFrames >= NEED_FRAMES) spoke = true;
+          silenceStart = null;
+        } else {
+          voiceFrames = 0;
+          if (spoke && elapsed > MIN_MS) {
+            if (silenceStart === null) silenceStart = now;
+            else if (now - silenceStart > SILENCE_MS) { stopListening(); return; }
+          }
         }
-        if (now - started > 12000) { stopListening(); return; }
+        if (elapsed > MAX_MS) { stopListening(); return; }
         rafRef.current = requestAnimationFrame(tick);
       };
       rafRef.current = requestAnimationFrame(tick);
@@ -229,8 +306,14 @@ const AIChat = ({ isOpen, onClose }) => {
 
   const handleVoiceTurn = useCallback(async (blob) => {
     if (!callActiveRef.current) return;
+    console.log('[Aira] captured audio blob:', blob.size, 'bytes');
     // Ignore ultra-short (no speech) clips.
-    if (blob.size < 2000) { if (callActiveRef.current && !mutedRef.current) startListening(); return; }
+    if (blob.size < 1200) {
+      console.log('[Aira] clip too short, re-listening');
+      setCaption('Didn\'t hear anything — go ahead, I\'m listening…');
+      if (callActiveRef.current && !mutedRef.current) setTimeout(startListening, 300);
+      return;
+    }
 
     setCallStatus('thinking');
     setCaption('…');
@@ -239,12 +322,15 @@ const AIChat = ({ isOpen, onClose }) => {
       const fd = new FormData();
       fd.append('audio', blob, 'recording.webm');
       const tRes = await fetch(`${API_URL}/api/ai/transcribe/`, { method: 'POST', body: fd });
-      const tData = await tRes.json();
+      const tData = await tRes.json().catch(() => ({}));
+      console.log('[Aira] transcription:', tRes.status, tData);
       const userText = (tData.text || '').trim();
+      const lang = (tData.language || '').toLowerCase();
+      if (lang) setDetectedLang(lang);
 
       if (!userText) {
-        setCaption("I didn't catch that. Please try again.");
-        if (callActiveRef.current && !mutedRef.current) setTimeout(startListening, 800);
+        setCaption('I didn\'t catch that — please speak a little louder and try again.');
+        if (callActiveRef.current && !mutedRef.current) setTimeout(startListening, 700);
         return;
       }
 
@@ -253,14 +339,16 @@ const AIChat = ({ isOpen, onClose }) => {
       setMessages(prev => { convo = [...prev, userMsg]; return convo; });
       setCaption(`You: ${userText}`);
 
-      // 2) ask Aira
-      const { text, properties } = await askAira(userText, convo || [...messages, userMsg]);
+      // 2) ask Aira. Pick the reply script that will sound most natural aloud on
+      //    this device, and tell the backend to answer in that script.
+      const script = scriptForLang(lang);
+      const { text, properties } = await askAira(userText, convo || [...messages, userMsg], true, script);
       setMessages(prev => [...prev, { role: 'assistant', text, properties, timestamp: new Date() }]);
 
-      // 3) speak
+      // 3) speak in the language the user spoke
       setCallStatus('speaking');
       setCaption(text.replace(/\[\[PROPS.*?\]\]/g, '').trim());
-      await speak(text);
+      await speak(text, script);
     } catch (e) {
       setCaption('Connection issue. Retrying…');
     } finally {
@@ -283,9 +371,10 @@ const AIChat = ({ isOpen, onClose }) => {
     setSpeakerOn(true);
     setCaption('Connecting…');
     setCallStatus('speaking');
-    // Aira greets, then starts listening.
-    const hi = "Hi, you're connected to Aira from IJ Estates. How can I help you today?";
-    speak(hi).then(() => {
+    // Aira greets in Urdu (natural neural voice), then starts listening. This also
+    // signals to the user right away that they can speak Urdu/Punjabi.
+    const hi = 'السلام علیکم! میں آئرا ہوں، آئی جے اسٹیٹس سے۔ آپ مجھ سے اردو، پنجابی یا انگلش، کسی بھی زبان میں بات کر سکتے ہیں۔ بتائیے، میں آپ کی کیا مدد کر سکتی ہوں؟';
+    speak(hi, 'urdu').then(() => {
       if (callActiveRef.current && !mutedRef.current) { setCallStatus('listening'); startListening(); }
     });
     setCaption(hi);
@@ -297,12 +386,13 @@ const AIChat = ({ isOpen, onClose }) => {
     setCallStatus('idle');
     setCaption('');
     setLevel(0);
-    window.speechSynthesis?.cancel();
+    setDetectedLang('');
+    stopSpeaking();
     stopListening();
     cancelAnimationFrame(rafRef.current);
     streamRef.current?.getTracks().forEach(t => t.stop());
     setMode('chat');
-  }, [stopListening]);
+  }, [stopListening, stopSpeaking]);
 
   const toggleMute = () => {
     setMuted(prev => {
@@ -320,7 +410,7 @@ const AIChat = ({ isOpen, onClose }) => {
     endCall();
     setTimeout(() => { setIsAnimatingOut(false); onClose(); }, 300);
   };
-  useEffect(() => () => { window.speechSynthesis?.cancel(); cancelAnimationFrame(rafRef.current); }, []);
+  useEffect(() => () => { stopSpeaking(); cancelAnimationFrame(rafRef.current); }, [stopSpeaking]);
 
   const handlePropertyClick = (propertyId, locationCode) => {
     handleClose();
@@ -412,7 +502,11 @@ const AIChat = ({ isOpen, onClose }) => {
         {/* ── CALL MODE ── */}
         {mode === 'call' ? (
           <div className="ai-call-screen">
-            <div className={`ai-orb-wrap status-${callStatus}`}>
+            <div
+              className={`ai-orb-wrap status-${callStatus} ${callStatus === 'listening' ? 'tappable' : ''}`}
+              onClick={() => { if (callStatus === 'listening') stopListening(); }}
+              title={callStatus === 'listening' ? 'Tap to send' : ''}
+            >
               <div className="ai-orb-ring r1" style={{ transform: `scale(${1 + level * 0.5})` }} />
               <div className="ai-orb-ring r2" style={{ transform: `scale(${1 + level * 0.8})` }} />
               <div className="ai-orb" style={{ transform: `scale(${1 + level * 0.25})` }}>
@@ -427,7 +521,13 @@ const AIChat = ({ isOpen, onClose }) => {
               {callStatus === 'idle' && (muted ? 'Muted' : 'Connecting…')}
             </div>
 
-            <div className="ai-call-caption">{caption}</div>
+            {LANG_LABEL(detectedLang) && (
+              <div className="ai-call-lang-pill">
+                <span className="ai-lang-dot" /> {LANG_LABEL(detectedLang)}
+              </div>
+            )}
+
+            <div className="ai-call-caption" dir="auto">{caption}</div>
 
             <div className="ai-call-controls">
               <button className={`ai-call-btn ${muted ? 'off' : ''}`} onClick={toggleMute} title={muted ? 'Unmute' : 'Mute'}>
@@ -437,12 +537,12 @@ const AIChat = ({ isOpen, onClose }) => {
                 <FaPhoneSlash />
               </button>
               <button className={`ai-call-btn ${!speakerOn ? 'off' : ''}`}
-                onClick={() => { setSpeakerOn(s => !s); if (speakerOn) window.speechSynthesis?.cancel(); }}
+                onClick={() => { setSpeakerOn(s => !s); if (speakerOn) stopSpeaking(); }}
                 title={speakerOn ? 'Speaker off' : 'Speaker on'}>
                 {speakerOn ? <FaVolumeUp /> : <FaVolumeMute />}
               </button>
             </div>
-            <p className="ai-call-hint">Speak naturally — I'll reply when you pause. Tap the red button to end.</p>
+            <p className="ai-call-hint">Speak in <strong>English, Urdu or Punjabi</strong> — I reply in your language. If I don't stop on my own, <strong>tap the circle</strong> to send. Red button ends the call.</p>
           </div>
         ) : (
           /* ── CHAT MODE ── */
@@ -452,7 +552,7 @@ const AIChat = ({ isOpen, onClose }) => {
                 <div key={index} className={`ai-message ${message.role === 'user' ? 'user' : 'ai'}`}>
                   <div className="message-content">
                     <div className={`message-bubble ${message.isError ? 'error' : ''}`}>
-                      <p dangerouslySetInnerHTML={{ __html: renderText(message.text) }} />
+                      <p dir="auto" dangerouslySetInnerHTML={{ __html: renderText(message.text) }} />
                       <span className="message-time">{formatTime(message.timestamp)}</span>
                     </div>
                     {message.properties?.length > 0 && <PropertyCards properties={message.properties} />}
