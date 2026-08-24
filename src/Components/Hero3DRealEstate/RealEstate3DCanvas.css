@@ -6,6 +6,16 @@
   pointer-events: none;
   z-index: 1;
   overflow: hidden;
+  /* Promote the WebGL surface onto its own GPU compositor layer. Without this,
+     scrolling forces Chrome to repaint this full-viewport canvas into the page's
+     scroll tiles every frame, saturating the main thread and starving the rAF
+     render loop (FPS collapses to ~10 during scroll and only mouse-driven frames
+     mask it). Isolated on its own layer, scrolling just shifts the layer on the
+     GPU — cheap — so the animation keeps its frame rate. */
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+  contain: layout paint;
 }
 
 .real-estate-3d-canvas canvas {
@@ -13,4 +23,7 @@
   height: 100% !important;
   display: block;
   outline: none;
+  /* Keep the GL canvas itself on the isolated layer too. */
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
