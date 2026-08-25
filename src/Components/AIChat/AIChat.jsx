@@ -77,6 +77,14 @@ const AIChat = ({ isOpen, onClose }) => {
   useEffect(() => { mutedRef.current = muted; }, [muted]);
   useEffect(() => { speakerRef.current = speakerOn; }, [speakerOn]);
 
+  // Warm up the browser voice list (used only as a fallback if neural TTS fails).
+  useEffect(() => {
+    if (!('speechSynthesis' in window)) return;
+    window.speechSynthesis.getVoices();
+    window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+    return () => { window.speechSynthesis.onvoiceschanged = null; };
+  }, []);
+
   const scrollToBottom = () => {
     requestAnimationFrame(() => {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
@@ -173,6 +181,32 @@ const AIChat = ({ isOpen, onClose }) => {
 
   // Fetch neural audio for `text` in `lang` and play it. Resolves when playback
   // finishes (or on any failure) so the call loop always continues to listening.
+
+  // Fallback voice: the browser's built-in speech engine. Robotic, but always
+  // available — so Aira is NEVER silent even if the neural TTS server is
+  // unreachable (e.g. edge-tts blocked on the host, backend down, offline).
+  const speakBrowser = useCallback((text, lang = 'english') => new Promise((resolve) => {
+    if (!speakerRef.current || !('speechSynthesis' in window)) { resolve(); return; }
+    try {
+      window.speechSynthesis.cancel();
+      const map = { urdu: 'ur-PK', punjabi: 'ur-PK', hindi: 'hi-IN', english: 'en-US' };
+      const code = map[(lang || '').toLowerCase()] || 'en-US';
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = code;
+      const voices = window.speechSynthesis.getVoices() || [];
+      const v = voices.find(x => x.lang?.toLowerCase().startsWith(code.slice(0, 2).toLowerCase()))
+             || voices.find(x => x.lang?.startsWith('en'));
+      if (v) { u.voice = v; u.lang = v.lang; }
+      u.rate = 0.97;
+      let done = false;
+      const fin = () => { if (!done) { done = true; resolve(); } };
+      u.onend = fin; u.onerror = fin;
+      // Web Speech onend is unreliable — watchdog guarantees the loop continues.
+      setTimeout(fin, Math.min(30000, 3000 + (text.split(/\s+/).length * 450)));
+      window.speechSynthesis.speak(u);
+    } catch (_) { resolve(); }
+  }), []);
+
   const speak = useCallback(async (text, lang = 'english') => {
     if (!speakerRef.current || !text?.trim()) return;
     stopSpeaking();
@@ -183,28 +217,32 @@ const AIChat = ({ isOpen, onClose }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text, lang }),
       });
-      if (!res.ok || !speakerRef.current) return;
+      if (!speakerRef.current) return;
+      if (!res.ok) {
+        console.warn('[Aira] TTS server error', res.status, '— using browser voice');
+        return speakBrowser(text, lang);
+      }
       const blob = await res.blob();
-      if (!blob.size) return;
+      if (!blob.size) { console.warn('[Aira] TTS empty — using browser voice'); return speakBrowser(text, lang); }
       url = URL.createObjectURL(blob);
     } catch (e) {
-      console.warn('[Aira] TTS request failed', e);
-      return;
+      console.warn('[Aira] TTS request failed', e, '— using browser voice');
+      return speakBrowser(text, lang);
     }
     await new Promise((resolve) => {
       const audio = new Audio(url);
       ttsAudioRef.current = audio;
-      const done = () => {
+      const cleanup = () => {
         audio.onended = null; audio.onerror = null;
         if (url) URL.revokeObjectURL(url);
         if (ttsAudioRef.current === audio) ttsAudioRef.current = null;
-        resolve();
       };
-      audio.onended = done;
-      audio.onerror = done;
-      audio.play().catch(done);
+      audio.onended = () => { cleanup(); resolve(); };
+      audio.onerror = () => { cleanup(); resolve(); };
+      // If playback is blocked (autoplay) or fails, fall back to the browser voice.
+      audio.play().catch(() => { cleanup(); speakBrowser(text, lang).then(resolve); });
     });
-  }, [stopSpeaking]);
+  }, [stopSpeaking, speakBrowser]);
 
   // ── VOICE CAPTURE with silence auto-stop (call feel) ──────────────────────
   const startListening = useCallback(async () => {
