@@ -116,8 +116,37 @@ const AIChat = ({ isOpen, onClose }) => {
     return {
       text: data.response || "I couldn't process that. Please try again.",
       properties: data.properties || [],
+      actions: data.actions || [],
     };
   }, []);
+
+  // ── ACTION EXECUTOR — lets Aira actually operate the website ───────────────
+  // Runs the actions the AI returned: navigate pages, open a property, or submit
+  // an enquiry. This is what turns Aira from a chatbot into a site operator.
+  const executeActions = useCallback(async (actions) => {
+    if (!Array.isArray(actions)) return;
+    for (const a of actions) {
+      try {
+        if (a.type === 'navigate' && a.target) {
+          navigate(a.target);
+        } else if (a.type === 'open_property' && a.id != null) {
+          navigate(`/property/${a.id}`);
+        } else if (a.type === 'enquiry' && a.name && a.phone) {
+          await fetch(`${API_URL}/api/enquiries/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: a.name, phone: a.phone,
+              email: a.email || '', message: a.message || '',
+              property: a.property_id || null,
+            }),
+          });
+        }
+      } catch (e) {
+        console.warn('[Aira] action failed', a, e);
+      }
+    }
+  }, [navigate]);
 
   // ── CHAT MODE ─────────────────────────────────────────────────────────────
   const handleInputChange = (e) => {
@@ -139,8 +168,9 @@ const AIChat = ({ isOpen, onClose }) => {
     setIsLoading(true);
 
     try {
-      const { text, properties } = await askAira(textToSend, next);
+      const { text, properties, actions } = await askAira(textToSend, next);
       setMessages(prev => [...prev, { role: 'assistant', text, properties, timestamp: new Date() }]);
+      executeActions(actions);
     } catch (e) {
       setMessages(prev => [...prev, {
         role: 'assistant',
@@ -360,13 +390,14 @@ const AIChat = ({ isOpen, onClose }) => {
       // 2) ask Aira. Pick the reply script that will sound most natural aloud on
       //    this device, and tell the backend to answer in that script.
       const script = scriptForLang(lang);
-      const { text, properties } = await askAira(userText, convo || [...messages, userMsg], true, script);
+      const { text, properties, actions } = await askAira(userText, convo || [...messages, userMsg], true, script);
       setMessages(prev => [...prev, { role: 'assistant', text, properties, timestamp: new Date() }]);
 
-      // 3) speak in the language the user spoke
+      // 3) speak the confirmation, THEN carry out any website actions
       setCallStatus('speaking');
       setCaption(text.replace(/\[\[PROPS.*?\]\]/g, '').trim());
       await speak(text, script);
+      executeActions(actions);
     } catch (e) {
       setCaption('Connection issue. Retrying…');
     } finally {
@@ -379,7 +410,7 @@ const AIChat = ({ isOpen, onClose }) => {
         setCaption('Muted. Unmute to keep talking.');
       }
     }
-  }, [askAira, speak, messages, startListening]);
+  }, [askAira, speak, messages, startListening, executeActions]);
 
   const startCall = useCallback(() => {
     unlockAudio();          // must run inside the tap gesture so neural audio can play
@@ -431,9 +462,9 @@ const AIChat = ({ isOpen, onClose }) => {
   };
   useEffect(() => () => { stopSpeaking(); cancelAnimationFrame(rafRef.current); }, [stopSpeaking]);
 
-  const handlePropertyClick = (propertyId, locationCode) => {
+  const handlePropertyClick = (propertyId) => {
     handleClose();
-    navigate(`/properties/${locationCode}/${propertyId}`);
+    navigate(`/property/${propertyId}`);
   };
 
   const formatTime = (date) =>
@@ -451,7 +482,7 @@ const AIChat = ({ isOpen, onClose }) => {
       <div className="property-cards-container">
         {properties.map((property) => (
           <div key={property.id} className="ai-property-card"
-            onClick={() => handlePropertyClick(property.id, property.location_code)}>
+            onClick={() => handlePropertyClick(property.id)}>
             <div className="property-card-image">
               {property.image
                 ? <img src={property.image} alt={property.name} />
@@ -478,6 +509,48 @@ const AIChat = ({ isOpen, onClose }) => {
       </div>
     </div>
   );
+
+  // ── SIRI-STYLE VOICE MODE — a compact floating orb at the top of the screen.
+  // No backdrop, so the page stays visible/usable while Aira drives the site.
+  if (mode === 'call') {
+    return (
+      <div className="ai-siri" role="dialog" aria-label="Aira voice assistant">
+        <div className={`ai-siri-card status-${callStatus}`}>
+          <div
+            className={`ai-siri-orb-wrap ${callStatus === 'listening' ? 'tappable' : ''}`}
+            onClick={() => { if (callStatus === 'listening') stopListening(); }}
+            title={callStatus === 'listening' ? 'Tap to send' : ''}
+          >
+            <div className="ai-orb-ring r1" style={{ transform: `scale(${1 + level * 0.6})` }} />
+            <div className="ai-orb-ring r2" style={{ transform: `scale(${1 + level * 0.9})` }} />
+            <div className="ai-siri-orb" style={{ transform: `scale(${1 + level * 0.22})` }}><span>Aira</span></div>
+          </div>
+
+          <div className="ai-siri-body">
+            <div className="ai-siri-top">
+              <span className="ai-siri-status">
+                {callStatus === 'listening' && 'Listening…'}
+                {callStatus === 'thinking' && 'Thinking…'}
+                {callStatus === 'speaking' && 'Speaking…'}
+                {callStatus === 'idle' && (muted ? 'Muted' : 'Connecting…')}
+              </span>
+              {LANG_LABEL(detectedLang) && <span className="ai-siri-lang">{LANG_LABEL(detectedLang)}</span>}
+            </div>
+            <div className="ai-siri-caption" dir="auto">{caption || 'Speak in Urdu, Punjabi or English…'}</div>
+          </div>
+
+          <div className="ai-siri-controls">
+            <button className={`ai-siri-btn ${muted ? 'off' : ''}`} onClick={toggleMute} title={muted ? 'Unmute' : 'Mute'}>
+              {muted ? <FaMicrophoneSlash /> : <FaMicrophone />}
+            </button>
+            <button className="ai-siri-btn end" onClick={endCall} title="End voice">
+              <FaPhoneSlash />
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>

@@ -14,6 +14,8 @@ import CommunityForums from './Components/CommunityForums/CommunityForums';
 import ThreadDetail from './Components/ThreadDetail/ThreadDetail';
 import NotFound from './Components/NotFound/NotFound';
 import ProjectPromo from './Components/ProjectPromo/ProjectPromo';
+import AIChat from './Components/AIChat/AIChat';
+import { useAiraOpen, airaStore } from './utils/airaStore';
 
 // Lazy load new flagship 3D Showcase (Inspired by asaram.dev & Aether Shoes)
 const Showcase3D = lazy(() => import('./Components/Showcase3D/Showcase3D'));
@@ -77,10 +79,21 @@ function App() {
 
           {/* Floating promo card — shown on all pages except the project page itself */}
           <ProjectPromo />
+
+          {/* Global AI assistant — mounted once so voice sessions & actions
+              persist across page navigation. */}
+          <GlobalAira />
         </div>
       </BrowserRouter>
     </HelmetProvider>
   );
+}
+
+// Reads open state from the shared store; lives above the router so it can
+// navigate the site and stay alive while pages change underneath it.
+function GlobalAira() {
+  const isOpen = useAiraOpen();
+  return <AIChat isOpen={isOpen} onClose={() => airaStore.close()} />;
 }
 
 export default App;

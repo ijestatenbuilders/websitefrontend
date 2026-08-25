@@ -1043,3 +1043,104 @@
 @media (prefers-color-scheme: dark) {
   .ai-call-lang-pill { background: rgba(56,189,248,.14); color: #7dd3fc; border-color: rgba(56,189,248,.4); }
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   SIRI-STYLE FLOATING VOICE ORB — compact widget at the top of screen
+   so Aira can drive the site while staying out of the way.
+   ══════════════════════════════════════════════════════════════════ */
+.ai-siri {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000002;
+  pointer-events: none;                 /* let clicks pass to the page around it */
+  width: min(440px, calc(100vw - 24px));
+  animation: aiSiriDrop .4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes aiSiriDrop {
+  from { opacity: 0; transform: translate(-50%, -16px) scale(.96); }
+  to   { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+
+.ai-siri-card {
+  pointer-events: auto;                 /* the widget itself is interactive */
+  display: flex;
+  align-items: center;
+  gap: .85rem;
+  padding: .6rem .8rem;
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(255,255,255,.97), rgba(240,249,255,.95));
+  border: 1.5px solid rgba(186, 230, 253, 0.95);
+  box-shadow: 0 18px 50px rgba(2,132,199,.22), 0 6px 18px rgba(15,23,42,.12), inset 0 1.5px 0 #fff;
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+}
+
+/* Compact orb (reuses .ai-orb-ring animations from the call screen) */
+.ai-siri-orb-wrap {
+  position: relative;
+  width: 56px; height: 56px;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.ai-siri-orb-wrap .ai-orb-ring {
+  position: absolute; width: 44px; height: 44px; border-radius: 50%;
+  border: 2px solid rgba(14,165,233,.45);
+}
+.ai-siri-orb-wrap .ai-orb-ring.r2 { border-color: rgba(2,132,199,.4); opacity:.4; }
+.ai-siri-orb {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: linear-gradient(135deg, #38bdf8 0%, #0284c7 55%, #0369a1 100%);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-weight: 800; font-size: .62rem; letter-spacing: .04em; text-transform: uppercase;
+  box-shadow: 0 8px 24px rgba(2,132,199,.5), inset 0 2px 5px rgba(255,255,255,.4);
+  transition: transform .08s linear;
+  z-index: 2;
+}
+.ai-siri-orb-wrap.tappable { cursor: pointer; }
+.ai-siri-orb-wrap.tappable .ai-siri-orb { box-shadow: 0 8px 24px rgba(2,132,199,.5), 0 0 0 3px rgba(56,189,248,.4); }
+
+/* status-driven orb animations (mirror the call-screen ones) */
+.ai-siri-card.status-speaking .ai-siri-orb { animation: orbSpeak 1s ease-in-out infinite; }
+.ai-siri-card.status-listening .ai-orb-ring { animation: orbListen 1.8s ease-out infinite; }
+.ai-siri-card.status-thinking .ai-siri-orb { animation: orbThink 1.4s ease-in-out infinite; }
+
+.ai-siri-body { flex: 1; min-width: 0; text-align: left; }
+.ai-siri-top { display: flex; align-items: center; gap: .5rem; margin-bottom: .1rem; }
+.ai-siri-status { font-size: .78rem; font-weight: 800; color: #0369a1; font-family: 'Outfit','Inter',sans-serif; }
+.ai-siri-lang {
+  font-size: .62rem; font-weight: 700; color: #0284c7;
+  background: rgba(2,132,199,.1); border: 1px solid rgba(56,189,248,.4);
+  border-radius: 999px; padding: .05rem .4rem;
+}
+.ai-siri-caption {
+  font-size: .82rem; line-height: 1.35; color: #1e293b;
+  font-family: 'Inter', 'Noto Nastaliq Urdu', sans-serif;
+  max-height: 3.5em; overflow-y: auto;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+}
+
+.ai-siri-controls { display: flex; align-items: center; gap: .4rem; flex-shrink: 0; }
+.ai-siri-btn {
+  width: 38px; height: 38px; border-radius: 50%; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  background: #eff6ff; color: #0369a1; font-size: .95rem;
+  transition: transform .15s ease, background .15s ease, color .15s ease;
+  box-shadow: 0 3px 10px rgba(2,132,199,.15);
+}
+.ai-siri-btn:hover { transform: translateY(-2px) scale(1.05); }
+.ai-siri-btn.off { background: #e2e8f0; color: #64748b; }
+.ai-siri-btn.end { background: linear-gradient(135deg,#ef4444,#b91c1c); color:#fff; box-shadow: 0 5px 16px rgba(239,68,68,.45); }
+
+@media (max-width: 600px) {
+  .ai-siri { top: 10px; width: calc(100vw - 16px); }
+  .ai-siri-caption { -webkit-line-clamp: 2; }
+}
+
+@media (prefers-color-scheme: dark) {
+  .ai-siri-card { background: linear-gradient(180deg, rgba(15,23,42,.96), rgba(12,20,38,.94)); border-color: rgba(30,64,80,.7); }
+  .ai-siri-caption { color: #e2e8f0; }
+  .ai-siri-status { color: #38bdf8; }
+  .ai-siri-btn { background: rgba(56,189,248,.12); color: #7dd3fc; }
+}

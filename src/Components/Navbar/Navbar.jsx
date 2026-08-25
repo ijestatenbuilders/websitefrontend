@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './Navbar.css';
 import logo from '../../Assets/images/logo.jpg';
-import AIChat from '../AIChat/AIChat';
+import { airaStore } from '../../utils/airaStore';
 
 /* ═══════════════════════════════════════════════════════════
    SEARCH MODAL DATA  (mirrors LandingPage options exactly)
@@ -349,7 +349,6 @@ function Navbar({ variant = 'default', heroTheme = 'light', onToggleTheme }) {
   const [isScrolled, setIsScrolled] = useState(variant === 'scrolled' ? true : false);
   const [activeLink, setActiveLink] = useState('home');
   const [modalOpen, setModalOpen] = useState(false);
-  const [aiChatOpen, setAiChatOpen] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -500,7 +499,7 @@ function Navbar({ variant = 'default', heroTheme = 'light', onToggleTheme }) {
             {/* AI Assistant Button */}
             <button
               className="navbar__ai-btn navbar__ai-btn--desktop"
-              onClick={() => setAiChatOpen(true)}
+              onClick={() => airaStore.open()}
               aria-label="AI Assistant"
             >
               <span className="navbar__ai-pulse"></span>
@@ -584,7 +583,7 @@ function Navbar({ variant = 'default', heroTheme = 'light', onToggleTheme }) {
             </button>
             <button
               className="navbar__ai-btn navbar__ai-btn--mobile"
-              onClick={() => { setAiChatOpen(true); closeMenu(); }}
+              onClick={() => { airaStore.open(); closeMenu(); }}
             >
               <span className="navbar__ai-pulse"></span>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -604,8 +603,6 @@ function Navbar({ variant = 'default', heroTheme = 'light', onToggleTheme }) {
       {/* Modal */}
       {modalOpen && <FindPropertyModal onClose={closeModal} />}
 
-      {/* AI Chat */}
-      <AIChat isOpen={aiChatOpen} onClose={() => setAiChatOpen(false)} />
     </>
   );
 }
