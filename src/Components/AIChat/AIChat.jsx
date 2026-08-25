@@ -8,11 +8,6 @@ import './AIChat.css';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
-// Tiny silent WAV. Playing this inside the call-tap gesture "unlocks" the audio
-// element so the neural TTS clips can autoplay afterwards (browsers block audio
-// that isn't tied to a user gesture — which otherwise silently falls back).
-const SILENT_WAV = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
-
 const QUICK_SUGGESTIONS = [
   '🏡 5 Marla house with a pool in Bahria Town',
   '🏢 Commercial plots in Business Bay',
@@ -81,14 +76,6 @@ const AIChat = ({ isOpen, onClose }) => {
   useEffect(() => { callActiveRef.current = callActive; }, [callActive]);
   useEffect(() => { mutedRef.current = muted; }, [muted]);
   useEffect(() => { speakerRef.current = speakerOn; }, [speakerOn]);
-
-  // Warm up the browser voice list (used only as a fallback if neural TTS fails).
-  useEffect(() => {
-    if (!('speechSynthesis' in window)) return;
-    window.speechSynthesis.getVoices();
-    window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
-    return () => { window.speechSynthesis.onvoiceschanged = null; };
-  }, []);
 
   const scrollToBottom = () => {
     requestAnimationFrame(() => {
@@ -178,53 +165,14 @@ const AIChat = ({ isOpen, onClose }) => {
     return 'english';
   }, []);
 
-  // One persistent audio element, reused for every clip. Unlocking it once (on the
-  // call tap) lets all later neural clips play without the browser blocking them.
-  const getAudioEl = () => (ttsAudioRef.current || (ttsAudioRef.current = new Audio()));
-
-  const unlockAudio = useCallback(() => {
-    try {
-      const a = getAudioEl();
-      a.src = SILENT_WAV;
-      const p = a.play();
-      if (p && p.catch) p.catch(() => {});
-    } catch (_) {}
-  }, []);
-
   const stopSpeaking = useCallback(() => {
     const a = ttsAudioRef.current;
-    if (a) { try { a.pause(); } catch (_) {} }   // keep the (unlocked) element alive
+    if (a) { try { a.pause(); a.src = ''; } catch (_) {} ttsAudioRef.current = null; }
     window.speechSynthesis?.cancel();
   }, []);
 
   // Fetch neural audio for `text` in `lang` and play it. Resolves when playback
   // finishes (or on any failure) so the call loop always continues to listening.
-
-  // Fallback voice: the browser's built-in speech engine. Robotic, but always
-  // available — so Aira is NEVER silent even if the neural TTS server is
-  // unreachable (e.g. edge-tts blocked on the host, backend down, offline).
-  const speakBrowser = useCallback((text, lang = 'english') => new Promise((resolve) => {
-    if (!speakerRef.current || !('speechSynthesis' in window)) { resolve(); return; }
-    try {
-      window.speechSynthesis.cancel();
-      const map = { urdu: 'ur-PK', punjabi: 'ur-PK', hindi: 'hi-IN', english: 'en-US' };
-      const code = map[(lang || '').toLowerCase()] || 'en-US';
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = code;
-      const voices = window.speechSynthesis.getVoices() || [];
-      const v = voices.find(x => x.lang?.toLowerCase().startsWith(code.slice(0, 2).toLowerCase()))
-             || voices.find(x => x.lang?.startsWith('en'));
-      if (v) { u.voice = v; u.lang = v.lang; }
-      u.rate = 0.97;
-      let done = false;
-      const fin = () => { if (!done) { done = true; resolve(); } };
-      u.onend = fin; u.onerror = fin;
-      // Web Speech onend is unreliable — watchdog guarantees the loop continues.
-      setTimeout(fin, Math.min(30000, 3000 + (text.split(/\s+/).length * 450)));
-      window.speechSynthesis.speak(u);
-    } catch (_) { resolve(); }
-  }), []);
-
   const speak = useCallback(async (text, lang = 'english') => {
     if (!speakerRef.current || !text?.trim()) return;
     stopSpeaking();
@@ -235,32 +183,28 @@ const AIChat = ({ isOpen, onClose }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text, lang }),
       });
-      if (!speakerRef.current) return;
-      if (!res.ok) {
-        console.warn('[Aira] TTS server error', res.status, '— using browser voice');
-        return speakBrowser(text, lang);
-      }
+      if (!res.ok || !speakerRef.current) return;
       const blob = await res.blob();
-      if (!blob.size) { console.warn('[Aira] TTS empty — using browser voice'); return speakBrowser(text, lang); }
+      if (!blob.size) return;
       url = URL.createObjectURL(blob);
     } catch (e) {
-      console.warn('[Aira] TTS request failed', e, '— using browser voice');
-      return speakBrowser(text, lang);
+      console.warn('[Aira] TTS request failed', e);
+      return;
     }
     await new Promise((resolve) => {
-      const audio = getAudioEl();          // reuse the gesture-unlocked element
-      const cleanup = () => {
+      const audio = new Audio(url);
+      ttsAudioRef.current = audio;
+      const done = () => {
         audio.onended = null; audio.onerror = null;
         if (url) URL.revokeObjectURL(url);
+        if (ttsAudioRef.current === audio) ttsAudioRef.current = null;
+        resolve();
       };
-      audio.onended = () => { cleanup(); resolve(); };
-      audio.onerror = () => { cleanup(); resolve(); };
-      audio.src = url;
-      // If playback is still blocked/fails, fall back to the browser voice.
-      const p = audio.play();
-      if (p && p.catch) p.catch(() => { cleanup(); speakBrowser(text, lang).then(resolve); });
+      audio.onended = done;
+      audio.onerror = done;
+      audio.play().catch(done);
     });
-  }, [stopSpeaking, speakBrowser]);
+  }, [stopSpeaking]);
 
   // ── VOICE CAPTURE with silence auto-stop (call feel) ──────────────────────
   const startListening = useCallback(async () => {
@@ -316,8 +260,8 @@ const AIChat = ({ isOpen, onClose }) => {
       const started = Date.now();
       const SPEAK_THRESHOLD = 0.035;
       const NEED_FRAMES = 4;
-      const SILENCE_MS = 1100;   // snappier turn-taking once the user pauses
-      const MIN_MS = 800;
+      const SILENCE_MS = 1500;
+      const MIN_MS = 900;
       const WARMUP_MS = 350;
       const MAX_MS = 15000;
 
@@ -411,7 +355,7 @@ const AIChat = ({ isOpen, onClose }) => {
       // 4) loop back to listening for a natural call
       if (callActiveRef.current && !mutedRef.current) {
         setCallStatus('listening');
-        setTimeout(startListening, 200);
+        setTimeout(startListening, 400);
       } else if (callActiveRef.current) {
         setCallStatus('idle');
         setCaption('Muted. Unmute to keep talking.');
@@ -420,7 +364,6 @@ const AIChat = ({ isOpen, onClose }) => {
   }, [askAira, speak, messages, startListening]);
 
   const startCall = useCallback(() => {
-    unlockAudio();          // must run inside the tap gesture so neural audio can play
     setMode('call');
     setCallActive(true);
     callActiveRef.current = true;
@@ -435,7 +378,7 @@ const AIChat = ({ isOpen, onClose }) => {
       if (callActiveRef.current && !mutedRef.current) { setCallStatus('listening'); startListening(); }
     });
     setCaption(hi);
-  }, [speak, startListening, unlockAudio]);
+  }, [speak, startListening]);
 
   const endCall = useCallback(() => {
     setCallActive(false);
