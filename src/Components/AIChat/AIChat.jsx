@@ -8,6 +8,11 @@ import './AIChat.css';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
+// Tiny silent WAV. Playing it inside the call-tap gesture "unlocks" the audio
+// element so the neural Uzma clips can play afterwards (browsers block audio that
+// isn't tied to a user gesture — which is what made the good voice not play).
+const SILENT_WAV = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
+
 const QUICK_SUGGESTIONS = [
   '🏡 5 Marla house with a pool in Bahria Town',
   '🏢 Commercial plots in Business Bay',
@@ -165,9 +170,22 @@ const AIChat = ({ isOpen, onClose }) => {
     return 'english';
   }, []);
 
+  // One persistent audio element, reused for every clip. Unlocking it once (on the
+  // call tap) lets all later neural Uzma clips play without the browser blocking them.
+  const getAudioEl = () => (ttsAudioRef.current || (ttsAudioRef.current = new Audio()));
+
+  const unlockAudio = useCallback(() => {
+    try {
+      const a = getAudioEl();
+      a.src = SILENT_WAV;
+      const p = a.play();
+      if (p && p.catch) p.catch(() => {});
+    } catch (_) {}
+  }, []);
+
   const stopSpeaking = useCallback(() => {
     const a = ttsAudioRef.current;
-    if (a) { try { a.pause(); a.src = ''; } catch (_) {} ttsAudioRef.current = null; }
+    if (a) { try { a.pause(); } catch (_) {} }   // keep the (unlocked) element alive
     window.speechSynthesis?.cancel();
   }, []);
 
@@ -192,17 +210,17 @@ const AIChat = ({ isOpen, onClose }) => {
       return;
     }
     await new Promise((resolve) => {
-      const audio = new Audio(url);
-      ttsAudioRef.current = audio;
+      const audio = getAudioEl();          // reuse the gesture-unlocked element
       const done = () => {
         audio.onended = null; audio.onerror = null;
         if (url) URL.revokeObjectURL(url);
-        if (ttsAudioRef.current === audio) ttsAudioRef.current = null;
         resolve();
       };
       audio.onended = done;
       audio.onerror = done;
-      audio.play().catch(done);
+      audio.src = url;
+      const p = audio.play();
+      if (p && p.catch) p.catch(done);
     });
   }, [stopSpeaking]);
 
@@ -364,6 +382,7 @@ const AIChat = ({ isOpen, onClose }) => {
   }, [askAira, speak, messages, startListening]);
 
   const startCall = useCallback(() => {
+    unlockAudio();          // must run inside the tap gesture so neural audio can play
     setMode('call');
     setCallActive(true);
     callActiveRef.current = true;
@@ -378,7 +397,7 @@ const AIChat = ({ isOpen, onClose }) => {
       if (callActiveRef.current && !mutedRef.current) { setCallStatus('listening'); startListening(); }
     });
     setCaption(hi);
-  }, [speak, startListening]);
+  }, [speak, startListening, unlockAudio]);
 
   const endCall = useCallback(() => {
     setCallActive(false);
