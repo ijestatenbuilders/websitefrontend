@@ -536,7 +536,10 @@ const AIChat = ({ isOpen, onClose }) => {
               </span>
               {LANG_LABEL(detectedLang) && <span className="ai-siri-lang">{LANG_LABEL(detectedLang)}</span>}
             </div>
-            <div className="ai-siri-caption" dir="auto">{caption || 'Speak in Urdu, Punjabi or English…'}</div>
+            {/* Hide the caption while Aira is speaking — don't show what she's saying */}
+            <div className="ai-siri-caption" dir="auto">
+              {callStatus === 'speaking' ? '' : (caption || 'Speak in Urdu, Punjabi or English…')}
+            </div>
           </div>
 
           <div className="ai-siri-controls">
