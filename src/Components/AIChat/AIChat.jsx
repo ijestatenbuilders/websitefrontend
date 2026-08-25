@@ -8,6 +8,11 @@ import './AIChat.css';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
+// Tiny silent WAV. Playing this inside the call-tap gesture "unlocks" the audio
+// element so the neural TTS clips can autoplay afterwards (browsers block audio
+// that isn't tied to a user gesture — which otherwise silently falls back).
+const SILENT_WAV = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
+
 const QUICK_SUGGESTIONS = [
   '🏡 5 Marla house with a pool in Bahria Town',
   '🏢 Commercial plots in Business Bay',
@@ -173,9 +178,22 @@ const AIChat = ({ isOpen, onClose }) => {
     return 'english';
   }, []);
 
+  // One persistent audio element, reused for every clip. Unlocking it once (on the
+  // call tap) lets all later neural clips play without the browser blocking them.
+  const getAudioEl = () => (ttsAudioRef.current || (ttsAudioRef.current = new Audio()));
+
+  const unlockAudio = useCallback(() => {
+    try {
+      const a = getAudioEl();
+      a.src = SILENT_WAV;
+      const p = a.play();
+      if (p && p.catch) p.catch(() => {});
+    } catch (_) {}
+  }, []);
+
   const stopSpeaking = useCallback(() => {
     const a = ttsAudioRef.current;
-    if (a) { try { a.pause(); a.src = ''; } catch (_) {} ttsAudioRef.current = null; }
+    if (a) { try { a.pause(); } catch (_) {} }   // keep the (unlocked) element alive
     window.speechSynthesis?.cancel();
   }, []);
 
@@ -230,17 +248,17 @@ const AIChat = ({ isOpen, onClose }) => {
       return speakBrowser(text, lang);
     }
     await new Promise((resolve) => {
-      const audio = new Audio(url);
-      ttsAudioRef.current = audio;
+      const audio = getAudioEl();          // reuse the gesture-unlocked element
       const cleanup = () => {
         audio.onended = null; audio.onerror = null;
         if (url) URL.revokeObjectURL(url);
-        if (ttsAudioRef.current === audio) ttsAudioRef.current = null;
       };
       audio.onended = () => { cleanup(); resolve(); };
       audio.onerror = () => { cleanup(); resolve(); };
-      // If playback is blocked (autoplay) or fails, fall back to the browser voice.
-      audio.play().catch(() => { cleanup(); speakBrowser(text, lang).then(resolve); });
+      audio.src = url;
+      // If playback is still blocked/fails, fall back to the browser voice.
+      const p = audio.play();
+      if (p && p.catch) p.catch(() => { cleanup(); speakBrowser(text, lang).then(resolve); });
     });
   }, [stopSpeaking, speakBrowser]);
 
@@ -402,6 +420,7 @@ const AIChat = ({ isOpen, onClose }) => {
   }, [askAira, speak, messages, startListening]);
 
   const startCall = useCallback(() => {
+    unlockAudio();          // must run inside the tap gesture so neural audio can play
     setMode('call');
     setCallActive(true);
     callActiveRef.current = true;
@@ -416,7 +435,7 @@ const AIChat = ({ isOpen, onClose }) => {
       if (callActiveRef.current && !mutedRef.current) { setCallStatus('listening'); startListening(); }
     });
     setCaption(hi);
-  }, [speak, startListening]);
+  }, [speak, startListening, unlockAudio]);
 
   const endCall = useCallback(() => {
     setCallActive(false);
