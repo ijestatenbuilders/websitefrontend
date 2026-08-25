@@ -260,8 +260,8 @@ const AIChat = ({ isOpen, onClose }) => {
       const started = Date.now();
       const SPEAK_THRESHOLD = 0.035;
       const NEED_FRAMES = 4;
-      const SILENCE_MS = 1500;
-      const MIN_MS = 900;
+      const SILENCE_MS = 1100;   // snappier turn-taking once the user pauses
+      const MIN_MS = 800;
       const WARMUP_MS = 350;
       const MAX_MS = 15000;
 
@@ -355,7 +355,7 @@ const AIChat = ({ isOpen, onClose }) => {
       // 4) loop back to listening for a natural call
       if (callActiveRef.current && !mutedRef.current) {
         setCallStatus('listening');
-        setTimeout(startListening, 400);
+        setTimeout(startListening, 200);
       } else if (callActiveRef.current) {
         setCallStatus('idle');
         setCaption('Muted. Unmute to keep talking.');
