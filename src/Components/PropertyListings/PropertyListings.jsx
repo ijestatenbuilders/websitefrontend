@@ -1,13 +1,20 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import SEO from '../SEO/SEO';
-import Navbar from '../Navbar/Navbar';
+import { seo } from '../../seo/seoConfig';
+import SiteNav from '../SiteNav/SiteNav';
 import Footer from '../Footer/Footer';
+import ListingsParallax from './ListingsParallax';
+import { prefersReducedMotion } from '../../utils/perf';
 import { fetchProperties, fetchFilterOptions } from '../../services/api';
 import { FaMapMarkerAlt, FaPhone, FaRuler } from 'react-icons/fa';
 import { VscSettingsCompact } from "react-icons/vsc";
-import { bbcPlots, bbcUniqueSizes } from '../../data/bbcPlots';
+import { bbcPlots } from '../../data/bbcPlots';
 import './PropertyListings.css';
+
+gsap.registerPlugin(ScrollTrigger);
 
 /* ═══════════════════════════════════════════════════════════
    PRICE UTILITIES
@@ -229,6 +236,7 @@ function PropertyListings() {
     const [priceBounds, setPriceBounds] = useState([0, 1000]);
     const [priceRange, setPriceRange] = useState([0, 1000]);
     const priceSeeded = useRef(false);
+    const gridRef = useRef(null);
 
     useEffect(() => { window.scrollTo(0, 0); }, []);
 
@@ -320,6 +328,31 @@ function PropertyListings() {
 
     const isPriceFiltered = priceRange[0] > priceBounds[0] || priceRange[1] < priceBounds[1];
 
+    // GSAP ScrollTrigger — cinematic fade-up reveal for the cards as they enter.
+    useEffect(() => {
+        if (loading || prefersReducedMotion()) return;
+        const cards = gridRef.current?.querySelectorAll('.prop-card, .bbc-lcard');
+        if (!cards || !cards.length) return;
+        const ctx = gsap.context(() => {
+            gsap.set(cards, { opacity: 0, y: 42 });
+            ScrollTrigger.batch(cards, {
+                start: 'top 88%',
+                once: true,
+                onEnter: (batch) => gsap.to(batch, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.7,
+                    stagger: 0.08,
+                    ease: 'power3.out',
+                    overwrite: true,
+                    clearProps: 'all', // restore CSS hover transforms afterwards
+                }),
+            });
+        }, gridRef);
+        ScrollTrigger.refresh();
+        return () => ctx.revert();
+    }, [loading, filteredProperties.length]);
+
     // BBC plots — only shown when Commercial type is explicitly selected
     const isCommercial = propertyType === 'Commercial';
     const filteredBbcPlots = bbcSizeFilter === 'All'
@@ -375,12 +408,16 @@ function PropertyListings() {
                 description={`Browse ${propertyType || 'residential and commercial'} properties in ${searchLocation || selected || 'Lahore'}. Find houses, apartments, plots, and commercial spaces with IJ Estate & Builders.`}
                 keywords={`properties for sale ${searchLocation || selected || 'Lahore'}, ${propertyType || 'real estate'} ${searchLocation || selected || 'Lahore'}, buy property Pakistan, houses for sale, apartments Lahore`}
                 canonicalUrl="/listings"
+                structuredData={seo.listings.structuredData}
             />
             <div className="listings-page">
-                <Navbar variant="listings" />
+                <SiteNav />
 
                 {/* ── Hero ── */}
                 <div className="listings-hero">
+                    {/* Cinematic floating 3D ambient objects (desktop, high-tier only) */}
+                    <ListingsParallax />
+                    <div className="listings-hero__mesh" aria-hidden="true" />
                     <div className="listings-hero__inner">
                         <button className="listings-hero__back" onClick={() => navigate(-1)}>
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -399,6 +436,10 @@ function PropertyListings() {
                                     : selected}
                             </strong>
                         </p>
+                        <span className="listings-hero__eyebrow">
+                            <span className="listings-hero__eyebrow-pulse" />
+                            CURATED LISTINGS
+                        </span>
                         <h1 className="listings-hero__title">{heroTitle}</h1>
                         <p className="listings-hero__subtitle">{heroSubtitle}</p>
                     </div>
@@ -457,7 +498,7 @@ function PropertyListings() {
                     )}
 
                     {/* ── Cards grid ── */}
-                    <div className="listings-grid">
+                    <div className="listings-grid" ref={gridRef}>
                         {loading ? (
                             <div className="listings-empty">
                                 <div className="listings-empty__icon">⏳</div>
@@ -507,7 +548,7 @@ function PropertyCard({ property }) {
     return (
         <div className="prop-card">
             <div className="prop-card__img-wrap">
-                <img src={imgSrc} alt={property.name} className="prop-card__img" />
+                <img src={imgSrc} alt={property.name} className="prop-card__img" loading="lazy" decoding="async" />
                 {property.badge && <span className="prop-card__badge">{property.badge}</span>}
                 <span className="prop-card__type-tag">{property.type}</span>
             </div>

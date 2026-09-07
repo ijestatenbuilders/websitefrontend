@@ -42,42 +42,37 @@ function Upcoming({ currentLocation = 'bahriatown' }) {
         fetchProjects();
     }, [currentLocation]);
 
-    // Internal RAF loop — scroll parallax goes directly to DOM (zero React re-renders)
+    // RAF loop — parallax RELATIVE to viewport position (bounded), so it works
+    // wherever the section sits and never pulls the header off the top or shoves
+    // the card image off its frame. Cards keep their fade-up reveal (not overridden).
     useEffect(() => {
         let animId;
-        let scrollSmooth = window.scrollY;
-        let scrollTarget = window.scrollY;
-        const LERP = 0.08;
-
-        const onScroll = () => { scrollTarget = window.scrollY; };
-        window.addEventListener('scroll', onScroll, { passive: true });
+        const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
 
         const loop = () => {
-            scrollSmooth += (scrollTarget - scrollSmooth) * LERP;
-            const sy = scrollSmooth;
+            const vh = window.innerHeight || 1;
 
-            if (bgGridRef.current)
-                bgGridRef.current.style.transform = `translate3d(0, ${((sy - 1500) * 0.07).toFixed(2)}px, 0)`;
-            if (headerRef.current)
-                headerRef.current.style.transform = `translate3d(0, ${((sy - 1550) * -0.035).toFixed(2)}px, 0)`;
-
-            cardRefs.current.forEach((card, i) => {
-                if (!card) return;
-                const cp = (i % 2 === 0 ? -1 : 1) * 8;
-                card.style.transform = `translate3d(0, ${((sy - 1700) * -0.030 + cp).toFixed(2)}px, 0)`;
-            });
+            if (bgGridRef.current) {
+                const r = bgGridRef.current.parentElement.getBoundingClientRect();
+                const p = (r.top + r.height / 2 - vh / 2) / vh;
+                bgGridRef.current.style.transform = `translate3d(0, ${clamp(p * 40, -50, 50).toFixed(2)}px, 0)`;
+            }
+            if (headerRef.current) {
+                const r = headerRef.current.parentElement.getBoundingClientRect();
+                const p = (r.top - vh / 2) / vh;
+                headerRef.current.style.transform = `translate3d(0, ${clamp(p * -10, -14, 14).toFixed(2)}px, 0)`;
+            }
             imgRefs.current.forEach((img) => {
                 if (!img) return;
-                img.style.transform = `scale(1.08) translate3d(0, ${((sy - 1750) * 0.042).toFixed(2)}px, 0)`;
+                const r = img.parentElement.getBoundingClientRect();
+                const p = (r.top + r.height / 2 - vh / 2) / vh;
+                img.style.transform = `scale(1.12) translate3d(0, ${clamp(p * -16, -9, 9).toFixed(2)}px, 0)`;
             });
 
             animId = requestAnimationFrame(loop);
         };
         animId = requestAnimationFrame(loop);
-        return () => {
-            window.removeEventListener('scroll', onScroll);
-            cancelAnimationFrame(animId);
-        };
+        return () => cancelAnimationFrame(animId);
     }, []);
 
     return (
@@ -85,10 +80,6 @@ function Upcoming({ currentLocation = 'bahriatown' }) {
             <div className="upcoming-parallax-grid" ref={bgGridRef} aria-hidden="true" />
             <div className="upcoming-container">
                 <div className="upcoming-header-wrap" ref={headerRef} data-reveal="fade-up">
-                    <div className="upcoming-eyebrow">
-                        <span className="upcoming-eyebrow-pulse" />
-                        <span>EXCLUSIVE NEW LAUNCHES // HIGH ROI</span>
-                    </div>
                     <h2 className="upcoming-title">Newly Launched Projects</h2>
                 </div>
 

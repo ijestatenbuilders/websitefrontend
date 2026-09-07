@@ -37,7 +37,6 @@ function ProjectPromo() {
     return (
         <aside
             className={`promo-float ${exiting ? 'promo-float--exit' : 'promo-float--enter'}`}
-            role="complementary"
             aria-label="Featured Commercial Project Announcement"
         >
             {/* Top gradient shimmer glow accent */}

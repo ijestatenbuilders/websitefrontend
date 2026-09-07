@@ -2,3 +2,39 @@
   min-height: 100vh;
   width: 100%;
 }
+
+/* ── Location-driven brand accent (set via data-loc on <html>) ──────────
+   Every branded blue across the site can reference these. Default = Bahria
+   (blue); DHA = green, Etihad = violet, Union = rose. */
+:root {
+  --brand: #1e6fff;
+  --brand-deep: #0d4dbb;
+  --brand-soft: #38bdf8;
+  --brand-rgb: 30, 111, 255;
+  --brand-text: #0284c7;   /* Bahria: the original sky-blue for headings */
+  --brand-text-rgb: 2, 132, 199;
+}
+:root[data-loc="dharaya"] {
+  --brand: #10b981;
+  --brand-deep: #059669;
+  --brand-soft: #34d399;
+  --brand-rgb: 16, 185, 129;
+  --brand-text: #10b981;
+  --brand-text-rgb: 16, 185, 129;
+}
+:root[data-loc="etihadtown"] {
+  --brand: #7c3aed;
+  --brand-deep: #6d28d9;
+  --brand-soft: #a78bfa;
+  --brand-rgb: 124, 58, 237;
+  --brand-text: #7c3aed;
+  --brand-text-rgb: 124, 58, 237;
+}
+:root[data-loc="uniontown"] {
+  --brand: #f43f5e;
+  --brand-deep: #be123c;
+  --brand-soft: #fb7185;
+  --brand-rgb: 244, 63, 94;
+  --brand-text: #f43f5e;
+  --brand-text-rgb: 244, 63, 94;
+}

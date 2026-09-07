@@ -1,0 +1,576 @@
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&display=swap');
+
+/* ══════════════════════════════════════════════════════════════
+   EXPERIENCE PAGE  —  cinematic, light-themed, page-scoped (.xp)
+   GSAP + Framer Motion.  Namespace: .xp-  ·  standalone design.
+   ══════════════════════════════════════════════════════════════ */
+.xp {
+  --ink: #0b1730;
+  --ink-2: #33456b;
+  --ink-3: #6b7c9e;
+  --blue: var(--brand, #1e6fff);
+  --blue-deep: var(--brand-deep, #0d4dbb);
+  --gold: #c99a3c;
+  --paper: #eef4fd;
+  --paper-2: #ffffff;
+  --line: rgba(13, 40, 90, 0.1);
+
+  position: relative;
+  background:
+    radial-gradient(120% 80% at 80% -10%, #eaf2ff 0%, transparent 55%),
+    radial-gradient(110% 70% at 0% 10%, #fff6ea 0%, transparent 50%),
+    linear-gradient(180deg, #f6f9ff 0%, #eef4fd 100%);
+  color: var(--ink);
+  font-family: 'Outfit', 'Inter', -apple-system, sans-serif;
+  overflow-x: clip;
+}
+
+/* shared bits ─────────────────────────────────────────────── */
+.xp-eyebrow {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  color: var(--blue-deep);
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+.xp-eyebrow--light { color: rgba(255, 255, 255, 0.85); }
+
+.xp-section-title {
+  font-size: clamp(2rem, 5.2vw, 4.2rem);
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin: 0;
+}
+
+/* Per-character vertical slide (no fade). Each letter has two stacked copies:
+   primary in view, secondary waiting just BELOW. On hover the primary slides UP
+   and out while the secondary rises from the bottom — with a small per-letter
+   delay from the first character for an "alive" cascade. Transform-only +
+   persistent GPU layers = buttery-smooth beside the 3D canvas. */
+.xp-split {
+  display: flex;
+  width: fit-content;
+  margin-inline: auto;
+  cursor: pointer;
+  /* ONE clip per line, on its own compositor layer, so the whole slide runs on
+     the GPU/compositor thread (never main-thread repaint → stays 120fps even
+     while the 3D canvas + magnetic loop + Lenis are busy). */
+  overflow: hidden;
+  line-height: 1.1;
+  transform: translateZ(0);
+  contain: paint;
+}
+.xp-split__char {
+  position: relative;
+  display: inline-block;
+}
+.xp-split__prim,
+.xp-split__sec {
+  display: block;
+  transform: translateZ(0);
+  /* transform-only + a gentle overshoot "jiggle" */
+  transition: transform 0.55s cubic-bezier(0.34, 1.28, 0.5, 1);
+  transition-delay: calc(var(--i, 0) * 0.022s); /* subtle cascade from letter 1 */
+  backface-visibility: hidden;
+  will-change: transform;
+}
+.xp-split__sec {
+  position: absolute;
+  top: 0; left: 0; width: 100%;
+  transform: translate3d(0, 100%, 0);   /* waits below, clipped by the line */
+  pointer-events: none;
+}
+
+/* buttons ─────────────────────────────────────────────────── */
+.xp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 1rem 1.7rem;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease, background 0.35s ease;
+}
+.xp-btn__arrow { transition: transform 0.35s ease; }
+.xp-btn:hover .xp-btn__arrow { transform: translateX(5px); }
+
+.xp-btn--primary {
+  background: linear-gradient(135deg, var(--brand-soft, #2a7bff), var(--brand, #1e6fff) 55%, var(--brand-deep, #0d4dbb));
+  color: #fff;
+  box-shadow: 0 16px 40px -12px rgba(var(--brand-rgb, 30, 111, 255), 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+.xp-btn--primary:hover { transform: translateY(-3px); box-shadow: 0 22px 50px -12px rgba(var(--brand-rgb, 30, 111, 255), 0.75); }
+
+.xp-btn--ghost {
+  background: rgba(13, 27, 62, 0.05);
+  color: var(--ink);
+  border: 1px solid rgba(13, 27, 62, 0.14);
+}
+.xp-btn--ghost:hover { transform: translateY(-3px); background: rgba(13, 27, 62, 0.09); }
+.xp-btn__play { font-size: 0.7rem; color: var(--blue); }
+
+.xp-btn--light { background: #fff; color: var(--blue-deep); box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.35); }
+.xp-btn--light:hover { transform: translateY(-3px); }
+.xp-btn--outline { background: transparent; color: #fff; border: 1.5px solid rgba(255, 255, 255, 0.5); }
+.xp-btn--outline:hover { background: rgba(255, 255, 255, 0.12); transform: translateY(-3px); }
+
+/* ═══════════ HERO ═══════════ */
+.xp-hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 8rem 1.5rem 4rem;
+  /* overflow-x is contained by the .xp wrapper (overflow-x: clip); we keep the
+     hero's vertical overflow VISIBLE so the search dropdown can open downward
+     without being clipped. The aurora glow is clipped on its own layer below. */
+  overflow: visible;
+}
+
+.xp-hero__bg { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
+.xp-hero__aurora {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.7;
+}
+.xp-hero__aurora--1 { width: 640px; height: 640px; top: -180px; left: -120px;
+  background: radial-gradient(circle, rgba(56, 130, 255, 0.4), transparent 70%); animation: xpDrift1 14s ease-in-out infinite alternate; }
+.xp-hero__aurora--2 { width: 560px; height: 560px; bottom: -160px; right: -100px;
+  background: radial-gradient(circle, rgba(201, 154, 60, 0.28), transparent 70%); animation: xpDrift2 16s ease-in-out infinite alternate; }
+.xp-hero__aurora--3 { width: 480px; height: 480px; top: 30%; left: 55%;
+  background: radial-gradient(circle, rgba(120, 90, 255, 0.22), transparent 70%); animation: xpDrift3 18s ease-in-out infinite alternate; }
+@keyframes xpDrift1 { to { transform: translate(80px, 60px) scale(1.15); } }
+@keyframes xpDrift2 { to { transform: translate(-70px, -50px) scale(1.1); } }
+@keyframes xpDrift3 { to { transform: translate(-50px, 40px) scale(1.2); } }
+
+.xp-hero__grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(13, 40, 90, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(13, 40, 90, 0.045) 1px, transparent 1px);
+  background-size: 62px 62px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, #000 30%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, #000 30%, transparent 75%);
+}
+
+/* floating 3D tokens */
+.xp-hero__floats { position: absolute; inset: 0; z-index: 1; pointer-events: none; perspective: 1000px; }
+.xp-float { position: absolute; will-change: transform; }
+.xp-float--cube { top: 22%; left: 13%; }
+.xp-float--pin { bottom: 26%; left: 19%; }
+.xp-float--cube2 { top: 24%; right: 13%; }
+.xp-float--pin2 { bottom: 24%; right: 18%; }
+.xp-float--orbA { top: 18%; right: 30%; width: 16px; height: 16px; border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, var(--brand-soft, #7db0ff), var(--brand, #1e6fff)); box-shadow: 0 8px 20px rgba(var(--brand-rgb, 30, 111, 255), 0.5); }
+.xp-float--orbB { bottom: 30%; left: 40%; width: 11px; height: 11px; border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #ffe0a3, #c99a3c); box-shadow: 0 8px 18px rgba(201, 154, 60, 0.5); }
+
+/* 3D cube */
+.xp-cube { position: relative; width: 66px; height: 66px; transform-style: preserve-3d; animation: xpSpin 16s linear infinite; }
+.xp-cube__f {
+  position: absolute; width: 66px; height: 66px;
+  background: linear-gradient(135deg, rgba(var(--brand-rgb, 30, 111, 255), 0.16), rgba(255, 255, 255, 0.5));
+  border: 1.5px solid rgba(var(--brand-rgb, 30, 111, 255), 0.4);
+  backdrop-filter: blur(4px);
+}
+.xp-cube__f--front { transform: translateZ(33px); }
+.xp-cube__f--back { transform: rotateY(180deg) translateZ(33px); }
+.xp-cube__f--right { transform: rotateY(90deg) translateZ(33px); }
+.xp-cube__f--left { transform: rotateY(-90deg) translateZ(33px); }
+.xp-cube__f--top { transform: rotateX(90deg) translateZ(33px); }
+.xp-cube__f--bottom { transform: rotateX(-90deg) translateZ(33px); }
+@keyframes xpSpin { to { transform: rotateX(360deg) rotateY(360deg); } }
+
+.xp-ring {
+  display: block; width: 92px; height: 92px; border-radius: 50%;
+  border: 3px solid transparent;
+  background: conic-gradient(from 0deg, var(--brand, #1e6fff), #c99a3c, var(--brand-soft, #7db0ff), var(--brand, #1e6fff)) border-box;
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 0);
+  mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 0);
+  animation: xpRingSpin 9s linear infinite;
+}
+@keyframes xpRingSpin { to { transform: rotate(360deg); } }
+
+.xp-pin {
+  display: grid; place-items: center;
+  width: 54px; height: 54px; border-radius: 16px;
+  background: linear-gradient(135deg, #fff, #e6efff);
+  border: 1.5px solid rgba(var(--brand-rgb, 30, 111, 255), 0.3);
+  color: var(--blue); font-size: 1.4rem;
+  box-shadow: 0 14px 30px -10px rgba(var(--brand-rgb, 30, 111, 255), 0.5);
+  animation: xpBob 5s ease-in-out infinite;
+}
+@keyframes xpBob { 0%, 100% { translate: 0 0; } 50% { translate: 0 -12px; } }
+
+.xp-glasscard {
+  display: block; width: 120px; height: 78px; border-radius: 14px; padding: 14px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.85), rgba(233, 243, 255, 0.7));
+  border: 1.5px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 18px 40px -14px rgba(13, 40, 90, 0.4);
+  backdrop-filter: blur(6px);
+  animation: xpBob 6s ease-in-out infinite 0.5s;
+}
+.xp-glasscard__row { display: block; height: 8px; border-radius: 4px; background: rgba(var(--brand-rgb, 30, 111, 255), 0.25); margin-bottom: 8px; }
+.xp-glasscard__row--short { width: 60%; background: rgba(201, 154, 60, 0.3); }
+.xp-glasscard__chip { display: block; width: 34px; height: 20px; border-radius: 6px; background: linear-gradient(135deg, #2a7bff, #0d4dbb); margin-top: 12px; }
+
+.xp-hero__content { position: relative; z-index: 2; max-width: 1000px; }
+.xp-hero__eyebrow {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  font-size: 0.78rem; font-weight: 700; letter-spacing: 0.22em;
+  color: var(--blue-deep);
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--line);
+  padding: 0.5rem 1rem; border-radius: 999px;
+  margin-bottom: 1.8rem;
+}
+.xp-hero__eyebrow-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--blue); box-shadow: 0 0 0 4px rgba(var(--brand-rgb, 30, 111, 255), 0.18); }
+
+/* Selected-location badge above the heading */
+.xp-hero__loc {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0 0 1.4rem;
+  padding: 0.5rem 1.15rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--brand-deep, #0d4dbb);
+  background: rgba(var(--brand-rgb, 30, 111, 255), 0.1);
+  border: 1px solid rgba(var(--brand-rgb, 30, 111, 255), 0.3);
+  box-shadow: 0 10px 26px -14px rgba(var(--brand-rgb, 30, 111, 255), 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.xp-hero__loc strong {
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--brand, #1e6fff);
+}
+.xp-hero__loc-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--brand, #1e6fff);
+  box-shadow: 0 0 0 4px rgba(var(--brand-rgb, 30, 111, 255), 0.2);
+}
+
+.xp-hero__title {
+  font-family: 'Bricolage Grotesque', 'Outfit', 'Inter', sans-serif;
+  font-size: clamp(3.3rem, 10.5vw, 8.6rem);
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  margin: 0 0 1.2rem;
+  color: var(--ink);
+}
+
+/* Line colours: line 1 dark→ocean-blue, line 2 ocean-blue→dark */
+.xp-hero__line1 .xp-split__prim { color: #0f172a; }
+.xp-hero__line1 .xp-split__sec { color: var(--brand-text, #0284c7); }
+.xp-hero__line2 .xp-split__prim { color: var(--brand-text, #0284c7); }
+.xp-hero__line2 .xp-split__sec { color: #0f172a; }
+
+/* Hover: primary slides UP out, secondary rises from below into view */
+.xp-split:hover .xp-split__prim { transform: translate3d(0, -100%, 0); }
+.xp-split:hover .xp-split__sec  { transform: translate3d(0, 0, 0); }
+
+.xp-magnetic { will-change: translate; }
+
+.xp-hero__cta-row { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+.xp-hero__scroll {
+  position: absolute; bottom: 2.2rem; left: 50%;
+  display: flex; flex-direction: column; align-items: center; gap: 0.7rem; z-index: 2;
+  transform: translateX(-50%);
+  animation: xpScrollFloat 3.4s ease-in-out infinite;
+  border: 0; background: transparent; padding: 0.4rem; cursor: pointer;
+  transition: filter 0.35s ease, opacity 0.45s ease;
+}
+/* Fades out the moment the user scrolls, before it can reach the search row */
+.xp-hero__scroll--hidden { opacity: 0; pointer-events: none; }
+.xp-hero__scroll:hover { filter: brightness(1.08); }
+.xp-hero__scroll:hover .xp-hero__scroll-mouse {
+  border-color: rgba(var(--brand-rgb, 30, 111, 255), 0.85);
+  box-shadow: 0 12px 28px -8px rgba(var(--brand-rgb, 30, 111, 255), 0.65), inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+}
+@keyframes xpScrollFloat {
+  0%, 100% { transform: translate3d(-50%, 0, 0); }
+  50% { transform: translate3d(-50%, 8px, 0); }
+}
+
+/* Glassy mouse capsule with a glow */
+.xp-hero__scroll-mouse {
+  position: relative;
+  width: 27px; height: 44px; border-radius: 999px;
+  border: 2px solid rgba(var(--brand-rgb, 30, 111, 255), 0.55);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.25));
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 8px 22px -8px rgba(var(--brand-rgb, 30, 111, 255), 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+  display: flex; justify-content: center;
+}
+.xp-hero__scroll-mouse::before {
+  content: ''; position: absolute; inset: -6px; border-radius: 999px;
+  background: radial-gradient(closest-side, rgba(var(--brand-rgb, 30, 111, 255), 0.28), transparent 70%);
+  opacity: 0.7; z-index: -1;
+}
+.xp-hero__scroll-wheel {
+  width: 4px; height: 9px; margin-top: 7px; border-radius: 999px;
+  background: linear-gradient(180deg, var(--blue), var(--blue-deep));
+  animation: xpScrollWheel 1.8s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+@keyframes xpScrollWheel {
+  0% { transform: translate3d(0, 0, 0); opacity: 0; }
+  15% { opacity: 1; }
+  70% { opacity: 1; }
+  100% { transform: translate3d(0, 15px, 0); opacity: 0; }
+}
+
+/* Animated double chevrons cascading down */
+.xp-hero__scroll-chevrons { display: flex; flex-direction: column; align-items: center; gap: 1px; color: var(--blue); }
+.xp-hero__scroll-chevrons svg { width: 16px; height: auto; }
+.xp-hero__scroll-chevrons svg:nth-child(1) { animation: xpChevron 1.8s ease-in-out infinite; }
+.xp-hero__scroll-chevrons svg:nth-child(2) { animation: xpChevron 1.8s ease-in-out 0.18s infinite; opacity: 0.5; }
+@keyframes xpChevron {
+  0%, 100% { transform: translate3d(0, -2px, 0); opacity: 0.35; }
+  50% { transform: translate3d(0, 2px, 0); opacity: 1; }
+}
+
+/* ═══════════ MARQUEE ═══════════ */
+.xp-marquee {
+  overflow: hidden;
+  padding: 1.6rem 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.4);
+}
+.xp-marquee__track { display: flex; width: max-content; animation: xpMarquee 26s linear infinite; }
+.xp-marquee__group { display: flex; }
+.xp-marquee__item {
+  font-size: clamp(1.4rem, 3vw, 2.4rem); font-weight: 700; letter-spacing: -0.01em;
+  color: var(--ink); opacity: 0.85; padding: 0 1.6rem; white-space: nowrap;
+}
+.xp-marquee__item:nth-child(even) { color: var(--gold); opacity: 0.9; }
+@keyframes xpMarquee { to { transform: translateX(-50%); } }
+
+/* ═══════════ RESIDENCES — horizontal rail ═══════════ */
+/* The section is a full viewport tall so GSAP can pin it: the title + cards are
+   held on screen while the track slides horizontally, then it releases. */
+.xp-rail {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 3rem 0;
+}
+.xp-rail__head { padding: 0 6vw; max-width: 1400px; }
+/* Clip only horizontally so the cards' vertical box-shadow / hover lift are
+   never cut off; the track's vertical padding gives them room. */
+.xp-rail__viewport { overflow-x: clip; overflow-y: visible; }
+.xp-rail__track {
+  display: flex; gap: 2rem; padding: 2.25rem 6vw; width: max-content; align-items: stretch;
+  will-change: transform;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+/* Reduced-motion fallback: no pin / scroll-jacking — plain horizontal swipe. */
+.xp-rail--reduced { min-height: auto; }
+.xp-rail--reduced .xp-rail__viewport {
+  overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+}
+.xp-rail--reduced .xp-rail__viewport::-webkit-scrollbar { display: none; }
+.xp-rail--reduced .xp-rail__viewport::-webkit-scrollbar { display: none; }
+
+.xp-rail__intro {
+  flex-shrink: 0; width: 320px; align-self: center;
+  display: flex; flex-direction: column; gap: 1rem;
+}
+.xp-rail__intro p { font-size: 1.15rem; color: var(--ink-2); line-height: 1.5; margin: 0; }
+.xp-rail__hint { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.2em; color: var(--blue-deep); }
+
+.xp-rescard {
+  flex-shrink: 0; width: 380px;
+  display: flex; flex-direction: column;
+  background: var(--paper-2);
+  border-radius: 26px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  box-shadow: 0 24px 60px -30px rgba(13, 40, 90, 0.35);
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.5s ease;
+  contain: layout paint;   /* isolate repaint during the rail transform */
+}
+.xp-rescard:hover { transform: translateY(-8px); box-shadow: 0 34px 70px -28px rgba(13, 40, 90, 0.45); }
+.xp-rescard__media { position: relative; height: 260px; overflow: hidden; }
+.xp-rescard__media img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1); }
+.xp-rescard:hover .xp-rescard__media img { transform: scale(1.08); }
+.xp-rescard__tag {
+  position: absolute; top: 14px; left: 14px;
+  background: rgba(255, 255, 255, 0.92); color: var(--blue-deep);
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.05em;
+  padding: 0.4rem 0.8rem; border-radius: 999px;
+  box-shadow: 0 6px 16px -6px rgba(0, 0, 0, 0.25);
+}
+.xp-rescard__price {
+  position: absolute; bottom: 14px; right: 14px;
+  background: linear-gradient(135deg, var(--brand-soft, #2a7bff), var(--brand-deep, #0d4dbb)); color: #fff;
+  font-size: 0.9rem; font-weight: 800;
+  padding: 0.45rem 0.9rem; border-radius: 999px;
+  box-shadow: 0 10px 24px -8px rgba(var(--brand-rgb, 30, 111, 255), 0.6);
+}
+.xp-rescard__body { padding: 1.5rem 1.6rem 1.7rem; display: flex; flex-direction: column; gap: 0.5rem; flex: 1; }
+.xp-rescard__body h3 { font-size: 1.35rem; font-weight: 800; line-height: 1.15; margin: 0; color: var(--ink); }
+.xp-rescard__area { font-size: 0.92rem; color: var(--ink-3); margin: 0; }
+.xp-rescard__specs { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.6rem 0 1rem; }
+.xp-rescard__specs span {
+  font-size: 0.8rem; font-weight: 600; color: var(--ink-2);
+  background: var(--paper); border: 1px solid var(--line);
+  padding: 0.4rem 0.75rem; border-radius: 10px;
+}
+.xp-rescard__btn {
+  margin-top: auto; align-self: flex-start;
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: none; border: none; cursor: pointer;
+  font-family: inherit; font-weight: 700; font-size: 0.95rem; color: var(--blue-deep);
+}
+.xp-rescard__btn span { transition: transform 0.3s ease; }
+.xp-rescard__btn:hover span { transform: translateX(5px); }
+
+.xp-rail__end {
+  flex-shrink: 0; width: 340px; align-self: center;
+  display: flex; flex-direction: column; gap: 1.4rem; align-items: flex-start;
+}
+.xp-rail__end h3 { font-size: 2rem; font-weight: 800; line-height: 1.1; margin: 0; color: var(--ink); }
+
+/* ═══════════ STATS ═══════════ */
+.xp-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem; max-width: 1200px; margin: 5rem auto; padding: 0 6vw;
+}
+.xp-stat { text-align: center; padding: 2rem 1rem; border-radius: 22px;
+  background: rgba(255, 255, 255, 0.6); border: 1px solid var(--line); }
+.xp-stat__num { font-size: clamp(2.4rem, 5vw, 3.6rem); font-weight: 800; letter-spacing: -0.02em; color: var(--ink); line-height: 1; }
+.xp-stat__num span { color: var(--blue); font-size: 0.6em; margin-left: 2px; }
+.xp-stat__label { margin-top: 0.6rem; font-size: 0.88rem; font-weight: 600; color: var(--ink-3); letter-spacing: 0.02em; }
+
+/* ═══════════ DEVELOPMENTS — bento parallax ═══════════ */
+.xp-dev { padding: 6rem 6vw 7rem; max-width: 1400px; margin: 0 auto; }
+.xp-dev__head { max-width: 760px; margin-bottom: 3rem; }
+.xp-dev__lead { font-size: 1.1rem; color: var(--ink-2); line-height: 1.6; margin: 1.2rem 0 0; }
+.xp-dev__grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 240px; gap: 1.4rem;
+}
+.xp-dev__card { position: relative; border-radius: 24px; overflow: hidden; box-shadow: 0 24px 60px -30px rgba(13, 40, 90, 0.4); }
+.xp-dev__card--tall { grid-row: span 2; }
+.xp-dev__card--wide { grid-column: span 2; }
+.xp-dev__card--std { grid-column: span 2; }
+.xp-dev__frame { position: absolute; inset: -14% 0; overflow: hidden; }
+.xp-dev__img { width: 100%; height: 100%; object-fit: cover; will-change: transform; }
+.xp-dev__overlay {
+  position: absolute; inset: 0; z-index: 2;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 1.6rem;
+  background: linear-gradient(to top, rgba(6, 18, 44, 0.82) 0%, rgba(6, 18, 44, 0.15) 45%, transparent 70%);
+  color: #fff;
+  transition: background 0.4s ease;
+}
+.xp-dev__card:hover .xp-dev__overlay { background: linear-gradient(to top, rgba(6, 18, 44, 0.9) 0%, rgba(13, 77, 187, 0.3) 55%, transparent 80%); }
+.xp-dev__meta { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; color: #9ec2ff; text-transform: uppercase; }
+.xp-dev__overlay h3 { font-size: 1.5rem; font-weight: 800; margin: 0.3rem 0 0; line-height: 1.1; }
+
+/* ═══════════ JOURNEY ═══════════ */
+.xp-journey { padding: 5rem 6vw 7rem; max-width: 1200px; margin: 0 auto; }
+.xp-journey__head { margin-bottom: 3.5rem; }
+.xp-journey__steps { position: relative; display: grid; gap: 1.5rem; }
+.xp-journey__spine { position: absolute; left: 46px; top: 20px; bottom: 20px; width: 2px;
+  background: linear-gradient(var(--blue), rgba(var(--brand-rgb, 30, 111, 255), 0.1)); z-index: 0; }
+.xp-jstep {
+  position: relative; z-index: 1;
+  display: grid; grid-template-columns: 92px 1fr; align-items: start; gap: 1.5rem;
+  background: rgba(255, 255, 255, 0.7); border: 1px solid var(--line);
+  border-radius: 22px; padding: 1.8rem 2rem;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+.xp-jstep:hover { transform: translateX(8px); box-shadow: 0 20px 46px -24px rgba(13, 40, 90, 0.4); }
+.xp-jstep__n {
+  width: 64px; height: 64px; border-radius: 18px; display: grid; place-items: center;
+  font-size: 1.4rem; font-weight: 800; color: #fff;
+  background: linear-gradient(135deg, #2a7bff, #0d4dbb);
+  box-shadow: 0 12px 28px -10px rgba(var(--brand-rgb, 30, 111, 255), 0.6);
+}
+.xp-jstep__body h3 { font-size: 1.5rem; font-weight: 800; margin: 0 0 0.5rem; color: var(--ink); }
+.xp-jstep__body p { font-size: 1rem; line-height: 1.6; color: var(--ink-2); margin: 0; }
+
+/* ═══════════ CTA ═══════════ */
+.xp-cta { padding: 3rem 5vw 6rem; }
+.xp-cta__inner {
+  position: relative; overflow: hidden;
+  max-width: 1200px; margin: 0 auto;
+  text-align: center;
+  padding: 5.5rem 2rem;
+  border-radius: 36px;
+  background: linear-gradient(135deg, #0d2555 0%, #103a86 45%, #0d4dbb 100%);
+  box-shadow: 0 40px 90px -30px rgba(13, 40, 90, 0.6);
+}
+.xp-cta__aura {
+  position: absolute; width: 520px; height: 520px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(201, 154, 60, 0.35), transparent 70%);
+  top: -160px; right: -120px; filter: blur(40px);
+}
+.xp-cta__title { position: relative; z-index: 1; font-size: clamp(2rem, 5vw, 3.6rem); font-weight: 800; line-height: 1.08; letter-spacing: -0.02em; color: #fff; margin: 0 0 1.2rem; }
+.xp-cta__sub { position: relative; z-index: 1; max-width: 580px; margin: 0 auto 2.4rem; font-size: 1.1rem; line-height: 1.6; color: rgba(226, 236, 255, 0.85); }
+.xp-cta__row { position: relative; z-index: 1; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+/* ═══════════ RESPONSIVE ═══════════ */
+@media (max-width: 980px) {
+  /* Rail keeps the pinned scroll-driven horizontal parallax on mobile too
+     (JS handles it for all widths now) — no manual drag / overflow scroll. */
+  .xp-dev__grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 220px; }
+  .xp-dev__card--tall, .xp-dev__card--wide, .xp-dev__card--std { grid-column: span 2; grid-row: span 1; }
+  .xp-stats { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 620px) {
+  .xp-hero { padding-top: 7rem; }
+  .xp-float--cube, .xp-float--cube2, .xp-float--pin2 { display: none; }
+  /* Smaller "Exploring <location>" pill — it was oversized on phones. */
+  .xp-hero__loc {
+    font-size: 0.6rem;
+    padding: 0.35rem 0.8rem;
+    gap: 0.4rem;
+    letter-spacing: 0.08em;
+    margin-bottom: 1rem;
+  }
+  .xp-hero__loc-dot { width: 6px; height: 6px; }
+  .xp-rescard, .xp-rail__intro, .xp-rail__end { width: 82vw; }
+  /* Keep the first card clearly off the screen edge (extra left inset). */
+  .xp-rail__track { padding-left: 14vw; padding-right: 8vw; gap: 1.2rem; }
+  /* Opaque marquee + gap so the hero search never visually bleeds into the
+     sliding locations strip beneath it. */
+  .xp-marquee { background: #eef5ff; margin-top: 0.75rem; position: relative; z-index: 1; }
+  .xp-stats { grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .xp-jstep { grid-template-columns: 1fr; gap: 1rem; padding: 1.5rem; }
+  .xp-journey__spine { display: none; }
+  .xp-btn { font-size: 0.92rem; padding: 0.9rem 1.4rem; }
+}
+
+/* reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .xp-hero__aurora, .xp-cube, .xp-ring, .xp-pin, .xp-glasscard,
+  .xp-marquee__track, .xp-hero__scroll, .xp-hero__scroll-wheel,
+  .xp-hero__scroll-chevrons svg { animation: none !important; }
+}

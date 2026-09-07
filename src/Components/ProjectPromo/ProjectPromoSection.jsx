@@ -19,60 +19,50 @@ function ProjectPromoSection() {
     const bgCircle2Ref = useRef(null);
     const contentRef = useRef(null);
     const visualRef = useRef(null);
-    const cardTagRef = useRef(null);
-    const cardIconRef = useRef(null);
-    const cardStatsRef = useRef(null);
+    const cardRef = useRef(null);
 
+    // Parallax RELATIVE to viewport position (bounded) — works wherever the
+    // section sits. The card only gets a mouse-tilt + gentle bounded float; its
+    // inner elements are left in normal flow so nothing overlaps. The card
+    // entrance is the pop-scale reveal on .pps-visual (not overridden here).
     useEffect(() => {
         let animId;
-        let scrollSmooth = window.scrollY;
-        let scrollTarget = window.scrollY;
-        let mouseXSmooth = 0.5;
-        let mouseYSmooth = 0.5;
-        let mouseXTarget = 0.5;
-        let mouseYTarget = 0.5;
+        let mxS = 0.5, myS = 0.5, mxT = 0.5, myT = 0.5;
         const LERP = 0.08;
-
-        const onScroll = () => { scrollTarget = window.scrollY; };
+        const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
         const onMouse = (e) => {
-            mouseXTarget = e.clientX / window.innerWidth;
-            mouseYTarget = e.clientY / window.innerHeight;
+            mxT = e.clientX / window.innerWidth;
+            myT = e.clientY / window.innerHeight;
         };
-
-        window.addEventListener('scroll', onScroll, { passive: true });
         window.addEventListener('mousemove', onMouse, { passive: true });
 
-        const loop = () => {
-            scrollSmooth += (scrollTarget - scrollSmooth) * LERP;
-            mouseXSmooth += (mouseXTarget - mouseXSmooth) * LERP;
-            mouseYSmooth += (mouseYTarget - mouseYSmooth) * LERP;
+        const prog = (el) => {
+            const r = el.parentElement.getBoundingClientRect();
+            const vh = window.innerHeight || 1;
+            return (r.top + r.height / 2 - vh / 2) / vh;
+        };
 
-            const sy = scrollSmooth;
-            const mx = mouseXSmooth - 0.5;
-            const my = mouseYSmooth - 0.5;
+        const loop = () => {
+            mxS += (mxT - mxS) * LERP;
+            myS += (myT - myS) * LERP;
+            const mx = mxS - 0.5;
+            const my = myS - 0.5;
 
             if (bgGridRef.current)
-                bgGridRef.current.style.transform = `translate3d(0, ${((sy - 2000) * 0.07).toFixed(2)}px, 0)`;
+                bgGridRef.current.style.transform = `translate3d(0, ${clamp(prog(bgGridRef.current) * 40, -50, 50).toFixed(2)}px, 0)`;
             if (bgCircle1Ref.current)
-                bgCircle1Ref.current.style.transform = `translate3d(${(mx * 28).toFixed(2)}px, ${((sy - 2000) * -0.10).toFixed(2)}px, 0)`;
+                bgCircle1Ref.current.style.transform = `translate3d(${(mx * 28).toFixed(2)}px, ${clamp(prog(bgCircle1Ref.current) * -40, -45, 45).toFixed(2)}px, 0)`;
             if (bgCircle2Ref.current)
-                bgCircle2Ref.current.style.transform = `translate3d(${(mx * -22).toFixed(2)}px, ${((sy - 2000) * 0.13).toFixed(2)}px, 0)`;
+                bgCircle2Ref.current.style.transform = `translate3d(${(mx * -22).toFixed(2)}px, ${clamp(prog(bgCircle2Ref.current) * 45, -45, 45).toFixed(2)}px, 0)`;
             if (contentRef.current)
-                contentRef.current.style.transform = `translate3d(0, ${((sy - 2100) * -0.035).toFixed(2)}px, 0)`;
-            if (visualRef.current)
-                visualRef.current.style.transform = `translate3d(${(mx * 10).toFixed(2)}px, ${((sy - 2100) * -0.06 + my * 8).toFixed(2)}px, 0) rotateY(${(mx * 8).toFixed(2)}deg) rotateX(${(my * -8).toFixed(2)}deg)`;
-            if (cardTagRef.current)
-                cardTagRef.current.style.transform = `translate3d(0, ${((sy - 2100) * -0.018).toFixed(2)}px, 15px)`;
-            if (cardIconRef.current)
-                cardIconRef.current.style.transform = `translate3d(0, ${((sy - 2100) * -0.035).toFixed(2)}px, 25px)`;
-            if (cardStatsRef.current)
-                cardStatsRef.current.style.transform = `translate3d(0, ${((sy - 2100) * -0.025).toFixed(2)}px, 20px)`;
+                contentRef.current.style.transform = `translate3d(0, ${clamp(prog(contentRef.current) * -12, -16, 16).toFixed(2)}px, 0)`;
+            if (cardRef.current)
+                cardRef.current.style.transform = `perspective(1000px) translate3d(${(mx * 10).toFixed(2)}px, ${(my * 8).toFixed(2)}px, 0) rotateY(${(mx * 8).toFixed(2)}deg) rotateX(${(my * -8).toFixed(2)}deg)`;
 
             animId = requestAnimationFrame(loop);
         };
         animId = requestAnimationFrame(loop);
         return () => {
-            window.removeEventListener('scroll', onScroll);
             window.removeEventListener('mousemove', onMouse);
             cancelAnimationFrame(animId);
         };
@@ -100,11 +90,6 @@ function ProjectPromoSection() {
             <div className="pps-inner">
                 {/* Left: text content with spring parallax */}
                 <div className="pps-content" ref={contentRef} data-reveal="slide-left">
-                    <div className="pps-eyebrow">
-                        <span className="pps-eyebrow__dot" />
-                        Featured New Launch
-                    </div>
-
                     <h2 className="pps-title">
                         Business Bay<br />
                         <span className="pps-title--accent">Commercial</span>
@@ -142,13 +127,13 @@ function ProjectPromoSection() {
                 </div>
 
                 {/* Right: visual 3D card with differential parallax floating layers */}
-                <div className="pps-visual" ref={visualRef} data-reveal="perspective-pop" data-delay="2" aria-hidden="true">
-                    <div className="pps-card">
-                        <div className="pps-card__tag" ref={cardTagRef}>
+                <div className="pps-visual" ref={visualRef} data-reveal="pop-scale" data-delay="2" aria-hidden="true">
+                    <div className="pps-card" ref={cardRef}>
+                        <div className="pps-card__tag">
                             Commercial
                         </div>
 
-                        <div className="pps-card__icon-wrap" ref={cardIconRef}>
+                        <div className="pps-card__icon-wrap">
                             <FaBuilding className="pps-card__icon" />
                         </div>
 
@@ -159,7 +144,7 @@ function ProjectPromoSection() {
 
                         <div className="pps-card__divider" />
 
-                        <div className="pps-card__stats" ref={cardStatsRef}>
+                        <div className="pps-card__stats">
                             <div className="pps-card__stat">
                                 <span className="pps-card__stat-value">4+</span>
                                 <span className="pps-card__stat-label">Plot Sizes</span>

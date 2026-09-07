@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchProperty, submitEnquiry } from '../../services/api';
-import Navbar from '../Navbar/Navbar';
+import { fetchProperty } from '../../services/api';
+import SiteNav from '../SiteNav/SiteNav';
 import Footer from '../Footer/Footer';
+import SEO from '../SEO/SEO';
+import { propertySeo } from '../../seo/seoConfig';
 import { FaMapMarkerAlt, FaPhone, FaEnvelope, FaChevronLeft, FaChevronRight, FaTimes, FaHome, FaRuler, FaBuilding, FaCheckCircle } from 'react-icons/fa';
 import { MdLocationOn } from 'react-icons/md';
 import './PropertyDetail.css';
@@ -39,11 +41,7 @@ function PropertyDetail() {
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [lightboxIndex, setLightboxIndex] = useState(0);
 
-    // Enquiry form state
-    const [enquiry, setEnquiry] = useState({ name: '', phone: '', email: '', message: '' });
-    const [submitting, setSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
-    const [submitError, setSubmitError] = useState('');
 
     useEffect(() => { window.scrollTo(0, 0); }, []);
 
@@ -71,32 +69,10 @@ function PropertyDetail() {
         return () => window.removeEventListener('keydown', onKey);
     });
 
-    const handleEnquiryChange = (e) => {
-        setEnquiry(prev => ({ ...prev, [e.target.name]: e.target.value }));
-    };
-
-    const handleEnquirySubmit = async (e) => {
-        e.preventDefault();
-        if (!enquiry.name || !enquiry.phone) {
-            setSubmitError('Name and phone number are required.');
-            return;
-        }
-        setSubmitting(true);
-        setSubmitError('');
-        try {
-            await submitEnquiry({ ...enquiry, property: property?.id || null });
-            setSubmitted(true);
-        } catch {
-            setSubmitError('Failed to send. Please call us directly.');
-        } finally {
-            setSubmitting(false);
-        }
-    };
-
     if (loading) {
         return (
             <div className="pd-page">
-                <Navbar />
+                <SiteNav />
                 <div className="pd-notfound__inner" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
                     <p style={{ color: '#64748b', fontSize: '1.1rem' }}>Loading property…</p>
                 </div>
@@ -108,7 +84,7 @@ function PropertyDetail() {
     if (!property) {
         return (
             <div className="pd-notfound">
-                <Navbar />
+                <SiteNav />
                 <div className="pd-notfound__inner">
                     <h2>{error || 'Property not found'}</h2>
                     <button onClick={() => navigate(-1)}>Go back</button>
@@ -133,7 +109,8 @@ function PropertyDetail() {
 
     return (
         <div className="pd-page">
-            <Navbar />
+            <SEO {...propertySeo(property)} />
+            <SiteNav />
 
             {/* ── Breadcrumb ── */}
             <div className="pd-breadcrumb">
@@ -339,7 +316,7 @@ function PropertyDetail() {
 
             {/* ── Contact Modal ── */}
             {contactOpen && (
-                <div className="pd-modal-backdrop" onClick={() => { setContactOpen(false); setSubmitted(false); setSubmitError(''); }}>
+                <div className="pd-modal-backdrop" onClick={() => { setContactOpen(false); setSubmitted(false); }}>
                     <div className="pd-modal" onClick={(e) => e.stopPropagation()}>
                         <button className="pd-modal__close" onClick={() => { setContactOpen(false); setSubmitted(false); }}>
                             <FaTimes />

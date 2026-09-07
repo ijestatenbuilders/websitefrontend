@@ -1,28 +1,32 @@
-import React, { useState } from 'react';
+import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './PropertyCardSimple.css';
 
 export default function PropertyCardSimple({ property }) {
-  const [transform, setTransform] = useState('');
+  const cardRef = useRef(null);
+  const rafRef = useRef(0);
   const navigate = useNavigate();
 
+  // Write the tilt straight to the DOM (rAF-throttled) instead of through React
+  // state — avoids a re-render on every mousemove event.
   const handleMouseMove = (e) => {
-    const card = e.currentTarget;
+    const card = cardRef.current;
+    if (!card) return;
     const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-    
-    const rotateX = ((y - centerY) / centerY) * -10;
-    const rotateY = ((x - centerX) / centerX) * 10;
-    
-    setTransform(`perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`);
+    const rotateX = ((e.clientY - rect.top - rect.height / 2) / (rect.height / 2)) * -10;
+    const rotateY = ((e.clientX - rect.left - rect.width / 2) / (rect.width / 2)) * 10;
+
+    cancelAnimationFrame(rafRef.current);
+    rafRef.current = requestAnimationFrame(() => {
+      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
+    });
   };
 
   const handleMouseLeave = () => {
-    setTransform('perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)');
+    cancelAnimationFrame(rafRef.current);
+    if (cardRef.current) {
+      cardRef.current.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+    }
   };
 
   const handleClick = () => {
@@ -53,7 +57,7 @@ export default function PropertyCardSimple({ property }) {
   return (
     <div
       className="property-card-simple"
-      style={{ transform }}
+      ref={cardRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       onClick={handleClick}
@@ -61,7 +65,7 @@ export default function PropertyCardSimple({ property }) {
       <div className="card-inner">
         {/* Image */}
         <div className="card-image">
-          <img src={imageUrl} alt={property.name || 'Property'} />
+          <img src={imageUrl} alt={property.name || 'Property'} loading="lazy" decoding="async" />
           {property.badge && (
             <div className="card-badge">{property.badge}</div>
           )}

@@ -14,6 +14,8 @@
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^13.5.0",
     "gsap": "^3.15.0",
+    "lenis": "^1.3.26",
+    "motion": "^13.1.1",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-helmet-async": "^3.0.0",
@@ -26,8 +28,26 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "postbuild": "react-snap",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
+  },
+  "reactSnap": {
+    "include": [
+      "/",
+      "/listings",
+      "/about",
+      "/contact",
+      "/commercial/business-bay",
+      "/commercial/generic",
+      "/virtual-3d",
+      "/forums"
+    ],
+    "puppeteerExecutablePath": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+    "puppeteerArgs": ["--no-sandbox", "--disable-setuid-sandbox"],
+    "inlineCss": false,
+    "skipThirdPartyRequests": true,
+    "minifyHtml": { "collapseWhitespace": false, "removeComments": false }
   },
   "eslintConfig": {
     "extends": [
@@ -48,6 +68,7 @@
     ]
   },
   "devDependencies": {
+    "react-snap": "^1.23.0",
     "sharp": "^0.35.3"
   }
 }

@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import './App.css';
 import LandingPage from './Components/LandingPage/LandingPage';
 import PropertyListings from './Components/PropertyListings/PropertyListings';
@@ -10,20 +10,31 @@ import ContactUs from './Components/ContactUs/ContactUs';
 import CommercialDetail from './Components/CommercialDetail/CommercialDetail';
 import BusinessBayCommercial from './Components/BusinessBayCommercial/BusinessBayCommercial';
 import MapView from './Components/MapView/MapView';
+import Virtual3D from './Components/Virtual3D/Virtual3D';
 import CommunityForums from './Components/CommunityForums/CommunityForums';
 import ThreadDetail from './Components/ThreadDetail/ThreadDetail';
 import NotFound from './Components/NotFound/NotFound';
-import ProjectPromo from './Components/ProjectPromo/ProjectPromo';
+// import ProjectPromo from './Components/ProjectPromo/ProjectPromo'; // Business Bay floating ad — removed for now
 import AIChat from './Components/AIChat/AIChat';
 import { useAiraOpen, airaStore } from './utils/airaStore';
 
 // Lazy load new flagship 3D Showcase (Inspired by asaram.dev & Aether Shoes)
 const Showcase3D = lazy(() => import('./Components/Showcase3D/Showcase3D'));
+// Cinematic standalone Experience landing page (GSAP + Framer Motion, light theme)
+const Experience = lazy(() => import('./Components/Experience/Experience'));
 // Legacy fallbacks
 const SimpleShowcase = lazy(() => import('./Components/SimpleShowcase/SimpleShowcase'));
 const FixedShowcase = lazy(() => import('./Components/FixedShowcase/FixedShowcase'));
 
 function App() {
+  // Restore the location brand accent chosen earlier so every page is themed.
+  useEffect(() => {
+    try {
+      const loc = localStorage.getItem('ij-loc');
+      if (loc) document.documentElement.setAttribute('data-loc', loc);
+    } catch (e) { /* ignore */ }
+  }, []);
+
   return (
     <HelmetProvider>
       <BrowserRouter>
@@ -37,6 +48,15 @@ function App() {
             <Route path="/commercial/business-bay" element={<BusinessBayCommercial />} />
             <Route path="/commercial/generic" element={<CommercialDetail />} />
             <Route path="/map" element={<MapView />} />
+            <Route path="/virtual-3d" element={<Virtual3D />} />
+            <Route
+              path="/experience"
+              element={
+                <Suspense fallback={<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#eef4fd', color: '#0d4dbb', fontFamily: 'Outfit, sans-serif', fontWeight: 700 }}>Loading the experience…</div>}>
+                  <Experience />
+                </Suspense>
+              }
+            />
             <Route path="/forums" element={<CommunityForums />} />
             <Route path="/forums/thread/:threadId" element={<ThreadDetail />} />
             {/* Flagship Next-Gen 3D Showcase */}
@@ -77,8 +97,8 @@ function App() {
             <Route path="*" element={<NotFound />} />
           </Routes>
 
-          {/* Floating promo card — shown on all pages except the project page itself */}
-          <ProjectPromo />
+          {/* Floating Business Bay promo ad — removed for now */}
+          {/* <ProjectPromo /> */}
 
           {/* Global AI assistant — mounted once so voice sessions & actions
               persist across page navigation. */}

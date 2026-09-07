@@ -3,8 +3,10 @@
  * Change API_URL to switch between development and production.
  */
 
-// Production backend URL
-export const API_URL = 'https://www.ijestateandbuilders.tech';
+// Backend URL. In local dev (`npm start`) REACT_APP_API_URL comes from
+// .env.development (http://localhost:8000). Production builds fall back to the
+// live backend below, so production is never affected.
+export const API_URL = process.env.REACT_APP_API_URL || 'https://www.ijestateandbuilders.tech';
 
 const API_BASE = `${API_URL}/api`;
 

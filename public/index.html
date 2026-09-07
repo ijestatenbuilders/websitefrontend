@@ -23,26 +23,12 @@
   <!-- Google Search Console Verification -->
   <meta name="google-site-verification" content="24EVwY3zvNjjPQ79d34NTTbPG8s-1RbWh2KXlJWE_8I" />
 
-  <!-- SEO Meta Tags -->
-  <meta name="description"
-    content="IJ Estates & Builders - Premium Real Estate Properties in Lahore. Find your dream home with the best real estate deals in Pakistan." />
-  <meta name="keywords"
-    content="IJ Estates, Real Estate Lahore, Properties in Pakistan, Homes for Sale, Real Estate Investment" />
-  <meta name="author" content="IJ Estates & Builders" />
-
-  <!-- Open Graph / Facebook -->
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="IJ Estates & Builders - Premium Real Estate Properties" />
-  <meta property="og:description"
-    content="Find your dream home with IJ Estates & Builders. Premium real estate properties in Lahore, Pakistan." />
-  <meta property="og:image" content="https://ijestateandbuilders.com/android-chrome-512x512.png" />
-  <meta property="og:url" content="https://ijestateandbuilders.com" />
-
-  <!-- Twitter -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="IJ Estates & Builders" />
-  <meta name="twitter:description" content="Premium Real Estate Properties in Lahore, Pakistan" />
-  <meta name="twitter:image" content="https://ijestateandbuilders.com/android-chrome-512x512.png" />
+  <!-- NOTE: Per-page SEO meta (title, description, keywords, Open Graph, Twitter,
+       canonical, JSON-LD) is owned entirely by the <SEO> component
+       (src/Components/SEO/SEO.jsx + src/seo/seoConfig.js) so each route gets its
+       own tags. Do NOT hardcode SEO meta here — it would duplicate Helmet's tags
+       and Google would use the wrong (generic) one on every page. -->
+  <meta name="author" content="IJ Estate & Builders" />
 
   <!-- Favicon Configuration - Proper favicon formats for all browsers -->
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
@@ -65,7 +51,9 @@
   <!-- Preload critical resources -->
   <link rel="preload" href="/static/css/main.css" as="style" />
 
-  <title>IJ Estates & Builders - Premium Real Estate in Lahore</title>
+  <!-- Neutral fallback title for no-JS scrapers; the <SEO> component sets the
+       real per-page title on every route (Helmet replaces this single tag). -->
+  <title>IJ Estate & Builders | Real Estate in Bahria Town Lahore</title>
 
   <!-- Critical CSS inline (prevents render-blocking) -->
   <style>

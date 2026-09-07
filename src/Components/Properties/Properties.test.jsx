@@ -1,3 +1,7 @@
+/* This test asserts on class-based DOM structure (.category-card / .dot) that
+   has no accessible role, so Testing Library's role/text queries don't fit —
+   direct container access is intentional here. */
+/* eslint-disable testing-library/no-container, testing-library/no-node-access */
 import { render, fireEvent } from '@testing-library/react';
 import BrowseProperties from './Properties';
 

@@ -6,9 +6,9 @@
 /* ── Hero banner ── */
 .listings-hero {
     position: relative;
-    padding: 130px 60px 48px;
+    padding: 150px 60px 84px;
     overflow: hidden;
-    background: linear-gradient(135deg, rgba(15, 28, 60, 0.92), rgba(10, 32, 82, 0.95));
+    background: linear-gradient(135deg, #0b1c3f 0%, #0a2054 55%, #0d1b45 100%);
 }
 
 .listings-hero::before {
@@ -35,9 +35,75 @@
 
 .listings-hero__inner {
     position: relative;
-    z-index: 1;
+    z-index: 3;
     max-width: 1400px;
     margin: 0 auto;
+}
+
+/* Cinematic animated colour mesh behind the hero content */
+.listings-hero__mesh {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background:
+        radial-gradient(600px 300px at 15% 20%, rgba(56, 189, 248, 0.28), transparent 60%),
+        radial-gradient(700px 360px at 85% 30%, rgba(37, 99, 235, 0.30), transparent 62%),
+        radial-gradient(500px 320px at 60% 100%, rgba(129, 140, 248, 0.22), transparent 60%);
+    background-size: 200% 200%;
+    animation: listingsMesh 18s ease-in-out infinite alternate;
+    opacity: 0.9;
+}
+@keyframes listingsMesh {
+    0%   { background-position: 0% 0%, 100% 0%, 50% 100%; }
+    100% { background-position: 30% 40%, 70% 30%, 40% 70%; }
+}
+
+/* Faint blueprint grid over the mesh for a spatial, architectural feel */
+.listings-hero__mesh::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 20%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 20%, transparent 75%);
+}
+
+/* Ambient parallax objects sit above the background but below the text */
+.listings-parallax {
+    z-index: 2 !important;
+}
+
+/* ── Hero eyebrow badge ── */
+.listings-hero__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 6px 15px;
+    margin-bottom: 16px;
+    border: 1px solid rgba(125, 211, 252, 0.35);
+    border-radius: 100px;
+    background: rgba(56, 189, 248, 0.12);
+    color: #bae6fd;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+}
+.listings-hero__eyebrow-pulse {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #38bdf8;
+    box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.6);
+    animation: listingsPulse 2s infinite;
+}
+@keyframes listingsPulse {
+    0%   { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.55); }
+    70%  { box-shadow: 0 0 0 10px rgba(56, 189, 248, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
 }
 
 .listings-hero__back {
@@ -95,17 +161,21 @@
 }
 
 .listings-hero__title {
-    font-size: 2.4rem;
+    font-size: clamp(2.4rem, 5vw, 3.6rem);
     font-weight: 800;
     color: #fff;
-    margin: 0 0 10px;
+    margin: 0 0 12px;
     letter-spacing: -0.03em;
-    line-height: 1.15;
+    line-height: 1.1;
+    text-shadow: 0 2px 24px rgba(4, 12, 32, 0.4);
 }
 
 .listings-hero__title em {
     font-style: normal;
-    color: #7eb8ff;
+    background: linear-gradient(135deg, #7dd3fc, #38bdf8 55%, #818cf8);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .listings-hero__subtitle {
@@ -943,4 +1013,65 @@
     .bbc-lcard__img-wrap {
         height: 155px;
     }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   LISTINGS HERO — CINEMATIC PARALLAX TOKEN POSITIONS
+   (scoped to the hero; the layer is clipped to the hero box)
+═══════════════════════════════════════════════════════════ */
+.listings-parallax.parallax-ambient-layer {
+    /* Fill only the hero, not the whole page */
+    position: absolute;
+    inset: 0;
+}
+
+.listings-parallax .lp-token--orb-cyan {
+    top: -60px;
+    left: -40px;
+    width: 380px;
+    height: 380px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.22) 0%, rgba(14, 165, 233, 0.05) 55%, transparent 70%);
+    filter: blur(30px);
+}
+.listings-parallax .lp-token--orb-gold {
+    bottom: -80px;
+    right: -30px;
+    width: 360px;
+    height: 360px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(129, 140, 248, 0.20) 0%, rgba(79, 70, 229, 0.05) 55%, transparent 70%);
+    filter: blur(32px);
+}
+.listings-parallax .lp-token--cube    { top: 120px;  right: 9%; }
+.listings-parallax .lp-token--ring    { top: 210px;  right: 20%; }
+.listings-parallax .lp-token--gyro    { bottom: 40px; right: 6%; }
+.listings-parallax .lp-token--diamond { bottom: 70px; left: 6%; }
+.listings-parallax .lp-token--gps     { top: 120px;  right: 26%; }
+.listings-parallax .lp-token--keycard { bottom: 54px; right: 24%; }
+
+/* Keep the ambient objects clear of the (left-aligned) hero text on smaller
+   desktops, and drop the fussier ones entirely on tablet/mobile. */
+@media (max-width: 1100px) {
+    .listings-parallax .lp-token--gps,
+    .listings-parallax .lp-token--keycard,
+    .listings-parallax .lp-token--ring {
+        display: none;
+    }
+}
+@media (max-width: 820px) {
+    .listings-parallax .lp-token--cube,
+    .listings-parallax .lp-token--gyro,
+    .listings-parallax .lp-token--diamond {
+        display: none;
+    }
+}
+
+/* Card render containment — isolate each card's paint/layout in long grids */
+.prop-card,
+.bbc-lcard {
+    contain: layout paint;
+}
+.prop-card__img-wrap {
+    contain: paint;
 }

@@ -5,6 +5,8 @@
   cursor: pointer;
   transition: transform 0.2s ease-out;
   transform-style: preserve-3d;
+  /* Isolate each card's reflow from the rest of the grid */
+  contain: layout;
 }
 
 .card-inner {

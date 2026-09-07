@@ -5,10 +5,15 @@ Disallow: /admin
 Disallow: /api
 Disallow: /*.json$
 
+# Keep thin/experimental 3D demo routes out of the index (no unique content)
+Disallow: /3d-showcase
+Disallow: /3d-legacy
+Disallow: /3d-css
+
 # Sitemaps
 Sitemap: https://ijestateandbuilders.com/sitemap.xml
 
-# Crawl-delay for specific bots
+# Per-bot rules
 User-agent: Googlebot
 Crawl-delay: 0
 

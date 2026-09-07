@@ -410,7 +410,7 @@ const AIChat = ({ isOpen, onClose }) => {
         setCaption('Muted. Unmute to keep talking.');
       }
     }
-  }, [askAira, speak, messages, startListening, executeActions]);
+  }, [askAira, speak, messages, startListening, executeActions, scriptForLang]);
 
   const startCall = useCallback(() => {
     unlockAudio();          // must run inside the tap gesture so neural audio can play

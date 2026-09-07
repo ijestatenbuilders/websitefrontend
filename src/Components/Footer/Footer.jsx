@@ -14,15 +14,6 @@ const quickLinks = [
     { label: 'Contact', href: '#contact' },
 ];
 
-const propertyLinks = [
-    { label: 'Houses for Sale' },
-    { label: 'Houses for Rent' },
-    { label: 'Plots for Sale' },
-    { label: 'Commercial Spaces' },
-    { label: 'Apartments' },
-    { label: 'New Launches' },
-];
-
 const socials = [
     { icon: FaFacebookF, label: 'Facebook', href: '#' },
     { icon: FaInstagram, label: 'Instagram', href: '#' },
@@ -169,9 +160,9 @@ function Footer() {
             <div className="footer__bottom" data-reveal="fade-up" data-delay="2">
                 <p className="footer__copy">© {new Date().getFullYear()} | IJ Estate & Builders | All rights reserved.</p>
                 <div className="footer__bottom-links">
-                    <a href="#" className="footer__bottom-link">Privacy Policy</a>
+                    <button type="button" className="footer__bottom-link">Privacy Policy</button>
                     <span className="footer__bottom-dot">·</span>
-                    <a href="#" className="footer__bottom-link">Terms of Service</a>
+                    <button type="button" className="footer__bottom-link">Terms of Service</button>
                 </div>
             </div>
         </footer>

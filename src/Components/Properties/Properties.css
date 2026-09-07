@@ -1,5 +1,5 @@
 .browse-properties {
-    padding: 70px 90px;
+    padding: 110px 90px 70px;
     position: relative;
     overflow: hidden;
     margin: 50px 30px 40px;
@@ -132,6 +132,18 @@
     grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
     gap: 30px;
     margin-bottom: 40px;
+}
+
+/* Reveal wrapper — carries the pop-scale entrance so the RAF tilt on the inner
+   card never overrides it. Fills the grid cell like the card used to. */
+.category-card-reveal {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+.category-card-reveal > .category-card {
+    flex: 1;
+    width: 100%;
 }
 
 .category-card {

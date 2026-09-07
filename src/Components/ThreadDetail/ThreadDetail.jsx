@@ -6,7 +6,7 @@ import {
     FaComments, FaFire, FaThumbtack
 } from 'react-icons/fa';
 import SEO from '../SEO/SEO';
-import Navbar from '../Navbar/Navbar';
+import SiteNav from '../SiteNav/SiteNav';
 import Footer from '../Footer/Footer';
 import Toast from '../Toast/Toast';
 import './ThreadDetail.css';
@@ -113,7 +113,7 @@ function ThreadDetail() {
     if (loading) {
         return (
             <div className="thread-detail">
-                <Navbar variant="scrolled" />
+                <SiteNav />
                 <div className="td-container td-state-container">
                     <div className="td-state">
                         <FaSpinner className="td-spin" />
@@ -129,7 +129,7 @@ function ThreadDetail() {
     if (error || !thread) {
         return (
             <div className="thread-detail">
-                <Navbar variant="scrolled" />
+                <SiteNav />
                 <div className="td-container td-state-container">
                     <div className="td-state td-state-error">
                         <FaExclamationCircle />
@@ -154,7 +154,7 @@ function ThreadDetail() {
                 ogType="article"
             />
             <div className="thread-detail">
-                <Navbar variant="scrolled" />
+                <SiteNav />
 
                 <div className="td-container">
                     {/* Back Button */}

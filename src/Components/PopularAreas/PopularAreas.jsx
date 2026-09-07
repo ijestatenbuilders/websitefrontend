@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import './PopularAreas.css';
 import { useNavigate } from 'react-router-dom';
 import { FaMapMarkerAlt } from 'react-icons/fa';
@@ -179,40 +179,41 @@ function PopularAreas({ currentLocation = 'bahriatown' }) {
 
     const locationDisplayName = locationNames[currentLocation] || 'Bahria Town Lahore';
 
-    // Internal RAF loop — background parallax & tilt on inner elements (never overrides entrance transform)
+    // Internal RAF loop — parallax computed RELATIVE to each element's viewport
+    // position (bounded), so it works wherever the section sits on the page and
+    // never shoves the card image off its frame (no black gap) or pulls the
+    // header off the top. Measures non-transformed references to avoid feedback.
     useEffect(() => {
         let animId;
-        let scrollSmooth = window.scrollY;
-        let scrollTarget = window.scrollY;
-        const LERP = 0.08;
-
-        const onScroll = () => { scrollTarget = window.scrollY; };
-        window.addEventListener('scroll', onScroll, { passive: true });
+        const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
 
         const loop = () => {
-            scrollSmooth += (scrollTarget - scrollSmooth) * LERP;
-            const sy = scrollSmooth;
+            const vh = window.innerHeight || 1;
 
             if (bgGridRef.current) {
-                bgGridRef.current.style.transform = `translate3d(0, ${((sy - 2800) * 0.07).toFixed(2)}px, 0)`;
+                const r = bgGridRef.current.parentElement.getBoundingClientRect();
+                const p = (r.top + r.height / 2 - vh / 2) / vh;
+                bgGridRef.current.style.transform = `translate3d(0, ${clamp(p * 40, -50, 50).toFixed(2)}px, 0)`;
             }
             if (headerRef.current) {
-                headerRef.current.style.transform = `translate3d(0, ${((sy - 2850) * -0.038).toFixed(2)}px, 0)`;
+                const r = headerRef.current.parentElement.getBoundingClientRect();
+                const p = (r.top - vh / 2) / vh;
+                headerRef.current.style.transform = `translate3d(0, ${clamp(p * -10, -14, 14).toFixed(2)}px, 0)`;
             }
 
             imgRefs.current.forEach((img) => {
                 if (!img) return;
-                img.style.transform = `scale(1.06) translate3d(0, ${((sy - 2900) * 0.025).toFixed(2)}px, 0)`;
+                const r = img.parentElement.getBoundingClientRect(); // img-wrap (not transformed here)
+                const p = (r.top + r.height / 2 - vh / 2) / vh;
+                const offset = clamp(p * -18, -10, 10);
+                img.style.transform = `scale(1.12) translate3d(0, ${offset.toFixed(2)}px, 0)`;
             });
 
             animId = requestAnimationFrame(loop);
         };
 
         animId = requestAnimationFrame(loop);
-        return () => {
-            window.removeEventListener('scroll', onScroll);
-            cancelAnimationFrame(animId);
-        };
+        return () => cancelAnimationFrame(animId);
     }, []);
 
     const handleCardMouseMove = (index, e) => {
@@ -258,10 +259,6 @@ function PopularAreas({ currentLocation = 'bahriatown' }) {
 
             <div className="popular-areas__container">
                 <div className="popular-header-wrap" ref={headerRef} data-reveal="fade-up">
-                    <div className="popular-eyebrow">
-                        <span className="popular-eyebrow-pulse" />
-                        <span>LANDMARKS & PRIME LOCALES</span>
-                    </div>
                     <h2 className="popular-areas__title">Popular Areas in {locationDisplayName}</h2>
                     <p className="popular-areas__subtitle">
                         Explore iconic architectural wonders, vibrant commercial squares, and high-yield lifestyle communities.
@@ -291,6 +288,8 @@ function PopularAreas({ currentLocation = 'bahriatown' }) {
                                         src={area.image}
                                         alt={area.name}
                                         className="popular-areas__img"
+                                        loading="lazy"
+                                        decoding="async"
                                         ref={(el) => { imgRefs.current[index] = el; }}
                                     />
                                     <div className="popular-areas__img-overlay" />

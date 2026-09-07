@@ -19,10 +19,10 @@ export default function PagePreloader({ onComplete, theme }) {
     const TOTAL_DURATION = 2800; // ms — the full 0→100 journey
 
     const easeProgress = (t) => {
-      // Custom ease: fast start, long mid-plateau, quick finish
-      if (t < 0.15) return t * 3.5;            // 0–15% time → 0–52% progress (fast start)
-      if (t < 0.75) return 0.52 + (t - 0.15) * 0.55; // 15–75% time → 52–85% (slow plateau)
-      return 0.85 + (t - 0.75) * 0.6;          // 75–100% time → 85–100% (fast finish)
+      // Smooth, near-linear travel start→end with a tiny speed-up through the
+      // middle (mostly linear blended with a subtle smoothstep).
+      const smooth = t * t * (3 - 2 * t); // smoothstep: slightly faster mid, softer ends
+      return 0.7 * t + 0.3 * smooth;
     };
 
     const animate = (timestamp) => {
@@ -56,7 +56,7 @@ export default function PagePreloader({ onComplete, theme }) {
       const t2 = setTimeout(() => {
         setIsDone(true);
         if (onComplete) onComplete();
-      }, 750);
+      }, 1050);
       return () => { clearTimeout(t1); clearTimeout(t2); };
     }
   }, [progress, onComplete]);
@@ -68,53 +68,54 @@ export default function PagePreloader({ onComplete, theme }) {
       className={`page-preloader page-preloader--${activeTheme} ${isFading ? 'page-preloader--fade' : ''}`}
       aria-hidden="true"
     >
-      {/* Ambient floating orbs */}
-      <div className="preloader-orb preloader-orb--1" />
-      <div className="preloader-orb preloader-orb--2" />
-      <div className="preloader-orb preloader-orb--3" />
-
-      {/* Top laser progress beam */}
-      <div className="preloader-laser-bar">
-        <div className="preloader-laser-progress" style={{ width: `${progress}%` }}>
-          <span className="preloader-laser-spark" />
-        </div>
+      {/* Ambient background — soft drifting orbs + faint grid */}
+      <div className="pl-ambient">
+        <span className="pl-orb pl-orb--1" />
+        <span className="pl-orb pl-orb--2" />
+        <span className="pl-orb pl-orb--3" />
       </div>
 
-      {/* Center content */}
-      <div className="preloader-center-content">
-        {/* Animated brand mark */}
-        <div className="preloader-brand-logo">
-          <div className="preloader-logo-ring preloader-logo-ring--outer" />
-          <div className="preloader-logo-ring preloader-logo-ring--inner" />
-          <span className="preloader-logo-text">✦ IJ</span>
+      {/* Thin top progress beam */}
+      <div className="pl-beam">
+        <span className="pl-beam__fill" style={{ width: `${progress}%` }}>
+          <i className="pl-beam__spark" />
+        </span>
+      </div>
+
+      {/* 3D animated centerpiece — gyroscope rings + glass cube + orbiters */}
+      <div className="pl-scene">
+        <div className="pl-gyro">
+          <span className="pl-ring pl-ring--a" />
+          <span className="pl-ring pl-ring--b" />
+          <span className="pl-ring pl-ring--c" />
+
+          <div className="pl-cube">
+            <span className="pl-cube__f pl-cube__f--front" />
+            <span className="pl-cube__f pl-cube__f--back" />
+            <span className="pl-cube__f pl-cube__f--right" />
+            <span className="pl-cube__f pl-cube__f--left" />
+            <span className="pl-cube__f pl-cube__f--top" />
+            <span className="pl-cube__f pl-cube__f--bottom" />
+          </div>
+
+          <span className="pl-core" />
         </div>
 
-        <div className="preloader-brand-title">
-          <span>IJ ESTATE</span>
-          <span className="preloader-brand-amp"> & </span>
-          <span>BUILDERS</span>
-        </div>
+        <span className="pl-orbit pl-orbit--1"><i /></span>
+        <span className="pl-orbit pl-orbit--2"><i /></span>
+      </div>
 
-        <div className="preloader-subtext">
-          PREMIER LUXURY REAL ESTATE · LAHORE, PAKISTAN
+      {/* Minimal brand + progress */}
+      <div className="pl-content">
+        <div className="pl-brand">
+          IJ&nbsp;ESTATE<span className="pl-brand__amp">&amp;</span>BUILDERS
         </div>
+        <div className="pl-sub">PREMIER LUXURY REAL ESTATE · LAHORE</div>
 
-        {/* Divider line */}
-        <div className="preloader-divider" />
-
-        {/* Capsule progress bar */}
-        <div className="preloader-capsule-track">
-          <div
-            className="preloader-capsule-bar"
-            style={{ width: `${progress}%` }}
-          />
-          <div className="preloader-capsule-glow" style={{ left: `${progress}%` }} />
+        <div className="pl-bar">
+          <span className="pl-bar__fill" style={{ width: `${progress}%` }} />
         </div>
-
-        {/* Percentage only */}
-        <div className="preloader-status-row">
-          <span className="preloader-percent">{progress}<span className="preloader-percent-sign">%</span></span>
-        </div>
+        <div className="pl-percent">{progress}<span>%</span></div>
       </div>
     </div>
   );

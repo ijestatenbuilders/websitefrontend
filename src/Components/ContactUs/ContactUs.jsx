@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Navbar from '../Navbar/Navbar';
+import SiteNav from '../SiteNav/SiteNav';
 import Footer from '../Footer/Footer';
+import SEO from '../SEO/SEO';
+import { seo } from '../../seo/seoConfig';
 import { API_URL } from '../../services/api';
 import './ContactUs.css';
 
 function ContactUs() {
-    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -68,7 +68,8 @@ function ContactUs() {
 
     return (
         <div className="contact-page">
-            <Navbar />
+            <SEO {...seo.contact} />
+            <SiteNav />
 
             {/* Success Notification */}
             <div className={`contact-notification ${showNotification ? 'contact-notification--show' : ''}`}>

@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import Navbar from '../Navbar/Navbar';
+import SiteNav from '../SiteNav/SiteNav';
 import Footer from '../Footer/Footer';
+import SEO from '../SEO/SEO';
+import { seo } from '../../seo/seoConfig';
 import { FaMapMarkerAlt, FaPhone, FaEnvelope, FaChevronLeft, FaChevronRight, FaTimes, FaBuilding, FaRuler } from 'react-icons/fa';
 import { MdLocationOn } from 'react-icons/md';
 import './BusinessBayCommercial.css';
@@ -104,7 +106,8 @@ function BusinessBayCommercial() {
     if (loading) {
         return (
             <div className="bbc-page">
-                <Navbar />
+                <SEO {...seo.businessBay} />
+                <SiteNav />
                 <div className="bbc-loading">
                     <div className="bbc-loading__spinner"></div>
                     <p>Loading project details...</p>
@@ -117,7 +120,8 @@ function BusinessBayCommercial() {
     if (error || !project) {
         return (
             <div className="bbc-page">
-                <Navbar />
+                <SEO {...seo.businessBay} />
+                <SiteNav />
                 <div className="bbc-error">
                     <h2>Project Not Found</h2>
                     <p>{error || 'The requested project could not be found.'}</p>
@@ -135,7 +139,8 @@ function BusinessBayCommercial() {
 
     return (
         <div className="bbc-page">
-            <Navbar />
+            <SEO {...seo.businessBay} />
+            <SiteNav />
 
             {/* ── Breadcrumb ── */}
             <div className="bbc-breadcrumb">

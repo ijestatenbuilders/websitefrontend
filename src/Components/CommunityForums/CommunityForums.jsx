@@ -7,7 +7,8 @@ import {
 } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import SEO from '../SEO/SEO';
-import Navbar from '../Navbar/Navbar';
+import { seo } from '../../seo/seoConfig';
+import SiteNav from '../SiteNav/SiteNav';
 import Footer from '../Footer/Footer';
 import Toast from '../Toast/Toast';
 import './CommunityForums.css';
@@ -177,9 +178,10 @@ function CommunityForums() {
                 description="Join the IJ Estate & Builders community forum. Discuss property investments, get expert advice, share market insights."
                 keywords="real estate forum Pakistan, property investment discussion, Lahore real estate community"
                 canonicalUrl="/forums"
+                structuredData={seo.forums.structuredData}
             />
             <div className="community-forums">
-                <Navbar variant="scrolled" />
+                <SiteNav />
 
                 {/* Hero */}
                 <div className="cf-hero">

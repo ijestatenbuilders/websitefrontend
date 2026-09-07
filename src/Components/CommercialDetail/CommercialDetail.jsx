@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../Navbar/Navbar';
+import SiteNav from '../SiteNav/SiteNav';
 import Footer from '../Footer/Footer';
-import { FaMapMarkerAlt, FaPhone, FaEnvelope, FaChevronLeft, FaChevronRight, FaTimes, FaBuilding, FaCheckCircle } from 'react-icons/fa';
+import SEO from '../SEO/SEO';
+import { seo } from '../../seo/seoConfig';
+import { FaMapMarkerAlt, FaPhone, FaEnvelope, FaChevronLeft, FaChevronRight, FaTimes, FaBuilding } from 'react-icons/fa';
 import { MdLocationOn } from 'react-icons/md';
 import './CommercialDetail.css';
 
@@ -35,7 +37,6 @@ function CommercialDetail() {
     const [contactOpen, setContactOpen] = useState(false);
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [lightboxIndex, setLightboxIndex] = useState(0);
-    const [selectedSize, setSelectedSize] = useState('');
 
     useEffect(() => { window.scrollTo(0, 0); }, []);
 
@@ -61,7 +62,8 @@ function CommercialDetail() {
 
     return (
         <div className="cd-page">
-            <Navbar />
+            <SEO {...seo.commercial} />
+            <SiteNav />
 
             {/* ── Breadcrumb ── */}
             <div className="cd-breadcrumb">

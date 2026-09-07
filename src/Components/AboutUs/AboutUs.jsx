@@ -1,7 +1,9 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../Navbar/Navbar';
+import SiteNav from '../SiteNav/SiteNav';
 import Footer from '../Footer/Footer';
+import SEO from '../SEO/SEO';
+import { seo } from '../../seo/seoConfig';
 import './AboutUs.css';
 
 const stats = [
@@ -140,7 +142,8 @@ function AboutUs() {
 
     return (
         <div className="about-page">
-            <Navbar />
+            <SEO {...seo.about} />
+            <SiteNav />
 
             {/* ── Hero ── */}
             <div className="about-hero">

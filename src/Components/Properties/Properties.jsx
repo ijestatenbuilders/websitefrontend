@@ -47,33 +47,34 @@ const BrowseProperties = ({ currentLocation = 'bahriatown' }) => {
     };
 
     // Internal RAF loop — scroll parallax directly to DOM
+    // Parallax computed RELATIVE to each element's viewport position (bounded),
+    // so it works wherever the section sits and never pulls the header/cards off.
+    // Cards only get the mouse-tilt — their entrance is driven by the pop-scale
+    // reveal on the wrapper, which this must not override.
     useEffect(() => {
         let animId;
-        let scrollSmooth = window.scrollY;
-        let scrollTarget = window.scrollY;
-        const LERP = 0.08;
-        const onScroll = () => { scrollTarget = window.scrollY; };
-        window.addEventListener('scroll', onScroll, { passive: true });
+        const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
         const loop = () => {
-            scrollSmooth += (scrollTarget - scrollSmooth) * LERP;
-            const sy = scrollSmooth;
-            if (bgGridRef.current)
-                bgGridRef.current.style.transform = `translate3d(0, ${((sy - 800) * 0.07).toFixed(2)}px, 0)`;
-            if (headerRef.current)
-                headerRef.current.style.transform = `translate3d(0, ${((sy - 850) * -0.042).toFixed(2)}px, 0)`;
-            Object.entries(cardRefs.current).forEach(([key, card], index) => {
+            const vh = window.innerHeight || 1;
+            if (bgGridRef.current) {
+                const r = bgGridRef.current.parentElement.getBoundingClientRect();
+                const p = (r.top + r.height / 2 - vh / 2) / vh;
+                bgGridRef.current.style.transform = `translate3d(0, ${clamp(p * 40, -50, 50).toFixed(2)}px, 0)`;
+            }
+            if (headerRef.current) {
+                const r = headerRef.current.parentElement.getBoundingClientRect();
+                const p = (r.top - vh / 2) / vh;
+                headerRef.current.style.transform = `translate3d(0, ${clamp(p * -10, -14, 14).toFixed(2)}px, 0)`;
+            }
+            Object.values(cardRefs.current).forEach((card) => {
                 if (!card) return;
                 const tilt = card._tilt || { rx: 0, ry: 0 };
-                const offset = (index - 1) * 12;
-                card.style.transform = `translate3d(0, ${((sy - 1000) * -0.033 + offset).toFixed(2)}px, 0) perspective(1000px) rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg)`;
+                card.style.transform = `perspective(1000px) rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg)`;
             });
             animId = requestAnimationFrame(loop);
         };
         animId = requestAnimationFrame(loop);
-        return () => {
-            window.removeEventListener('scroll', onScroll);
-            cancelAnimationFrame(animId);
-        };
+        return () => cancelAnimationFrame(animId);
     }, []);
 
     const propertyTypeByCategory = {
@@ -342,10 +343,6 @@ const BrowseProperties = ({ currentLocation = 'bahriatown' }) => {
             
             <div className="browse-container">
                 <div className="browse-header-wrap" ref={headerRef} data-reveal="zoom-fade">
-                    <div className="browse-eyebrow">
-                        <span className="browse-eyebrow-pulse" />
-                        <span>PREMIER DIRECTORY // LAHORE DEVELOPMENTS</span>
-                    </div>
                     <h2 className="browse-title">Properties</h2>
                 </div>
 
@@ -396,14 +393,16 @@ const BrowseProperties = ({ currentLocation = 'bahriatown' }) => {
                             const currentTab = activeTabs[key];
                             const currentItems = category.tabs[currentTab];
                             const tilt = cardTilts[key] || { rx: 0, ry: 0, px: 0, py: 0 };
-                            const parallaxOffset = (index - 1) * 12; // Slight natural staggered offset
 
                             return (
                                 <div
                                     key={key}
-                                    className="category-card"
-                                    data-reveal="cascade-up"
+                                    className="category-card-reveal"
+                                    data-reveal="pop-scale"
                                     data-delay={index}
+                                >
+                                <div
+                                    className="category-card"
                                     ref={(el) => {
                                         if (el) {
                                             cardRefs.current[key] = el;
@@ -468,6 +467,7 @@ const BrowseProperties = ({ currentLocation = 'bahriatown' }) => {
                                             />
                                         ))}
                                     </div>
+                                </div>
                                 </div>
                             );
                         })}

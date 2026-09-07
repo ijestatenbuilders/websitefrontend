@@ -7,7 +7,7 @@ export function ParticleAtmosphere({ lightingMode = 'cyberMidnight' }) {
   const pointsRef = useRef();
   const particleCount = 500;
 
-  const { positions, colors, scales } = useMemo(() => {
+  const { positions, colors } = useMemo(() => {
     const pos = new Float32Array(particleCount * 3);
     const col = new Float32Array(particleCount * 3);
     const sca = new Float32Array(particleCount);

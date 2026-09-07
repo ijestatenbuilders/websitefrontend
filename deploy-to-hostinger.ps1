@@ -120,7 +120,7 @@ Write-Host "  Verification Steps" -ForegroundColor Yellow
 Write-Host "============================================" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "After upload, check:" -ForegroundColor Yellow
-Write-Host "  ✓ Website loads: https://ijestateandbuilders.tech" -ForegroundColor White
+Write-Host "  ✓ Website loads: https://ijestateandbuilders.com" -ForegroundColor White
 Write-Host "  ✓ Favicon shows your logo (not React icon)" -ForegroundColor White
 Write-Host "  ✓ Clear cache: Ctrl+Shift+R" -ForegroundColor White
 Write-Host "  ✓ Test in incognito mode" -ForegroundColor White

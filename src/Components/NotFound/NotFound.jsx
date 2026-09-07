@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { FaHome, FaSearch, FaMapMarkerAlt, FaBuilding, FaArrowLeft } from 'react-icons/fa';
+import SEO from '../SEO/SEO';
 import './NotFound.css';
 
 function NotFound() {
@@ -7,13 +8,14 @@ function NotFound() {
 
     const quickLinks = [
         { icon: <FaHome size={20} />, label: 'Home', path: '/' },
-        { icon: <FaSearch size={20} />, label: 'Browse Properties', path: '/properties' },
+        { icon: <FaSearch size={20} />, label: 'Browse Properties', path: '/listings' },
         { icon: <FaBuilding size={20} />, label: 'New Projects', path: '/#new' },
         { icon: <FaMapMarkerAlt size={20} />, label: 'Popular Areas', path: '/#areas' },
     ];
 
     return (
         <div className="notfound-page">
+            <SEO title="Page Not Found | IJ Estate & Builders" description="The page you are looking for could not be found. Explore properties in Bahria Town Lahore with IJ Estate & Builders." noindex={true} />
 
             <div className="notfound-container">
                 {/* Animated Background Elements */}

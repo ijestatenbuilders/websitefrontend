@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../Navbar/Navbar';
+import SiteNav from '../SiteNav/SiteNav';
 import Footer from '../Footer/Footer';
+import SEO from '../SEO/SEO';
+import { seo } from '../../seo/seoConfig';
 import { FaChevronLeft, FaMap, FaStreetView, FaTimes, FaExpand, FaCompress } from 'react-icons/fa';
 import { MdMyLocation } from 'react-icons/md';
 import './MapView.css';
@@ -224,7 +226,8 @@ function MapView() {
 
     return (
         <div className="map-view-page">
-            <Navbar />
+            <SEO {...seo.map} />
+            <SiteNav />
 
             {/* Breadcrumb */}
             <div className="map-view-breadcrumb">
