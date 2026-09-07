@@ -93,7 +93,11 @@ export default function ExperienceNav({ links = DEFAULT_LINKS, secondary, primar
   // are in that same untransformed space, so the pill stays aligned at any scale.
   const movePill = (el) => {
     if (!el || !listRef.current) return;
-    setPill({ x: el.offsetLeft, w: el.offsetWidth, opacity: 1 });
+    const w = el.offsetWidth;
+    // Bail on a zero-width measurement (layout/webfont not ready yet) instead of
+    // collapsing the pill to nothing — restPill re-runs once fonts settle.
+    if (!w) return;
+    setPill({ x: el.offsetLeft, w, opacity: 1 });
   };
   // Rest the pill under whichever link is currently active — works for both
   // in-page section links (data-id) and full-route links (to), since it keys off
@@ -103,8 +107,15 @@ export default function ExperienceNav({ links = DEFAULT_LINKS, secondary, primar
     if (el) movePill(el); else setPill((p) => ({ ...p, opacity: 0 }));
   };
 
-  useEffect(() => {
-    restPill();
+  useLayoutEffect(() => {
+    // Rest after paint (double rAF) so link metrics are final, and again once
+    // webfonts load — otherwise the first measurement can be 0-width and the
+    // active pill never appears on a fresh page load.
+    let r1 = requestAnimationFrame(() => { r1 = requestAnimationFrame(restPill); });
+    if (document.fonts?.ready) document.fonts.ready.then(restPill).catch(() => {});
+    const onResize = () => restPill();
+    window.addEventListener('resize', onResize);
+    return () => { cancelAnimationFrame(r1); window.removeEventListener('resize', onResize); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active, scrolled, location.pathname]);
 
