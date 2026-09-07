@@ -43,7 +43,6 @@
       "/virtual-3d",
       "/forums"
     ],
-    "puppeteerExecutablePath": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
     "puppeteerArgs": ["--no-sandbox", "--disable-setuid-sandbox"],
     "inlineCss": false,
     "skipThirdPartyRequests": true,
