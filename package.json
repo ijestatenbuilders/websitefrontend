@@ -28,7 +28,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "postbuild": "react-snap",
+    "postbuild": "react-snap || echo \"react-snap pre-render skipped; using SPA build\"",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -44,6 +44,7 @@
       "/forums"
     ],
     "puppeteerArgs": ["--no-sandbox", "--disable-setuid-sandbox"],
+    "port": 45999,
     "inlineCss": false,
     "skipThirdPartyRequests": true,
     "minifyHtml": { "collapseWhitespace": false, "removeComments": false }
