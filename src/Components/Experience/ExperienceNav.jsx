@@ -69,11 +69,17 @@ export default function ExperienceNav({ links = DEFAULT_LINKS, secondary, primar
       .filter((l) => l.id)
       .map((l) => document.getElementById(l.id))
       .filter(Boolean);
+    const visible = new Set();
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((en) => {
-          if (en.isIntersecting) setActive(en.target.id);
+          if (en.isIntersecting) visible.add(en.target.id);
+          else visible.delete(en.target.id);
         });
+        // Highlight the topmost section currently in the detection band (sections
+        // are in document order), so the pill tracks scrolling deterministically.
+        const topmost = sections.find((s) => visible.has(s.id));
+        if (topmost) setActive(topmost.id);
       },
       { rootMargin: '-45% 0px -50% 0px', threshold: 0 }
     );
@@ -123,6 +129,9 @@ export default function ExperienceNav({ links = DEFAULT_LINKS, secondary, primar
   const go = (link) => {
     setOpen(false);
     if (link.external || link.to) { navigate(link.to); return; }
+    // Highlight the clicked link immediately instead of waiting for the scroll-spy
+    // observer to catch the section as it scrolls into the detection band.
+    setActive(link.id);
     const el = document.getElementById(link.id);
     if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
     // Section isn't on this page → go to the home page and scroll to it there.
