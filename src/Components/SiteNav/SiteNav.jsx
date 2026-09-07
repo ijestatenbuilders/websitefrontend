@@ -12,7 +12,7 @@ const SITE_LINKS = [
   { to: '/virtual-3d', label: 'Virtual 3D', external: true },
   { to: '/forums', label: 'Forums', external: true },
   { to: '/about', label: 'About Us', external: true },
-  { id: 'contact', label: 'Contact Us' },
+  { to: '/contact', label: 'Contact Us', external: true },
 ];
 
 /**
