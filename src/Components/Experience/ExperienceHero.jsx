@@ -25,11 +25,48 @@ const LOC_NAMES = {
 /* Each character = two stacked copies (primary + secondary) that slide
    vertically on hover, with a small per-character delay from the first letter
    for an "alive" cascade (asaram.dev style). Transform-only = buttery smooth. */
-function SplitHeadline({ text, className = '' }) {
+/* Stylized "I" glyph: a rounded vertical bar wearing the brand's red "cap" —
+   the same notched dome from the IJ Estate logo — on its head. The bar uses
+   currentColor so it inherits the same dark→blue color and slide as every other
+   character on hover; the red cap is a fixed brand accent. */
+const IGlyph = () => (
+  <span className="xp-i" aria-hidden="true">
+    {/* preserveAspectRatio="none" so the CSS width/height on .xp-i__cap directly
+        control the cap's proportions (a square viewBox with "meet" ignored width). */}
+    <svg className="xp-i__cap" viewBox="0 0 100 100" preserveAspectRatio="none">
+      <defs>
+        {/* left = red, right = dark red (horizontal) */}
+        <linearGradient id="iCapGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stopColor="#ff2338" />
+          <stop offset="1" stopColor="#7d0016" />
+        </linearGradient>
+      </defs>
+      {/* Rounded dome top; the two bottom ends taper to sharp points (the feet),
+          and the centre is cut out as a house/pentagon shape (vertical walls +
+          pointed roof) instead of an oval scoop. */}
+      <path
+        d="M6 62 A44 54 0 0 1 94 62 C91 82 82 88 74 99 L64 86 L64 60 L50 42 L36 60 L36 86 L26 99 C18 88 9 82 6 62 Z"
+        fill="url(#iCapGrad)"
+      />
+    </svg>
+    <span className="xp-i__stem" />
+  </span>
+);
+
+function SplitHeadline({ text, className = '', logoI = false }) {
   return (
     <span className={`xp-split ${className}`} aria-label={text}>
       {text.split('').map((ch, i) => {
         const isSpace = ch === ' ';
+        // Render the first "I" as the stylized logo glyph (both stacked copies).
+        if (logoI && i === 0 && ch === 'I') {
+          return (
+            <span className="xp-split__char xp-split__char--i" key={i} style={{ '--i': i }}>
+              <span className="xp-split__prim"><IGlyph /></span>
+              <span className="xp-split__sec" aria-hidden="true"><IGlyph /></span>
+            </span>
+          );
+        }
         return (
           <span className="xp-split__char" key={i} style={{ '--i': i }}>
             <span className="xp-split__prim">{isSpace ? ' ' : ch}</span>
@@ -274,7 +311,7 @@ export default function ExperienceHero({ onLocationSwitch, location = 'bahriatow
           Exploring <strong>{LOC_NAMES[location] || LOC_NAMES.bahriatown}</strong>
         </div>
         <h1 className="xp-hero__title">
-          <SplitHeadline text="IJ ESTATE" className="xp-hero__line1" />
+          <SplitHeadline text="IJ ESTATE" className="xp-hero__line1" logoI />
           <SplitHeadline text="& BUILDERS" className="xp-hero__line2" />
         </h1>
         <HeroSearch onLocationSwitch={onLocationSwitch} />

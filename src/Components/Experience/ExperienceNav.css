@@ -65,9 +65,9 @@
 }
 
 .xnav__brand-logo {
-  width: 52px;
-  height: 52px;
-  border-radius: 13px;
+  width: 62px;
+  height: 62px;
+  border-radius: 15px;
   overflow: hidden;
   flex-shrink: 0;
   box-shadow: 0 8px 20px -8px rgba(13, 40, 90, 0.5);
@@ -172,6 +172,7 @@
   border: 1px solid rgba(13, 27, 62, 0.12);
   color: var(--xn-ink);
   font-family: 'Outfit', 'Inter', sans-serif;
+
   font-weight: 600;
   font-size: 0.84rem;
   padding: 0.55rem 1rem;
@@ -297,6 +298,7 @@
   pointer-events: none;
   transition: visibility 0s linear 0.5s;
 }
+
 .xnav__sheet.is-open {
   visibility: visible;
   pointer-events: auto;
@@ -320,7 +322,10 @@
     radial-gradient(130% 90% at 100% 0%, rgba(42, 123, 255, 0.2), transparent 55%),
     linear-gradient(160deg, #eef5ff 0%, #ffffff 58%, #eaf2ff 100%);
 }
-.xnav__sheet.is-open .xnav__sheet-fill { transform: scale(1); }
+
+.xnav__sheet.is-open .xnav__sheet-fill {
+  transform: scale(1);
+}
 
 .xnav__sheet-links {
   position: relative;
@@ -332,6 +337,7 @@
   transform: translateY(14px);
   transition: opacity 0.35s ease, transform 0.35s ease;
 }
+
 .xnav__sheet.is-open .xnav__sheet-links {
   opacity: 1;
   transform: translateY(0);
@@ -376,6 +382,7 @@
   transform: translateY(14px);
   transition: opacity 0.35s ease, transform 0.35s ease;
 }
+
 .xnav__sheet.is-open .xnav__sheet-actions {
   opacity: 1;
   transform: translateY(0);

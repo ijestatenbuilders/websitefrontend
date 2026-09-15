@@ -43,6 +43,7 @@
     height: 380px;
     background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.95), rgba(56, 189, 248, 0.35) 40%, rgba(2, 132, 199, 0.15) 70%, transparent 80%);
     filter: blur(22px);
+    will-change: transform;
     animation: paFluidDrift 9s ease-in-out infinite alternate;
 }
 
@@ -52,6 +53,7 @@
     height: 400px;
     background: radial-gradient(circle at 70% 40%, rgba(255, 255, 255, 0.9), rgba(251, 191, 36, 0.22) 35%, rgba(2, 132, 199, 0.14) 68%, transparent 82%);
     filter: blur(24px);
+    will-change: transform;
     animation: paFluidDrift 10s ease-in-out infinite alternate-reverse;
 }
 
@@ -146,7 +148,10 @@
 
 .popular-areas__card {
     width: 100%;
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.92) 0%, rgba(240, 249, 255, 0.72) 100%);
+    /* Near-opaque so we can drop the per-card backdrop-filter — 8 live backdrop
+       blurs were re-sampling the page behind them on every scroll frame, the main
+       source of scroll jank. The blur was barely visible behind this fill anyway. */
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.98) 0%, rgba(240, 249, 255, 0.95) 100%);
     border: 1.5px solid rgba(255, 255, 255, 0.95);
     border-radius: 22px;
     padding: 18px 18px 22px;
@@ -154,8 +159,6 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.95),
         0 14px 36px rgba(15, 82, 173, 0.10),
         0 0 0 1px rgba(2, 132, 199, 0.12);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
     position: relative;
     overflow: hidden;
     display: flex;
@@ -237,12 +240,10 @@
     height: 100%;
     object-fit: cover;
     display: block;
+    /* Transform is driven every frame by the JS parallax; a CSS transition here
+       made the browser continuously interpolate against those writes, causing
+       lag. The JS keeps a constant scale(1.12) so the image still fills the frame. */
     will-change: transform;
-    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.popular-areas__card:hover .popular-areas__img {
-    transform: scale(1.1);
 }
 
 .popular-areas__card-icon {

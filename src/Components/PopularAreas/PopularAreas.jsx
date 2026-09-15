@@ -179,42 +179,84 @@ function PopularAreas({ currentLocation = 'bahriatown' }) {
 
     const locationDisplayName = locationNames[currentLocation] || 'Bahria Town Lahore';
 
-    // Internal RAF loop — parallax computed RELATIVE to each element's viewport
-    // position (bounded), so it works wherever the section sits on the page and
-    // never shoves the card image off its frame (no black gap) or pulls the
-    // header off the top. Measures non-transformed references to avoid feedback.
+    // Scroll-driven parallax computed RELATIVE to each element's viewport position
+    // (bounded), so it works wherever the section sits on the page and never shoves
+    // the card image off its frame (no black gap) or pulls the header off the top.
+    //
+    // Performance: instead of a perpetual RAF loop (which forced a layout reflow on
+    // every frame forever, even while idle or off-screen), we only recompute in
+    // response to scroll/resize, throttled to one update per animation frame, and
+    // ONLY while the section is actually in the viewport (IntersectionObserver gate).
+    // Each pass batches all DOM reads before all writes to avoid layout thrashing.
+    // Honors prefers-reduced-motion by skipping parallax entirely.
     useEffect(() => {
-        let animId;
-        const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+        const section = revealRef.current;
+        if (!section) return;
 
-        const loop = () => {
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reduceMotion) return;
+
+        const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+        let ticking = false;
+        let visible = false;
+
+        const update = () => {
+            ticking = false;
             const vh = window.innerHeight || 1;
 
+            // ── Read phase: gather every measurement first ──
+            const reads = [];
             if (bgGridRef.current) {
-                const r = bgGridRef.current.parentElement.getBoundingClientRect();
-                const p = (r.top + r.height / 2 - vh / 2) / vh;
-                bgGridRef.current.style.transform = `translate3d(0, ${clamp(p * 40, -50, 50).toFixed(2)}px, 0)`;
+                reads.push({ el: bgGridRef.current, r: bgGridRef.current.parentElement.getBoundingClientRect(), kind: 'bg' });
             }
             if (headerRef.current) {
-                const r = headerRef.current.parentElement.getBoundingClientRect();
-                const p = (r.top - vh / 2) / vh;
-                headerRef.current.style.transform = `translate3d(0, ${clamp(p * -10, -14, 14).toFixed(2)}px, 0)`;
+                reads.push({ el: headerRef.current, r: headerRef.current.parentElement.getBoundingClientRect(), kind: 'header' });
             }
-
             imgRefs.current.forEach((img) => {
-                if (!img) return;
-                const r = img.parentElement.getBoundingClientRect(); // img-wrap (not transformed here)
-                const p = (r.top + r.height / 2 - vh / 2) / vh;
-                const offset = clamp(p * -18, -10, 10);
-                img.style.transform = `scale(1.12) translate3d(0, ${offset.toFixed(2)}px, 0)`;
+                if (img) reads.push({ el: img, r: img.parentElement.getBoundingClientRect(), kind: 'img' });
             });
 
-            animId = requestAnimationFrame(loop);
+            // ── Write phase: apply all transforms, no interleaved reads ──
+            for (const { el, r, kind } of reads) {
+                if (kind === 'bg') {
+                    const p = (r.top + r.height / 2 - vh / 2) / vh;
+                    el.style.transform = `translate3d(0, ${clamp(p * 40, -50, 50).toFixed(2)}px, 0)`;
+                } else if (kind === 'header') {
+                    const p = (r.top - vh / 2) / vh;
+                    el.style.transform = `translate3d(0, ${clamp(p * -10, -14, 14).toFixed(2)}px, 0)`;
+                } else {
+                    const p = (r.top + r.height / 2 - vh / 2) / vh;
+                    const offset = clamp(p * -18, -10, 10);
+                    el.style.transform = `scale(1.12) translate3d(0, ${offset.toFixed(2)}px, 0)`;
+                }
+            }
         };
 
-        animId = requestAnimationFrame(loop);
-        return () => cancelAnimationFrame(animId);
-    }, []);
+        const requestTick = () => {
+            if (!ticking && visible) {
+                ticking = true;
+                requestAnimationFrame(update);
+            }
+        };
+
+        const io = new IntersectionObserver(
+            ([entry]) => {
+                visible = entry.isIntersecting;
+                if (visible) requestTick(); // sync position when it scrolls into view
+            },
+            { rootMargin: '100px 0px' }
+        );
+        io.observe(section);
+
+        window.addEventListener('scroll', requestTick, { passive: true });
+        window.addEventListener('resize', requestTick, { passive: true });
+
+        return () => {
+            io.disconnect();
+            window.removeEventListener('scroll', requestTick);
+            window.removeEventListener('resize', requestTick);
+        };
+    }, [revealRef]);
 
     const handleCardMouseMove = (index, e) => {
         const rect = e.currentTarget.getBoundingClientRect();

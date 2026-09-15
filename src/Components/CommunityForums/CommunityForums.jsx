@@ -173,13 +173,7 @@ function CommunityForums() {
 
     return (
         <>
-            <SEO
-                title="Community Forums | IJ Estate & Builders"
-                description="Join the IJ Estate & Builders community forum. Discuss property investments, get expert advice, share market insights."
-                keywords="real estate forum Pakistan, property investment discussion, Lahore real estate community"
-                canonicalUrl="/forums"
-                structuredData={seo.forums.structuredData}
-            />
+            <SEO {...seo.forums} />
             <div className="community-forums">
                 <SiteNav />
 

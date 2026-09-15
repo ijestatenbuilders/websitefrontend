@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import SEO from '../SEO/SEO';
+import { seo } from '../../seo/seoConfig';
 import BrowseProperties from '../Properties/Properties';
 import Upcoming from '../Upcoming/Upcoming';
 import PopularAreas from '../PopularAreas/PopularAreas';
@@ -54,34 +55,14 @@ function LandingPage() {
     return () => clearTimeout(t);
   }, [location]);
 
-  const structuredData = {
-    '@context': 'https://schema.org',
-    '@type': 'RealEstateAgent',
-    name: 'IJ Estate & Builders',
-    description:
-      'Premier real estate agency in Lahore, Pakistan specializing in residential and commercial properties in DHA, Bahria Town, and other premium locations.',
-    url: 'https://ijestateandbuilders.com',
-    logo: 'https://ijestateandbuilders.com/logo512.png',
-    address: {
-      '@type': 'PostalAddress',
-      addressLocality: 'Lahore',
-      addressRegion: 'Punjab',
-      addressCountry: 'PK',
-    },
-    telephone: '+92-XXX-XXXXXXX',
-    areaServed: 'Lahore, Pakistan',
-  };
-
   return (
     <>
       <PagePreloader theme="light" />
-      <SEO
-        title="IJ Estate & Builders | Premium Luxury Real Estate & 3D Spatial Experiences"
-        description="Explore luxury properties in Lahore with IJ Estate & Builders. Featuring real-time 3D spatial exploration, verified residential villas, commercial towers, and prime plots in Bahria Town & DHA Raya."
-        keywords="real estate Lahore, properties for sale Lahore, DHA Lahore properties, Bahria Town Lahore, houses for sale, commercial properties Lahore, real estate agency Pakistan, property investment Lahore"
-        canonicalUrl="/"
-        structuredData={structuredData}
-      />
+      {/* Home SEO (title, description, keywords, WebSite + RealEstateAgent JSON-LD)
+          is owned by the central config in src/seo/seoConfig.js. Edit it there —
+          do NOT hardcode meta here, or the homepage drifts off its target
+          keywords and re-introduces the broken logo/placeholder-phone schema. */}
+      <SEO {...seo.home} />
 
       {/* Site-wide floating navbar */}
       <SiteNav />
@@ -109,8 +90,9 @@ function LandingPage() {
             </div>
           </div>
 
-          {/* "Homes worth the journey" — horizontal pinned rail, under the hero */}
-          <JourneyRail />
+          {/* "Homes worth the journey" — horizontal pinned rail, under the hero.
+              Temporarily hidden (not removed) — re-enable by uncommenting. */}
+          {/* <JourneyRail /> */}
         </div>
 
         {/* Core real estate sections */}

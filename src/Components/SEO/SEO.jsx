@@ -11,7 +11,10 @@ function SEO({
     noindex = false
 }) {
     const siteUrl = 'https://ijestateandbuilders.com';
-    const defaultImage = `${siteUrl}/logo512.png`;
+    // Must point at a file that actually exists in /public. logo512.png was
+    // never shipped, so this default previously 404'd on every page's social
+    // share preview. android-chrome-512x512.png is the real 512px asset.
+    const defaultImage = `${siteUrl}/android-chrome-512x512.png`;
     const fullUrl = canonicalUrl ? `${siteUrl}${canonicalUrl}` : siteUrl;
     
     return (
@@ -49,9 +52,11 @@ function SEO({
             {/* Additional Meta Tags */}
             <meta name="author" content="IJ Estate & Builders" />
             <meta name="geo.region" content="PK-PB" />
-            <meta name="geo.placename" content="Lahore" />
-            <meta name="geo.position" content="31.5204;74.3587" />
-            <meta name="ICBM" content="31.5204, 74.3587" />
+            <meta name="geo.placename" content="Bahria Town Lahore" />
+            {/* Bahria Town Lahore coords — matches the RealEstateAgent geo node
+                in seoConfig.js so location signals are consistent, not Lahore centre. */}
+            <meta name="geo.position" content="31.3684;74.1897" />
+            <meta name="ICBM" content="31.3684, 74.1897" />
             
             {/* Structured Data */}
             {structuredData && (
