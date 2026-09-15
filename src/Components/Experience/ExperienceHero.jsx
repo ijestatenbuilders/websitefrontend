@@ -37,8 +37,8 @@ const IGlyph = () => (
       <defs>
         {/* left = red, right = dark red (horizontal) */}
         <linearGradient id="iCapGrad" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor="#ff2338" />
-          <stop offset="1" stopColor="#7d0016" />
+          <stop offset="0" stopColor="#b40012" />
+          <stop offset="1" stopColor="#6b0014" />
         </linearGradient>
       </defs>
       {/* Rounded dome top; the two bottom ends taper to sharp points (the feet),
