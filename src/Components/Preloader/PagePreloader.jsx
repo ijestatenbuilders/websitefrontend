@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './PagePreloader.css';
+import logo from '../../Assets/images/logo.jpg';
 
 
 
@@ -82,27 +83,10 @@ export default function PagePreloader({ onComplete, theme }) {
         </span>
       </div>
 
-      {/* 3D animated centerpiece — gyroscope rings + glass cube + orbiters */}
-      <div className="pl-scene">
-        <div className="pl-gyro">
-          <span className="pl-ring pl-ring--a" />
-          <span className="pl-ring pl-ring--b" />
-          <span className="pl-ring pl-ring--c" />
-
-          <div className="pl-cube">
-            <span className="pl-cube__f pl-cube__f--front" />
-            <span className="pl-cube__f pl-cube__f--back" />
-            <span className="pl-cube__f pl-cube__f--right" />
-            <span className="pl-cube__f pl-cube__f--left" />
-            <span className="pl-cube__f pl-cube__f--top" />
-            <span className="pl-cube__f pl-cube__f--bottom" />
-          </div>
-
-          <span className="pl-core" />
-        </div>
-
-        <span className="pl-orbit pl-orbit--1"><i /></span>
-        <span className="pl-orbit pl-orbit--2"><i /></span>
+      {/* Brand logo centerpiece — softly glowing + gently breathing (zoom) */}
+      <div className="pl-logo">
+        <span className="pl-logo__halo" aria-hidden="true" />
+        <img className="pl-logo__img" src={logo} alt="IJ Estate & Builders" draggable="false" />
       </div>
 
       {/* Minimal brand + progress */}

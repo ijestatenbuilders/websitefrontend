@@ -192,7 +192,9 @@
 .xp-hero__aurora {
   position: absolute;
   border-radius: 50%;
-  filter: blur(90px);
+  /* 60px reads as soft as 90px on a 600px blob but is markedly cheaper to
+     rasterize — these three blobs animate continuously behind the hero. */
+  filter: blur(60px);
   opacity: 0.7;
 }
 

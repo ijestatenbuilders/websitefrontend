@@ -95,110 +95,59 @@
   to { transform: translateY(-50%) scale(1.3); opacity: 1; }
 }
 
-/* ══════════════ 3D SCENE ══════════════ */
-.pl-scene {
+/* ══════════════ BRAND LOGO CENTERPIECE ══════════════
+   Softly glowing + gently breathing (zoom in/out). Pure transform/opacity so it
+   composites on the GPU and stays perfectly smooth on any device. */
+.pl-logo {
   position: relative;
-  width: 190px; height: 190px;
+  display: grid; place-items: center;
+  width: 168px; height: 168px;
   margin-bottom: 46px;
-  perspective: 900px;
-  animation: plSceneIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: plLogoIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
-@keyframes plSceneIn {
-  from { opacity: 0; transform: scale(0.7); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-.pl-gyro {
-  position: absolute; inset: 0;
-  transform-style: preserve-3d;
-  display: flex; align-items: center; justify-content: center;
-  animation: plGyroFloat 4s ease-in-out infinite;
-}
-@keyframes plGyroFloat {
-  0%, 100% { transform: translateY(0) rotateX(4deg); }
-  50% { transform: translateY(-10px) rotateX(-4deg); }
+@keyframes plLogoIn {
+  from { opacity: 0; transform: scale(0.82); }
+  to   { opacity: 1; transform: scale(1); }
 }
 
-/* Gyroscope rings — each spins within its own tilted plane */
-.pl-ring {
-  position: absolute; inset: 0; border-radius: 50%;
-  border: 2px solid transparent;
+/* Soft glow halo behind the logo — its opacity/scale pulse gives the "glowing"
+   feel without animating an expensive box-shadow. */
+.pl-logo__halo {
+  position: absolute; inset: -18%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.55) 0%, rgba(30, 111, 255, 0.28) 40%, transparent 70%);
+  filter: blur(14px);
+  transform: translateZ(0);
+  animation: plLogoGlow 3.8s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+@keyframes plLogoGlow {
+  0%, 100% { opacity: 0.45; transform: scale(0.9); }
+  50%      { opacity: 0.9;  transform: scale(1.08); }
+}
+.page-preloader--dark .pl-logo__halo {
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.4) 0%, rgba(30, 111, 255, 0.22) 40%, transparent 70%);
+}
+
+/* The logo itself — slow breathing zoom (scale up a touch, then back). */
+.pl-logo__img {
+  position: relative; z-index: 1;
+  width: 132px; height: auto; object-fit: contain;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 10px 34px rgba(13, 77, 187, 0.18);
+  user-select: none; -webkit-user-drag: none;
+  transform: translateZ(0);
+  animation: plLogoBreath 4.2s ease-in-out infinite;
   will-change: transform;
 }
-.pl-ring--a {
-  border-top-color: #38bdf8; border-bottom-color: rgba(56, 189, 248, 0.25);
-  box-shadow: 0 0 18px rgba(56, 189, 248, 0.4);
-  animation: plRingA 3.2s linear infinite;
+@keyframes plLogoBreath {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.07); }
 }
-.pl-ring--b {
-  inset: 20px;
-  border-left-color: #1e6fff; border-right-color: rgba(30, 111, 255, 0.22);
-  box-shadow: 0 0 16px rgba(30, 111, 255, 0.35);
-  animation: plRingB 4.2s linear infinite;
+.page-preloader--dark .pl-logo__img {
+  box-shadow: 0 10px 40px rgba(56, 189, 248, 0.28);
 }
-.pl-ring--c {
-  inset: 40px;
-  border-top-color: #0d4dbb; border-left-color: rgba(13, 77, 187, 0.25);
-  box-shadow: 0 0 14px rgba(13, 77, 187, 0.3);
-  animation: plRingC 5.4s linear infinite;
-}
-@keyframes plRingA { from { transform: rotateX(65deg) rotateZ(0); } to { transform: rotateX(65deg) rotateZ(360deg); } }
-@keyframes plRingB { from { transform: rotateY(70deg) rotateZ(0); } to { transform: rotateY(70deg) rotateZ(-360deg); } }
-@keyframes plRingC { from { transform: rotateX(115deg) rotateY(25deg) rotateZ(0); } to { transform: rotateX(115deg) rotateY(25deg) rotateZ(360deg); } }
-
-/* Glass cube at the core */
-.pl-cube {
-  position: relative; width: 46px; height: 46px;
-  transform-style: preserve-3d;
-  animation: plCubeSpin 6s linear infinite;
-}
-@keyframes plCubeSpin {
-  from { transform: rotateX(-20deg) rotateY(0); }
-  to { transform: rotateX(-20deg) rotateY(360deg); }
-}
-.pl-cube__f {
-  position: absolute; width: 46px; height: 46px;
-  background: linear-gradient(135deg, rgba(56, 189, 248, 0.28), rgba(30, 111, 255, 0.14));
-  border: 1px solid rgba(56, 189, 248, 0.6);
-  box-shadow: inset 0 0 18px rgba(125, 211, 252, 0.45);
-  backdrop-filter: blur(2px);
-}
-.pl-cube__f--front  { transform: translateZ(23px); }
-.pl-cube__f--back   { transform: rotateY(180deg) translateZ(23px); }
-.pl-cube__f--right  { transform: rotateY(90deg) translateZ(23px); }
-.pl-cube__f--left   { transform: rotateY(-90deg) translateZ(23px); }
-.pl-cube__f--top    { transform: rotateX(90deg) translateZ(23px); }
-.pl-cube__f--bottom { transform: rotateX(-90deg) translateZ(23px); }
-
-/* Glowing core */
-.pl-core {
-  position: absolute; width: 12px; height: 12px; border-radius: 50%;
-  background: radial-gradient(circle, #ffffff 0%, #7dd3fc 60%, transparent 100%);
-  box-shadow: 0 0 16px 6px rgba(56, 189, 248, 0.7);
-  animation: plCore 1.8s ease-in-out infinite;
-}
-@keyframes plCore {
-  0%, 100% { transform: scale(0.8); opacity: 0.8; }
-  50% { transform: scale(1.25); opacity: 1; }
-}
-
-/* Orbiting dots around the scene */
-.pl-orbit {
-  position: absolute; inset: 0; margin: auto;
-  width: 100%; height: 100%; border-radius: 50%;
-  transform-style: preserve-3d;
-}
-.pl-orbit i {
-  position: absolute; top: 50%; left: 0;
-  width: 9px; height: 9px; border-radius: 50%;
-  background: #38bdf8;
-  box-shadow: 0 0 12px 3px rgba(56, 189, 248, 0.75);
-}
-.pl-orbit--1 { animation: plOrbit1 3.6s linear infinite; }
-.pl-orbit--2 { animation: plOrbit2 5s linear infinite; }
-.pl-orbit--2 i { background: #1e6fff; box-shadow: 0 0 12px 3px rgba(30, 111, 255, 0.7); width: 7px; height: 7px; }
-@keyframes plOrbit1 { from { transform: rotateZ(0) rotateX(70deg); } to { transform: rotateZ(360deg) rotateX(70deg); } }
-@keyframes plOrbit2 { from { transform: rotateZ(120deg) rotateY(70deg); } to { transform: rotateZ(480deg) rotateY(70deg); } }
 
 /* ══════════════ CONTENT ══════════════ */
 .pl-content {
@@ -256,11 +205,14 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pl-orb, .pl-grid, .pl-ring, .pl-cube, .pl-core, .pl-orbit, .pl-beam__spark { animation: none !important; }
+  .pl-orb, .pl-grid, .pl-beam__spark, .pl-logo__halo { animation: none !important; }
+  /* Keep the breathing calm rather than frozen for reduced-motion users. */
+  .pl-logo__img { animation: none !important; }
 }
 
 @media (max-width: 520px) {
-  .pl-scene { width: 150px; height: 150px; margin-bottom: 38px; }
+  .pl-logo { width: 140px; height: 140px; margin-bottom: 38px; }
+  .pl-logo__img { width: 112px; }
   .pl-brand { font-size: 14px; letter-spacing: 4px; }
   .pl-bar { width: 180px; }
 }

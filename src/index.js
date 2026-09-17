@@ -3,6 +3,11 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { applyPerfFlags } from './utils/perf';
+
+// Stamp device-tier flags on <html> before first paint so the global perf CSS
+// can strip expensive effects on low-end / touch devices with zero JS cost.
+applyPerfFlags();
 
 const container = document.getElementById('root');
 const app = (

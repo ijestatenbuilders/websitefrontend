@@ -1,0 +1,76 @@
+/* ─────────────────────────────────────────────────────────────
+   GLOBAL LOW-END / TOUCH PERFORMANCE LAYER
+   ─────────────────────────────────────────────────────────────
+   These rules are keyed off the data-perf / data-touch / data-reduce-motion
+   flags stamped on <html> at startup (see utils/perf.js → applyPerfFlags()).
+
+   The goal: on weak phones and low-end laptops the page must stay buttery
+   smooth no matter how hard the user scrolls. The three biggest culprits on
+   that hardware are:
+     1. backdrop-filter  — repaints the ENTIRE region behind the element every
+        frame the page scrolls. Death on mobile GPUs.
+     2. large filter: blur() decorative orbs/auroras — huge fill-rate cost.
+     3. perpetual `... infinite` CSS animations that keep the compositor /
+        main thread busy even while off-screen.
+   We strip / soften all three below, keeping the layout & colours intact so
+   the site looks the same, just without the per-frame GPU tax.
+   ───────────────────────────────────────────────────────────── */
+
+/* ── 1. Kill backdrop-filter on low-end + every touch device ──
+   Frosted-glass panels fall back to their own (already translucent) background
+   colour, which reads almost identically but costs nothing to scroll past. */
+html[data-perf="low"] *,
+html[data-touch="true"] * {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+/* NOTE: only ever set backdrop-filter to `none` on a universal selector —
+   setting an actual blur here would force a costly backdrop-filter *context*
+   onto every element on the page. Mid-tier desktops keep each component's own
+   (already modest) blur values instead. */
+
+/* ── 2. Tame heavy decorative blur orbs / auroras on low-end + touch ──
+   These are all aria-hidden ambient flourishes; a smaller blur (or none) keeps
+   the vibe without the fill-rate hit. */
+html[data-perf="low"] [aria-hidden="true"] {
+  filter: none !important;
+}
+
+/* ── 3. Stop perpetual ambient animations on low-end + reduced-motion ──
+   Decorative infinite loops (auroras, floating tokens, shimmer) run forever and
+   never stop to let the phone breathe. Freeze them; real interaction-driven
+   transitions still work. */
+html[data-perf="low"] *,
+html[data-reduce-motion="true"] * {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+}
+
+/* Re-allow short, meaningful (non-infinite) UI feedback loops that the app
+   explicitly opts back in via the .keep-anim marker. */
+html[data-perf="low"] .keep-anim,
+html[data-reduce-motion="true"] .keep-anim {
+  animation-duration: revert !important;
+  animation-iteration-count: revert !important;
+}
+
+/* ── 4. Drop the permanent scroll-position will-change hint everywhere ──
+   A page-wide `will-change: scroll-position` forces the browser to keep the
+   body on its own layer indefinitely, wasting memory on low-end devices. */
+body {
+  will-change: auto !important;
+}
+
+/* ── 5. Skip painting off-screen sections entirely (all devices) ──
+   content-visibility:auto tells the browser not to render a section until it's
+   near the viewport — so no matter how fast you fling the page, only the
+   sections actually on screen do layout/paint work. contain-intrinsic-size
+   reserves space so the scrollbar never jumps. */
+.browse-properties,
+.upcoming-projects,
+.pps-section,
+.popular-areas,
+.footer {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 900px;
+}

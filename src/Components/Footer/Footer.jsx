@@ -26,13 +26,22 @@ function Footer() {
     const bgGridRef = useRef(null);
 
     useEffect(() => {
-        let animId;
+        // The blueprint-grid parallax only matters while the footer is on screen.
+        // Running its RAF loop the whole time (even 3+ screens away) needlessly
+        // burns the main thread on low-end devices, so gate it on an
+        // IntersectionObserver + tab visibility — the loop only spins when the
+        // footer is actually near the viewport.
+        const footerEl = document.getElementById('contact');
+        if (!footerEl) return;
+
+        let animId = null;
+        let running = false;
+        let onScreen = false;
         let scrollSmooth = window.scrollY;
         let scrollTarget = window.scrollY;
         const LERP = 0.08;
 
         const onScroll = () => { scrollTarget = window.scrollY; };
-        window.addEventListener('scroll', onScroll, { passive: true });
 
         const loop = () => {
             scrollSmooth += (scrollTarget - scrollSmooth) * LERP;
@@ -41,11 +50,33 @@ function Footer() {
             }
             animId = requestAnimationFrame(loop);
         };
-        animId = requestAnimationFrame(loop);
+
+        const start = () => {
+            if (running || !onScreen || document.hidden) return;
+            running = true;
+            scrollTarget = window.scrollY;
+            window.addEventListener('scroll', onScroll, { passive: true });
+            animId = requestAnimationFrame(loop);
+        };
+        const stop = () => {
+            running = false;
+            window.removeEventListener('scroll', onScroll);
+            if (animId) cancelAnimationFrame(animId);
+        };
+
+        const io = new IntersectionObserver(
+            ([entry]) => { onScreen = entry.isIntersecting; onScreen ? start() : stop(); },
+            { rootMargin: '200px 0px' }
+        );
+        io.observe(footerEl);
+
+        const onVisibility = () => { document.hidden ? stop() : start(); };
+        document.addEventListener('visibilitychange', onVisibility);
 
         return () => {
-            window.removeEventListener('scroll', onScroll);
-            cancelAnimationFrame(animId);
+            io.disconnect();
+            document.removeEventListener('visibilitychange', onVisibility);
+            stop();
         };
     }, []);
 

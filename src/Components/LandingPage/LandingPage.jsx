@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import { useLocation } from 'react-router-dom';
 import SEO from '../SEO/SEO';
 import { seo } from '../../seo/seoConfig';
@@ -12,8 +12,12 @@ import PagePreloader from '../Preloader/PagePreloader';
 import SiteNav from '../SiteNav/SiteNav';
 import ExperienceHero from '../Experience/ExperienceHero';
 import JourneyRail from '../Experience/JourneyRail';
-import LocationTransition from '../LocationTransition/LocationTransition';
 import './LandingPage.css';
+
+// Lazy — the 3D location-switch loader pulls in three.js, but it's only used
+// when the visitor actually switches location. Splitting it keeps three.js out
+// of the initial bundle so the home page parses/paints far faster on low-end.
+const LocationTransition = lazy(() => import('../LocationTransition/LocationTransition'));
 
 function LandingPage() {
   const location = useLocation();
@@ -67,8 +71,11 @@ function LandingPage() {
       {/* Site-wide floating navbar */}
       <SiteNav />
 
-      {/* Cinematic 3D loader shown when switching location */}
-      <LocationTransition isActive={isTransitioning} onCovered={handleTransitionCovered} onComplete={handleTransitionDone} />
+      {/* Cinematic 3D loader shown when switching location (lazy: three.js
+          loads in the background after first paint, or on first switch). */}
+      <Suspense fallback={null}>
+        <LocationTransition isActive={isTransitioning} onCovered={handleTransitionCovered} onComplete={handleTransitionDone} />
+      </Suspense>
 
       <div className="landing-page">
         {/* .xp provides the Experience design tokens/background the hero + rail

@@ -1,17 +1,21 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, lazy, Suspense } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
 import 'lenis/dist/lenis.css';
-import HeroBlob3D from './HeroBlob3D';
 import HeroSearch from './HeroSearch';
-import { prefersReducedMotion } from '../../utils/perf';
+import { prefersReducedMotion, getDeviceTier, isTouch } from '../../utils/perf';
 import './Experience.css';
 
 import eiffelImg from '../../Assets/images/eiffletower.png';
 import mosqueImg from '../../Assets/images/background.jpeg';
 import res1 from '../../Assets/images/upcoming-project-1.jpg';
+
+// Decorative WebGL jelly — lazy so three.js (~150 kB gzip) splits into its own
+// chunk and loads AFTER first paint instead of blocking the main thread on
+// every landing-page load. Being aria-hidden, an empty fallback is invisible.
+const HeroBlob3D = lazy(() => import('./HeroBlob3D'));
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -97,7 +101,6 @@ export default function ExperienceHero({ onLocationSwitch, location = 'bahriatow
   });
   const heroTitleY = useTransform(scrollYProgress, [0, 1], ['0%', '40%']);
   const heroFade = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
-  const heroScale = useTransform(scrollYProgress, [0, 1], [1, 1.15]);
 
   // Scroll cue fades out as soon as the page starts scrolling (well before it
   // could ever reach the quick-search row).
@@ -110,15 +113,22 @@ export default function ExperienceHero({ onLocationSwitch, location = 'bahriatow
   }, []);
 
   /* Smooth, slightly-slow parallax scrolling (Lenis) — synced to GSAP's ticker
-     + ScrollTrigger so every pinned/scrubbed section stays in step. */
+     + ScrollTrigger so every pinned/scrubbed section stays in step.
+     Only worth it on capable, non-touch hardware: on phones and low-end laptops
+     a JS-driven smooth-scroll fights the OS's own inertial scrolling and causes
+     exactly the stutter we're trying to kill, so those get buttery NATIVE
+     scrolling instead. */
   useEffect(() => {
-    if (reduce) return;
+    if (reduce || isTouch() || getDeviceTier() === 'low') return;
     const lenis = new Lenis({
-      duration: 1.35,
+      // Snappier than before (was 1.35 / 0.9): a long duration + <1 multiplier
+      // made the page feel like it lagged behind the wheel. This tracks the
+      // input more closely while staying smooth.
+      duration: 1.0,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
-      wheelMultiplier: 0.9,
-      touchMultiplier: 1.4,
+      wheelMultiplier: 1.0,
+      touchMultiplier: 1.5,
     });
     lenisRef.current = lenis;
 
@@ -147,7 +157,10 @@ export default function ExperienceHero({ onLocationSwitch, location = 'bahriatow
      pointer enters each element's radius). Uses the CSS `translate` property so
      it composes with each element's own rotate/spin transform. */
   useEffect(() => {
-    if (reduce) return;
+    // Magnetic repulsion is a pointer effect (meaningless on touch) and its
+    // perpetual RAF + per-scroll getBoundingClientRect reads are pure overhead
+    // on weaker machines — restrict it to high-tier, non-touch devices.
+    if (reduce || isTouch() || getDeviceTier() !== 'high') return;
     const hero = heroRef.current;
     if (!hero) return;
 
@@ -228,13 +241,18 @@ export default function ExperienceHero({ onLocationSwitch, location = 'bahriatow
 
   return (
     <section className="xp-hero" id="hero" ref={heroRef}>
-      <motion.div className="xp-hero__bg" style={{ scale: heroScale, opacity: heroFade }} aria-hidden="true">
+      {/* Only the opacity fades on scroll (compositor-cheap). We deliberately do
+          NOT scale this layer — it holds the big blurred auroras, and scaling
+          them each scroll frame forces a costly blur re-rasterization = jank. */}
+      <motion.div className="xp-hero__bg" style={{ opacity: heroFade }} aria-hidden="true">
         <span className="xp-hero__aurora xp-hero__aurora--1" />
         <span className="xp-hero__aurora xp-hero__aurora--2" />
         <span className="xp-hero__aurora xp-hero__aurora--3" />
       </motion.div>
 
-      <HeroBlob3D location={location} />
+      <Suspense fallback={null}>
+        <HeroBlob3D location={location} />
+      </Suspense>
 
       <div className="xp-hero__floats" aria-hidden="true">
         <div className="xp-float xp-float--cube xp-magnetic" ref={(n) => (floatRefs.current.cube = n)}>
