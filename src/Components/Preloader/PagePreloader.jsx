@@ -4,6 +4,10 @@ import logo from '../../Assets/images/logo.jpg';
 
 
 
+// The full 0→100 journey. Shared by the JS % counter and the CSS bar animation
+// (passed to CSS as a custom property) so the two can never drift apart.
+const TOTAL_DURATION = 1000; // ms
+
 export default function PagePreloader({ onComplete, theme }) {
   const [progress, setProgress] = useState(0);
 
@@ -15,26 +19,21 @@ export default function PagePreloader({ onComplete, theme }) {
 
   const activeTheme = theme || (typeof window !== 'undefined' ? localStorage.getItem('heroTheme') || 'light' : 'light');
 
-  // Slow, organic progress that lingers at checkpoints — total ~2.8s
+  // The BAR itself is animated purely in CSS (transform: scaleX on the compositor
+  // thread) so it glides at a perfectly constant speed and can NEVER stall — even
+  // while the main thread is busy booting the app behind this screen. This rAF
+  // loop only drives the % number, using a strictly LINEAR, wall-clock-based
+  // value so the digits climb at the same constant rate as the bar.
   useEffect(() => {
-    const TOTAL_DURATION = 2800; // ms — the full 0→100 journey
-
-    const easeProgress = (t) => {
-      // Smooth, near-linear travel start→end with a tiny speed-up through the
-      // middle (mostly linear blended with a subtle smoothstep).
-      const smooth = t * t * (3 - 2 * t); // smoothstep: slightly faster mid, softer ends
-      return 0.7 * t + 0.3 * smooth;
-    };
-
     const animate = (timestamp) => {
       if (!startTimeRef.current) startTimeRef.current = timestamp;
       const elapsed = timestamp - startTimeRef.current;
       const t = Math.min(elapsed / TOTAL_DURATION, 1);
-      const easedVal = Math.min(Math.floor(easeProgress(t) * 100), 100);
+      const val = Math.min(Math.round(t * 100), 100);
 
-      if (easedVal !== progressRef.current) {
-        progressRef.current = easedVal;
-        setProgress(easedVal);
+      if (val !== progressRef.current) {
+        progressRef.current = val;
+        setProgress(val);
       }
 
       if (t < 1) {
@@ -53,11 +52,11 @@ export default function PagePreloader({ onComplete, theme }) {
   // Trigger fade-out once at 100%
   useEffect(() => {
     if (progress === 100) {
-      const t1 = setTimeout(() => setIsFading(true), 200);
+      const t1 = setTimeout(() => setIsFading(true), 100);
       const t2 = setTimeout(() => {
         setIsDone(true);
         if (onComplete) onComplete();
-      }, 1050);
+      }, 700);
       return () => { clearTimeout(t1); clearTimeout(t2); };
     }
   }, [progress, onComplete]);
@@ -68,6 +67,7 @@ export default function PagePreloader({ onComplete, theme }) {
     <div
       className={`page-preloader page-preloader--${activeTheme} ${isFading ? 'page-preloader--fade' : ''}`}
       aria-hidden="true"
+      style={{ '--pl-duration': `${TOTAL_DURATION}ms` }}
     >
       {/* Ambient background — soft drifting orbs + faint grid */}
       <div className="pl-ambient">
@@ -76,11 +76,11 @@ export default function PagePreloader({ onComplete, theme }) {
         <span className="pl-orb pl-orb--3" />
       </div>
 
-      {/* Thin top progress beam */}
+      {/* Thin top progress beam — fill + edge spark both CSS-animated (compositor
+          thread), so they advance at a constant speed and never stall. */}
       <div className="pl-beam">
-        <span className="pl-beam__fill" style={{ width: `${progress}%` }}>
-          <i className="pl-beam__spark" />
-        </span>
+        <span className="pl-beam__fill" />
+        <i className="pl-beam__spark" />
       </div>
 
       {/* Brand logo centerpiece — softly glowing + gently breathing (zoom) */}
@@ -97,7 +97,7 @@ export default function PagePreloader({ onComplete, theme }) {
         <div className="pl-sub">PREMIER LUXURY REAL ESTATE · LAHORE</div>
 
         <div className="pl-bar">
-          <span className="pl-bar__fill" style={{ width: `${progress}%` }} />
+          <span className="pl-bar__fill" />
         </div>
         <div className="pl-percent">{progress}<span>%</span></div>
       </div>

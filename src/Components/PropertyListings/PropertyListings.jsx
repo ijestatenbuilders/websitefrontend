@@ -1,13 +1,15 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import Lenis from 'lenis';
+import 'lenis/dist/lenis.css';
 import SEO from '../SEO/SEO';
 import { seo } from '../../seo/seoConfig';
 import SiteNav from '../SiteNav/SiteNav';
 import Footer from '../Footer/Footer';
 import ListingsParallax from './ListingsParallax';
-import { prefersReducedMotion } from '../../utils/perf';
+import { prefersReducedMotion, getDeviceTier, isTouch } from '../../utils/perf';
 import { fetchProperties, fetchFilterOptions } from '../../services/api';
 import { FaMapMarkerAlt, FaPhone, FaRuler } from 'react-icons/fa';
 import { VscSettingsCompact } from "react-icons/vsc";
@@ -240,6 +242,38 @@ function PropertyListings() {
 
     useEffect(() => { window.scrollTo(0, 0); }, []);
 
+    /* Buttery-smooth inertial scrolling (Lenis), synced to GSAP's ticker +
+       ScrollTrigger so the card-reveal batches stay perfectly in step.
+       Gated to capable, non-touch hardware — phones and low-end laptops get
+       the OS's own native inertial scroll, which is smoother than fighting it
+       with a JS smooth-scroll (see the landing hero for the same reasoning). */
+    useEffect(() => {
+        if (prefersReducedMotion() || isTouch() || getDeviceTier() === 'low') return;
+        const lenis = new Lenis({
+            // lerp-based (not duration-based) interpolation gives that heavy,
+            // continuously-gliding "parallax" feel of the home page rather than
+            // snapping to the wheel. Lower = smoother/slower glide. Paired with a
+            // sub-1 wheel multiplier so each notch travels less → never too fast.
+            lerp: 0.07,
+            smoothWheel: true,
+            wheelMultiplier: 0.8,
+            touchMultiplier: 1.5,
+        });
+
+        const onLenisScroll = () => ScrollTrigger.update();
+        lenis.on('scroll', onLenisScroll);
+
+        const tick = (time) => lenis.raf(time * 1000);
+        gsap.ticker.add(tick);
+        gsap.ticker.lagSmoothing(0);
+
+        return () => {
+            lenis.off('scroll', onLenisScroll);
+            gsap.ticker.remove(tick);
+            lenis.destroy();
+        };
+    }, []);
+
     useEffect(() => {
         fetchFilterOptions()
             .then(data => {
@@ -329,23 +363,31 @@ function PropertyListings() {
     const isPriceFiltered = priceRange[0] > priceBounds[0] || priceRange[1] < priceBounds[1];
 
     // GSAP ScrollTrigger — cinematic fade-up reveal for the cards as they enter.
-    useEffect(() => {
+    // useLayoutEffect (not useEffect) so the hidden initial state is committed
+    // BEFORE the browser paints — otherwise the cards flash in fully-visible for
+    // one frame and then jump to opacity:0, which reads as a flicker.
+    useLayoutEffect(() => {
         if (loading || prefersReducedMotion()) return;
         const cards = gridRef.current?.querySelectorAll('.prop-card, .bbc-lcard');
         if (!cards || !cards.length) return;
         const ctx = gsap.context(() => {
-            gsap.set(cards, { opacity: 0, y: 42 });
+            // will-change promotes each card to its own compositor layer up front
+            // so the fade-up runs on the GPU without a layout/paint per frame.
+            gsap.set(cards, { opacity: 0, y: 40, willChange: 'transform, opacity' });
             ScrollTrigger.batch(cards, {
-                start: 'top 88%',
+                start: 'top 90%',
                 once: true,
                 onEnter: (batch) => gsap.to(batch, {
                     opacity: 1,
                     y: 0,
-                    duration: 0.7,
-                    stagger: 0.08,
+                    duration: 0.85,
+                    stagger: { each: 0.07, ease: 'power1.out' },
                     ease: 'power3.out',
                     overwrite: true,
-                    clearProps: 'all', // restore CSS hover transforms afterwards
+                    // Drop the initial inline props (incl. will-change) once the
+                    // card has settled, so CSS hover transforms take back over and
+                    // we don't leave every card permanently layer-promoted.
+                    clearProps: 'transform,opacity,willChange',
                 }),
             });
         }, gridRef);

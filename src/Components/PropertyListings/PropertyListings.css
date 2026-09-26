@@ -1071,6 +1071,12 @@
 .prop-card,
 .bbc-lcard {
     contain: layout paint;
+    /* Off-screen cards skip layout/paint entirely, so no matter how fast the
+       page is flung only the visible cards pay the (backdrop-filter) cost.
+       `auto` on the intrinsic size makes the browser remember each card's real
+       height after first render, so the scrollbar never jumps. */
+    content-visibility: auto;
+    contain-intrinsic-size: auto 420px;
 }
 .prop-card__img-wrap {
     contain: paint;

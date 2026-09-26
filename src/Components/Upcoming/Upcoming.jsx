@@ -42,38 +42,54 @@ function Upcoming({ currentLocation = 'bahriatown' }) {
         fetchProjects();
     }, [currentLocation]);
 
-    // RAF loop — parallax RELATIVE to viewport position (bounded), so it works
-    // wherever the section sits and never pulls the header off the top or shoves
-    // the card image off its frame. Cards keep their fade-up reveal (not overridden).
+    // Update parallax only on scroll/resize and while this section is nearby.
     useEffect(() => {
-        let animId;
-        const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+        const section = revealRef.current;
+        if (!section) return;
 
-        const loop = () => {
+        let animId = null;
+        let visible = false;
+        const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+        const update = () => {
+            animId = null;
+            if (!visible) return;
             const vh = window.innerHeight || 1;
 
             if (bgGridRef.current) {
                 const r = bgGridRef.current.parentElement.getBoundingClientRect();
                 const p = (r.top + r.height / 2 - vh / 2) / vh;
-                bgGridRef.current.style.transform = `translate3d(0, ${clamp(p * 40, -50, 50).toFixed(2)}px, 0)`;
+                bgGridRef.current.style.translate = `0 ${clamp(p * 40, -50, 50).toFixed(2)}px`;
             }
             if (headerRef.current) {
                 const r = headerRef.current.parentElement.getBoundingClientRect();
                 const p = (r.top - vh / 2) / vh;
-                headerRef.current.style.transform = `translate3d(0, ${clamp(p * -10, -14, 14).toFixed(2)}px, 0)`;
+                headerRef.current.style.translate = `0 ${clamp(p * -10, -14, 14).toFixed(2)}px`;
             }
             imgRefs.current.forEach((img) => {
                 if (!img) return;
                 const r = img.parentElement.getBoundingClientRect();
                 const p = (r.top + r.height / 2 - vh / 2) / vh;
-                img.style.transform = `scale(1.12) translate3d(0, ${clamp(p * -16, -9, 9).toFixed(2)}px, 0)`;
+                img.style.translate = `0 ${clamp(p * -16, -9, 9).toFixed(2)}px`;
             });
-
-            animId = requestAnimationFrame(loop);
         };
-        animId = requestAnimationFrame(loop);
-        return () => cancelAnimationFrame(animId);
-    }, []);
+        const requestUpdate = () => {
+            if (visible && animId === null) animId = requestAnimationFrame(update);
+        };
+        const observer = new IntersectionObserver(([entry]) => {
+            visible = entry.isIntersecting;
+            if (visible) requestUpdate();
+        }, { rootMargin: '100px 0px' });
+        observer.observe(section);
+        window.addEventListener('scroll', requestUpdate, { passive: true });
+        window.addEventListener('resize', requestUpdate, { passive: true });
+        requestUpdate();
+        return () => {
+            observer.disconnect();
+            window.removeEventListener('scroll', requestUpdate);
+            window.removeEventListener('resize', requestUpdate);
+            if (animId !== null) cancelAnimationFrame(animId);
+        };
+    }, [upcomingProjects, revealRef]);
 
     return (
         <section className="upcoming-projects" id='new' ref={revealRef}>
@@ -101,7 +117,7 @@ function Upcoming({ currentLocation = 'bahriatown' }) {
                                     ref={(el) => { cardRefs.current[index] = el; }}
                                 >
                                     <div className="upcoming-content">
-                                        <div 
+                                        <div
                                             className="upcoming-text"
                                             data-reveal={isEven ? "slide-left" : "slide-right"}
                                         >
@@ -120,7 +136,7 @@ function Upcoming({ currentLocation = 'bahriatown' }) {
                                                 </svg>
                                             </button>
                                         </div>
-                                        <div 
+                                        <div
                                             className="upcoming-image-wrap"
                                             data-reveal={isEven ? "slide-right" : "slide-left"}
                                         >

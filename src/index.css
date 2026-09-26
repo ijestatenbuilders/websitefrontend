@@ -27,8 +27,6 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
-  /* Tell the GPU this layer will be composited independently */
-  will-change: scroll-position;
 }
 
 code {

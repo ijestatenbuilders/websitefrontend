@@ -16,7 +16,6 @@ import res1 from '../../Assets/images/upcoming-project-1.jpg';
 // chunk and loads AFTER first paint instead of blocking the main thread on
 // every landing-page load. Being aria-hidden, an empty fallback is invisible.
 const HeroBlob3D = lazy(() => import('./HeroBlob3D'));
-
 gsap.registerPlugin(ScrollTrigger);
 
 const LOC_NAMES = {
@@ -93,6 +92,22 @@ export default function ExperienceHero({ onLocationSwitch, location = 'bahriatow
   const floatRefs = useRef({});
   const lenisRef = useRef(null);
   const reduce = prefersReducedMotion();
+  const [showHeroBlob, setShowHeroBlob] = useState(false);
+
+  useEffect(() => {
+    const reveal = () => setShowHeroBlob(true);
+    let idleId;
+    let timeoutId;
+    if (window.requestIdleCallback) {
+      idleId = window.requestIdleCallback(reveal, { timeout: 1800 });
+    } else {
+      timeoutId = window.setTimeout(reveal, 900);
+    }
+    return () => {
+      if (idleId !== undefined) window.cancelIdleCallback(idleId);
+      window.clearTimeout(timeoutId);
+    };
+  }, []);
 
   // Scroll-linked backdrop depth
   const { scrollYProgress } = useScroll({
@@ -112,35 +127,24 @@ export default function ExperienceHero({ onLocationSwitch, location = 'bahriatow
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  /* Smooth, slightly-slow parallax scrolling (Lenis) — synced to GSAP's ticker
-     + ScrollTrigger so every pinned/scrubbed section stays in step.
-     Only worth it on capable, non-touch hardware: on phones and low-end laptops
-     a JS-driven smooth-scroll fights the OS's own inertial scrolling and causes
-     exactly the stutter we're trying to kill, so those get buttery NATIVE
-     scrolling instead. */
   useEffect(() => {
     if (reduce || isTouch() || getDeviceTier() === 'low') return;
     const lenis = new Lenis({
-      // Snappier than before (was 1.35 / 0.9): a long duration + <1 multiplier
-      // made the page feel like it lagged behind the wheel. This tracks the
-      // input more closely while staying smooth.
-      duration: 1.0,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      lerp: 0.09,
       smoothWheel: true,
-      wheelMultiplier: 1.0,
+      wheelMultiplier: 1,
       touchMultiplier: 1.5,
     });
     lenisRef.current = lenis;
 
-    const onLenisScroll = () => ScrollTrigger.update();
-    lenis.on('scroll', onLenisScroll);
-
+    const syncScrollTrigger = () => ScrollTrigger.update();
+    lenis.on('scroll', syncScrollTrigger);
     const tick = (time) => lenis.raf(time * 1000);
     gsap.ticker.add(tick);
     gsap.ticker.lagSmoothing(0);
 
     return () => {
-      lenis.off('scroll', onLenisScroll);
+      lenis.off('scroll', syncScrollTrigger);
       gsap.ticker.remove(tick);
       lenis.destroy();
       lenisRef.current = null;
@@ -149,7 +153,7 @@ export default function ExperienceHero({ onLocationSwitch, location = 'bahriatow
 
   const handleScrollCue = () => {
     const dist = Math.round(window.innerHeight * 0.88);
-    if (lenisRef.current) lenisRef.current.scrollTo(dist, { duration: 1.3 });
+    if (lenisRef.current) lenisRef.current.scrollTo(dist);
     else window.scrollTo({ top: dist, behavior: 'smooth' });
   };
 
@@ -170,54 +174,72 @@ export default function ExperienceHero({ onLocationSwitch, location = 'bahriatow
     const orbs = [floatRefs.current.orbA, floatRefs.current.orbB].filter(Boolean);
 
     let mouseX = -9999, mouseY = -9999;
+    let heroVisible = true;
+    let raf = 0;
     const RADIUS = 170;
     const MAXPUSH = 78;
 
+    const schedule = () => {
+      if (heroVisible && !raf) raf = requestAnimationFrame(loop);
+    };
     const measure = () => {
       mags.forEach((s) => {
         const r = s.el.getBoundingClientRect();
-        s.cx = r.left + r.width / 2 - s.x;
-        s.cy = r.top + r.height / 2 - s.y;
+        s.cx = r.left + window.scrollX + r.width / 2 - s.x;
+        s.cy = r.top + window.scrollY + r.height / 2 - s.y;
       });
+      schedule();
     };
-    const onMove = (e) => { mouseX = e.clientX; mouseY = e.clientY; };
-    window.addEventListener('mousemove', onMove, { passive: true });
-    window.addEventListener('resize', measure);
-    window.addEventListener('scroll', measure, { passive: true });
-    requestAnimationFrame(() => requestAnimationFrame(measure));
-    const t = setTimeout(measure, 900);
-
-    let raf;
+    const onMove = (e) => { mouseX = e.clientX; mouseY = e.clientY; schedule(); };
+    const onLeave = () => { mouseX = -9999; mouseY = -9999; schedule(); };
     const loop = () => {
-      raf = requestAnimationFrame(loop);
+      raf = 0;
+      if (!heroVisible) return;
+      let moving = false;
       mags.forEach((s) => {
-        const dx = s.cx - mouseX;
-        const dy = s.cy - mouseY;
+        const dx = s.cx - window.scrollX - mouseX;
+        const dy = s.cy - window.scrollY - mouseY;
         const dist = Math.hypot(dx, dy) || 1;
         if (dist < RADIUS) {
           const force = 1 - dist / RADIUS;
           s.tx = (dx / dist) * force * MAXPUSH;
           s.ty = (dy / dist) * force * MAXPUSH;
         } else {
-          s.tx = 0; s.ty = 0;
+          s.tx = 0;
+          s.ty = 0;
         }
         s.x += (s.tx - s.x) * 0.16;
         s.y += (s.ty - s.y) * 0.16;
         s.el.style.translate = `${s.x.toFixed(1)}px ${s.y.toFixed(1)}px`;
+        if (Math.abs(s.tx - s.x) > 0.15 || Math.abs(s.ty - s.y) > 0.15) moving = true;
       });
 
       const ox = mouseX >= 0 ? mouseX / window.innerWidth - 0.5 : 0;
       const oy = mouseY >= 0 ? mouseY / window.innerHeight - 0.5 : 0;
       if (orbs[0]) orbs[0].style.translate = `${(ox * 30).toFixed(1)}px ${(oy * 24).toFixed(1)}px`;
       if (orbs[1]) orbs[1].style.translate = `${(ox * -26).toFixed(1)}px ${(oy * -20).toFixed(1)}px`;
+      if (moving) schedule();
     };
-    raf = requestAnimationFrame(loop);
+    const observer = new IntersectionObserver(([entry]) => {
+      heroVisible = entry.isIntersecting;
+      if (heroVisible) measure();
+      else if (raf) { cancelAnimationFrame(raf); raf = 0; }
+    }, { rootMargin: '100px 0px' });
+    observer.observe(hero);
+    window.addEventListener('mousemove', onMove, { passive: true });
+    window.addEventListener('mouseleave', onLeave);
+    window.addEventListener('resize', measure);
+    window.addEventListener('scroll', schedule, { passive: true });
+    requestAnimationFrame(measure);
+    const t = setTimeout(measure, 900);
     return () => {
+      observer.disconnect();
       window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseleave', onLeave);
       window.removeEventListener('resize', measure);
-      window.removeEventListener('scroll', measure);
+      window.removeEventListener('scroll', schedule);
       clearTimeout(t);
-      cancelAnimationFrame(raf);
+      if (raf) cancelAnimationFrame(raf);
     };
   }, [reduce]);
 
@@ -250,9 +272,11 @@ export default function ExperienceHero({ onLocationSwitch, location = 'bahriatow
         <span className="xp-hero__aurora xp-hero__aurora--3" />
       </motion.div>
 
-      <Suspense fallback={null}>
-        <HeroBlob3D location={location} />
-      </Suspense>
+      {showHeroBlob && (
+        <Suspense fallback={null}>
+          <HeroBlob3D location={location} />
+        </Suspense>
+      )}
 
       <div className="xp-hero__floats" aria-hidden="true">
         <div className="xp-float xp-float--cube xp-magnetic" ref={(n) => (floatRefs.current.cube = n)}>

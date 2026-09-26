@@ -30,19 +30,39 @@ export const organizationSchema = {
         { '@type': 'City', name: 'Lahore' },
         { '@type': 'Place', name: 'Bahria Town Lahore' },
         { '@type': 'Place', name: 'DHA Lahore' },
+        { '@type': 'Place', name: 'Etihad Town Lahore' },
+        { '@type': 'Place', name: 'Union Town Lahore' },
     ],
     address: {
         '@type': 'PostalAddress',
+        // ⚠️ ACTION REQUIRED: fill your real office street address + postal code.
+        // A precise physical address is a top "near me" / local-pack signal and
+        // must match your Google Business Profile NAP byte-for-byte.
+        // streetAddress: 'Office #, Block, Bahria Town',   // ← uncomment & fill
+        // postalCode: '54000',                             // ← uncomment & fill
         addressLocality: 'Lahore',
         addressRegion: 'Punjab',
         addressCountry: 'PK',
     },
+    // ⚠️ Verify these coordinates point at your ACTUAL office (Google Maps →
+    // right-click your office pin → copy the lat,long). Currently ~Bahria Town.
     geo: { '@type': 'GeoCoordinates', latitude: 31.3684, longitude: 74.1897 },
+    // sameAs confirms your identity to Google. Placeholder homepage URLs were
+    // removed (they hurt more than help). Add your REAL, public profile URLs:
     sameAs: [
-        // TODO: add real profile URLs
-        'https://www.facebook.com/',
-        'https://www.instagram.com/',
+        // 'https://www.facebook.com/YourExactPageHandle',
+        // 'https://www.instagram.com/YourExactHandle',
+        // 'https://www.google.com/maps?cid=YOUR_GBP_CID',  // your GBP listing
     ],
+    // ⚠️ DO NOT enable this until you have REAL Google reviews. Fake ratings
+    // violate Google policy and can trigger a manual penalty. Once you have
+    // 10+ reviews, uncomment and set the true values (keep them in sync):
+    // aggregateRating: {
+    //     '@type': 'AggregateRating',
+    //     ratingValue: '4.9',      // your real average
+    //     reviewCount: '37',       // your real count
+    //     bestRating: '5',
+    // },
 };
 
 // ─── Breadcrumb builder ──────────────────────────────────────────────────────

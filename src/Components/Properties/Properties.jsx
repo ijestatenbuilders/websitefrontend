@@ -17,7 +17,6 @@ const BrowseProperties = ({ currentLocation = 'bahriatown' }) => {
     });
     const [blockOptions, setBlockOptions] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [cardTilts, setCardTilts] = useState({});
 
     // DOM refs for RAF-driven scroll parallax
     const bgGridRef = useRef(null);
@@ -28,54 +27,64 @@ const BrowseProperties = ({ currentLocation = 'bahriatown' }) => {
         const rect = e.currentTarget.getBoundingClientRect();
         const x = (e.clientX - rect.left) / rect.width - 0.5;
         const y = (e.clientY - rect.top) / rect.height - 0.5;
-        setCardTilts(prev => ({
-            ...prev,
-            [key]: {
-                rx: -y * 12,
-                ry: x * 14,
-                px: (e.clientX - rect.left),
-                py: (e.clientY - rect.top),
-            }
-        }));
+        const card = cardRefs.current[key];
+        if (!card) return;
+        card._tilt = { rx: -y * 12, ry: x * 14 };
+        card.style.transform = `perspective(1000px) rotateX(${card._tilt.rx}deg) rotateY(${card._tilt.ry}deg)`;
+        card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+        card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
     };
 
     const handleCardTiltLeave = (key) => {
-        setCardTilts(prev => ({
-            ...prev,
-            [key]: { rx: 0, ry: 0, px: 0, py: 0 }
-        }));
+        const card = cardRefs.current[key];
+        if (!card) return;
+        card._tilt = { rx: 0, ry: 0 };
+        card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg)';
+        card.style.setProperty('--mouse-x', '50%');
+        card.style.setProperty('--mouse-y', '50%');
     };
 
-    // Internal RAF loop — scroll parallax directly to DOM
-    // Parallax computed RELATIVE to each element's viewport position (bounded),
-    // so it works wherever the section sits and never pulls the header/cards off.
-    // Cards only get the mouse-tilt — their entrance is driven by the pop-scale
-    // reveal on the wrapper, which this must not override.
+    // Update parallax only on scroll/resize and while this section is nearby.
     useEffect(() => {
-        let animId;
+        const section = revealRef.current;
+        if (!section) return;
+
+        let animId = null;
+        let visible = false;
         const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
-        const loop = () => {
+        const update = () => {
+            animId = null;
+            if (!visible) return;
             const vh = window.innerHeight || 1;
             if (bgGridRef.current) {
                 const r = bgGridRef.current.parentElement.getBoundingClientRect();
                 const p = (r.top + r.height / 2 - vh / 2) / vh;
-                bgGridRef.current.style.transform = `translate3d(0, ${clamp(p * 40, -50, 50).toFixed(2)}px, 0)`;
+                bgGridRef.current.style.translate = `0 ${clamp(p * 40, -50, 50).toFixed(2)}px`;
             }
             if (headerRef.current) {
                 const r = headerRef.current.parentElement.getBoundingClientRect();
                 const p = (r.top - vh / 2) / vh;
-                headerRef.current.style.transform = `translate3d(0, ${clamp(p * -10, -14, 14).toFixed(2)}px, 0)`;
+                headerRef.current.style.translate = `0 ${clamp(p * -10, -14, 14).toFixed(2)}px`;
             }
-            Object.values(cardRefs.current).forEach((card) => {
-                if (!card) return;
-                const tilt = card._tilt || { rx: 0, ry: 0 };
-                card.style.transform = `perspective(1000px) rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg)`;
-            });
-            animId = requestAnimationFrame(loop);
         };
-        animId = requestAnimationFrame(loop);
-        return () => cancelAnimationFrame(animId);
-    }, []);
+        const requestUpdate = () => {
+            if (visible && animId === null) animId = requestAnimationFrame(update);
+        };
+        const observer = new IntersectionObserver(([entry]) => {
+            visible = entry.isIntersecting;
+            if (visible) requestUpdate();
+        }, { rootMargin: '100px 0px' });
+        observer.observe(section);
+        window.addEventListener('scroll', requestUpdate, { passive: true });
+        window.addEventListener('resize', requestUpdate, { passive: true });
+        requestUpdate();
+        return () => {
+            observer.disconnect();
+            window.removeEventListener('scroll', requestUpdate);
+            window.removeEventListener('resize', requestUpdate);
+            if (animId !== null) cancelAnimationFrame(animId);
+        };
+    }, [revealRef]);
 
     const propertyTypeByCategory = {
         homes: 'House',
@@ -340,7 +349,7 @@ const BrowseProperties = ({ currentLocation = 'bahriatown' }) => {
         <section className="browse-properties" id="properties" ref={revealRef}>
             {/* Parallax Blueprint Grid Layer */}
             <div className="properties-parallax-grid" ref={bgGridRef} aria-hidden="true" />
-            
+
             <div className="browse-container">
                 <div className="browse-header-wrap" ref={headerRef} data-reveal="zoom-fade">
                     <h2 className="browse-title">Properties</h2>
@@ -392,7 +401,6 @@ const BrowseProperties = ({ currentLocation = 'bahriatown' }) => {
                             const Icon = category.icon;
                             const currentTab = activeTabs[key];
                             const currentItems = category.tabs[currentTab];
-                            const tilt = cardTilts[key] || { rx: 0, ry: 0, px: 0, py: 0 };
 
                             return (
                                 <div
@@ -401,73 +409,66 @@ const BrowseProperties = ({ currentLocation = 'bahriatown' }) => {
                                     data-reveal="pop-scale"
                                     data-delay={index}
                                 >
-                                <div
-                                    className="category-card"
-                                    ref={(el) => {
-                                        if (el) {
-                                            cardRefs.current[key] = el;
-                                            el._tilt = cardTilts[key] || { rx: 0, ry: 0 };
-                                        }
-                                    }}
-                                    onMouseMove={(e) => handleCardTiltMove(key, e)}
-                                    onMouseLeave={() => handleCardTiltLeave(key)}
-                                    style={{
-                                        '--mouse-x': `${tilt.px}px`,
-                                        '--mouse-y': `${tilt.py}px`,
-                                    }}
-                                >
-                                    <div className="category-icon">
-                                        <Icon size={41} />
-                                    </div>
-                                    <h3 className="category-name">{category.name}</h3>
+                                    <div
+                                        className="category-card"
+                                        ref={(el) => {
+                                            if (el) cardRefs.current[key] = el;
+                                        }}
+                                        onMouseMove={(e) => handleCardTiltMove(key, e)}
+                                        onMouseLeave={() => handleCardTiltLeave(key)}
+                                    >
+                                        <div className="category-icon">
+                                            <Icon size={41} />
+                                        </div>
+                                        <h3 className="category-name">{category.name}</h3>
 
-                                    <div className="tabs">
-                                        {Object.keys(category.tabs).map((tabKey) => (
-                                            <button
-                                                key={tabKey}
-                                                className={`tab-button ${currentTab === tabKey ? 'active' : ''}`}
-                                                onClick={() => handleTabChange(key, tabKey)}
-                                            >
-                                                {tabKey === 'popular' && 'Popular'}
-                                                {tabKey === 'size' && 'Size'}
-                                            </button>
-                                        ))}
-                                    </div>
-
-                                    <div className="properties-grid">
-                                        {currentItems && currentItems.length > 0 ? (
-                                            currentItems.map((item, i) => (
-                                                <div
-                                                    key={i}
-                                                    className="property-item"
-                                                    onClick={() => handleItemClick(item, currentTab, key)}
-                                                    style={{ cursor: (currentTab === 'popular' || currentTab === 'size') ? 'pointer' : 'default' }}
+                                        <div className="tabs">
+                                            {Object.keys(category.tabs).map((tabKey) => (
+                                                <button
+                                                    key={tabKey}
+                                                    className={`tab-button ${currentTab === tabKey ? 'active' : ''}`}
+                                                    onClick={() => handleTabChange(key, tabKey)}
                                                 >
-                                                    <div className="property-content">
-                                                        <h4 className="property-label">{item.label}</h4>
-                                                        <p className="property-subtitle">{item.subtitle}</p>
-                                                    </div>
-                                                </div>
-                                            ))
-                                        ) : (
-                                            <div style={{ padding: '20px', textAlign: 'center', gridColumn: '1 / -1' }}>
-                                                <p>No properties available</p>
-                                            </div>
-                                        )}
-                                    </div>
+                                                    {tabKey === 'popular' && 'Popular'}
+                                                    {tabKey === 'size' && 'Size'}
+                                                </button>
+                                            ))}
+                                        </div>
 
-                                    <div className="carousel-dots" aria-label={`${category.name} tabs`}>
-                                        {tabOrder.map((tabKey) => (
-                                            <button
-                                                key={tabKey}
-                                                type="button"
-                                                className={`dot ${currentTab === tabKey ? 'active' : ''}`}
-                                                onClick={() => handleTabChange(key, tabKey)}
-                                                aria-label={`Show ${tabKey === 'popular' ? 'Popular' : 'Size'} tab`}
-                                            />
-                                        ))}
+                                        <div className="properties-grid">
+                                            {currentItems && currentItems.length > 0 ? (
+                                                currentItems.map((item, i) => (
+                                                    <div
+                                                        key={i}
+                                                        className="property-item"
+                                                        onClick={() => handleItemClick(item, currentTab, key)}
+                                                        style={{ cursor: (currentTab === 'popular' || currentTab === 'size') ? 'pointer' : 'default' }}
+                                                    >
+                                                        <div className="property-content">
+                                                            <h4 className="property-label">{item.label}</h4>
+                                                            <p className="property-subtitle">{item.subtitle}</p>
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <div style={{ padding: '20px', textAlign: 'center', gridColumn: '1 / -1' }}>
+                                                    <p>No properties available</p>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div className="carousel-dots" aria-label={`${category.name} tabs`}>
+                                            {tabOrder.map((tabKey) => (
+                                                <button
+                                                    key={tabKey}
+                                                    type="button"
+                                                    className={`dot ${currentTab === tabKey ? 'active' : ''}`}
+                                                    onClick={() => handleTabChange(key, tabKey)}
+                                                    aria-label={`Show ${tabKey === 'popular' ? 'Popular' : 'Size'} tab`}
+                                                />
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
                                 </div>
                             );
                         })}
