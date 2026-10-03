@@ -10,9 +10,14 @@
         inset 0 2px 4px rgba(255, 255, 255, 0.9),
         0 24px 60px rgba(2, 132, 199, 0.14),
         0 0 0 1px rgba(56, 189, 248, 0.18);
-    backdrop-filter: blur(28px);
-    -webkit-backdrop-filter: blur(28px);
+    /* Optimized backdrop-filter for better performance */
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     perspective: 1200px;
+    /* Performance: GPU acceleration */
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    contain: layout style paint;
 }
 
 .properties-parallax-grid {
@@ -43,8 +48,12 @@
     width: 380px;
     height: 380px;
     background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.95), rgba(56, 189, 248, 0.35) 40%, rgba(2, 132, 199, 0.16) 70%, transparent 80%);
-    filter: blur(22px);
+    /* Optimized blur for better performance */
+    filter: blur(18px);
     animation: fluidDrift 8s ease-in-out infinite alternate;
+    /* Performance optimizations */
+    backface-visibility: hidden;
+    transform: translate3d(0, 0, 0);
 }
 
 .browse-properties::after {
@@ -52,8 +61,12 @@
     width: 380px;
     height: 380px;
     background: radial-gradient(circle at 70% 40%, rgba(255, 255, 255, 0.9), rgba(251, 191, 36, 0.25) 35%, rgba(2, 132, 199, 0.15) 70%, transparent 80%);
-    filter: blur(20px);
+    /* Optimized blur for better performance */
+    filter: blur(16px);
     animation: fluidDrift 8s ease-in-out infinite alternate-reverse;
+    /* Performance optimizations */
+    backface-visibility: hidden;
+    transform: translate3d(0, 0, 0);
 }
 
 .browse-container {
@@ -98,8 +111,17 @@
 }
 
 @keyframes badgePulse {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.4); opacity: 0.6; }
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.4);
+        opacity: 0.6;
+    }
 }
 
 .browse-title {
@@ -141,7 +163,8 @@
     flex-direction: column;
     height: 100%;
 }
-.category-card-reveal > .category-card {
+
+.category-card-reveal>.category-card {
     flex: 1;
     width: 100%;
 }
@@ -155,19 +178,24 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.95),
         0 20px 50px rgba(15, 82, 173, 0.12),
         0 0 0 1px rgba(2, 132, 199, 0.12);
-    backdrop-filter: blur(24px) saturate(180%);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    /* Optimized backdrop-filter for performance */
+    backdrop-filter: blur(12px) saturate(150%);
+    -webkit-backdrop-filter: blur(12px) saturate(150%);
+    /* Optimized transitions - only transform and opacity */
     transition:
-        transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-        box-shadow 0.35s ease,
-        border-color 0.35s ease;
+        transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 0.3s ease,
+        border-color 0.3s ease;
     cursor: pointer;
     overflow: hidden;
     position: relative;
     display: flex;
     flex-direction: column;
     transform-style: preserve-3d;
-    will-change: transform;
+    /* Performance: GPU acceleration */
+    backface-visibility: hidden;
+    transform: translate3d(0, 0, 0);
+    contain: layout style paint;
 }
 
 .category-card::before {
@@ -187,6 +215,8 @@
         0 28px 68px rgba(30, 144, 255, 0.22),
         0 0 0 1px rgba(30, 144, 255, 0.35);
     border-color: rgba(56, 189, 248, 0.5);
+    /* Only trigger will-change on hover */
+    will-change: transform;
 }
 
 .category-card:hover::before {
@@ -206,12 +236,17 @@
     text-align: center;
     color: #1E90FF;
     filter: drop-shadow(0 4px 12px rgba(30, 144, 255, 0.25));
-    transition: all 0.3s ease;
+    /* Optimized transition */
+    transition: all 0.25s ease;
+    /* Performance optimization */
+    backface-visibility: hidden;
+    transform: translate3d(0, 0, 0);
 }
 
 .category-card:hover .category-icon {
-    transform: scale(1.1) translateY(-4px);
+    transform: translate3d(0, -4px, 0) scale(1.1);
     filter: drop-shadow(0 6px 18px rgba(30, 144, 255, 0.4));
+    will-change: transform;
 }
 
 .category-name {
@@ -222,8 +257,11 @@
     font-family: 'Ubuntu', sans-serif;
     margin-bottom: 28px;
     letter-spacing: -0.02em;
-    transition: all 0.3s ease;
+    /* Optimized transition */
+    transition: color 0.25s ease;
     margin-top: 0;
+    /* Performance optimization */
+    backface-visibility: hidden;
 }
 
 .category-card:hover .category-name {
@@ -248,23 +286,29 @@
     color: #475569;
     cursor: pointer;
     border-radius: 999px;
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    /* Optimized transition timing */
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
     font-weight: 600;
     font-family: 'Ubuntu', sans-serif;
     letter-spacing: 0.01em;
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.5),
         0 2px 8px rgba(30, 144, 255, 0.06);
+    /* Performance: GPU acceleration */
+    backface-visibility: hidden;
+    transform: translate3d(0, 0, 0);
 }
 
 .tab-button:hover {
     background: rgba(30, 144, 255, 0.08);
     border-color: rgba(30, 144, 255, 0.3);
     color: #1e90ff;
-    transform: translateY(-2px);
+    transform: translate3d(0, -2px, 0);
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.6),
         0 4px 12px rgba(30, 144, 255, 0.15);
+    /* Only use will-change on hover */
+    will-change: transform;
 }
 
 .tab-button.active {
@@ -274,7 +318,7 @@
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.3),
         0 6px 18px rgba(30, 144, 255, 0.35);
-    transform: translateY(-2px);
+    transform: translate3d(0, -2px, 0);
     font-weight: 700;
 }
 
@@ -292,27 +336,29 @@
     border-radius: 14px;
     padding: 18px 14px;
     text-align: center;
+    /* Optimized transition - only transform properties */
     transition:
-        transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
-        background 0.3s ease,
-        box-shadow 0.3s ease,
-        border-color 0.3s ease,
-        color 0.3s ease;
+        transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+        background 0.25s ease,
+        box-shadow 0.25s ease,
+        border-color 0.25s ease;
     cursor: pointer;
     min-width: 0;
     overflow: hidden;
-    backdrop-filter: blur(16px) saturate(180%);
-    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    /* Reduced backdrop-filter for better performance */
+    backdrop-filter: blur(8px) saturate(150%);
+    -webkit-backdrop-filter: blur(8px) saturate(150%);
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.8),
         0 4px 16px rgba(30, 144, 255, 0.08),
         0 0 0 1px rgba(255, 255, 255, 0.5);
     position: relative;
-    will-change: transform;
-    transform: translateY(0) scale(1);
-    -webkit-transform: translateY(0) scale(1);
+    /* Performance: GPU acceleration without constant will-change */
+    transform: translate3d(0, 0, 0) scale(1);
+    -webkit-transform: translate3d(0, 0, 0) scale(1);
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
+    contain: layout style paint;
 }
 
 .property-item:hover {
@@ -322,8 +368,10 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.3),
         0 12px 32px rgba(30, 144, 255, 0.35),
         0 0 0 1px rgba(30, 144, 255, 0.4);
-    transform: translateY(-6px) scale(1.03);
-    -webkit-transform: translateY(-6px) scale(1.03);
+    transform: translate3d(0, -6px, 0) scale(1.03);
+    -webkit-transform: translate3d(0, -6px, 0) scale(1.03);
+    /* Only apply will-change on hover */
+    will-change: transform;
 }
 
 .property-item:hover .property-subtitle {
@@ -346,26 +394,33 @@
     font-weight: 700;
     color: #0f172a;
     margin: 0;
-    transition: all 0.3s ease;
+    /* Optimized transition */
+    transition: all 0.2s ease;
     word-wrap: break-word;
     line-height: 1.3;
     letter-spacing: 0.01em;
+    /* Performance optimization */
+    backface-visibility: hidden;
 }
 
 .property-item:hover .property-label {
     color: white;
-    transform: translateY(-1px);
+    transform: translate3d(0, -1px, 0);
     font-weight: 800;
+    will-change: transform;
 }
 
 .property-subtitle {
     font-size: 0.75rem;
     color: #64748b;
     margin: 0;
-    transition: all 0.3s ease;
+    /* Optimized transition */
+    transition: color 0.2s ease;
     word-wrap: break-word;
     line-height: 1.2;
     font-weight: 500;
+    /* Performance optimization */
+    backface-visibility: hidden;
 }
 
 .carousel-dots {
@@ -387,14 +442,19 @@
     background: rgba(30, 144, 255, 0.25);
     cursor: pointer;
     padding: 0;
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    /* Optimized transition */
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
     box-shadow: 0 2px 6px rgba(30, 144, 255, 0.15);
+    /* Performance optimization */
+    backface-visibility: hidden;
+    transform: translate3d(0, 0, 0) scale(1);
 }
 
 .dot:hover {
-    transform: scale(1.2);
+    transform: translate3d(0, 0, 0) scale(1.2);
     background: rgba(30, 144, 255, 0.6);
     box-shadow: 0 3px 10px rgba(30, 144, 255, 0.3);
+    will-change: transform;
 }
 
 .dot.active {
@@ -637,5 +697,76 @@
 
     .property-subtitle {
         font-size: 0.6rem;
+    }
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   PERFORMANCE OPTIMIZATIONS FOR SMOOTH 60FPS ANIMATIONS
+   ══════════════════════════════════════════════════════════ */
+
+/* Optimize card reveal animations - reduce initial complexity */
+.category-cards {
+    /* Create independent compositing layer */
+    contain: layout style;
+}
+
+/* Optimize parallax grid for smooth scrolling */
+.properties-parallax-grid {
+    /* Force GPU compositing */
+    backface-visibility: hidden;
+    transform: translate3d(0, 0, 0);
+}
+
+/* Optimize property grid for smooth rendering */
+.properties-grid {
+    /* Create independent compositing layer */
+    contain: layout style;
+    /* Force GPU compositing */
+    backface-visibility: hidden;
+    transform: translate3d(0, 0, 0);
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+
+    .browse-properties::before,
+    .browse-properties::after {
+        animation: none !important;
+        transform: translate3d(0, 0, 0) scale(1) !important;
+    }
+
+    .category-card,
+    .property-item,
+    .tab-button,
+    .dot {
+        transition: none !important;
+    }
+}
+
+/* Mobile performance optimizations */
+@media (max-width: 768px) {
+
+    /* Reduce blur complexity on mobile */
+    .browse-properties {
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+
+    .category-card {
+        backdrop-filter: blur(8px) saturate(130%);
+        -webkit-backdrop-filter: blur(8px) saturate(130%);
+    }
+
+    .property-item {
+        backdrop-filter: blur(6px) saturate(130%);
+        -webkit-backdrop-filter: blur(6px) saturate(130%);
+    }
+
+    /* Simplify animations on mobile */
+    .browse-properties::before,
+    .browse-properties::after {
+        filter: blur(12px);
+        animation-duration: 12s !important;
     }
 }
