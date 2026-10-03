@@ -498,6 +498,111 @@ function PropertyListings() {
                 {/* ── Body ── */}
                 <div className="listings-body">
 
+                    {/* ── Toolbar (filters + price range) ── */}
+                    <div className="listings-toolbar">
+                        <div className="listings-toolbar__pills">
+                            {pills.map((pill) => (
+                                <button
+                                    key={pill}
+                                    type="button"
+                                    className={`listings-pill ${activeFilter === pill ? 'listings-pill--active' : ''}`}
+                                    onClick={() => setActiveFilter(pill)}
+                                >
+                                    {pill}
+                                </button>
+                            ))}
+                        </div>
+                        <PriceRangeSlider
+                            min={priceBounds[0]}
+                            max={priceBounds[1]}
+                            values={priceRange}
+                            onChange={setPriceRange}
+                        />
+                    </div>
+
+                    {/* ── Grid ── */}
+                    {loading ? (
+                        <div className="listings-loading">
+                            <div className="listings-loading__spinner" />
+                            <p>Loading properties...</p>
+                        </div>
+                    ) : error ? (
+                        <div className="listings-error">
+                            <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" />
+                                <path d="M12 8v4M12 16h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                            </svg>
+                            <p>{error}</p>
+                        </div>
+                    ) : filteredProperties.length === 0 && (!isCommercial || filteredBbcPlots.length === 0) ? (
+                        <div className="listings-empty">
+                            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                                <path d="M9 22V12h6v10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                            <p className="listings-empty__title">No properties found</p>
+                            <p className="listings-empty__subtitle">
+                                Try adjusting your filters or{' '}
+                                {isPriceFiltered && (
+                                    <button
+                                        type="button"
+                                        className="listings-empty__reset"
+                                        onClick={() => setPriceRange(priceBounds)}
+                                    >
+                                        reset your price range
+                                    </button>
+                                )}
+                                {!isPriceFiltered && activeFilter !== 'All' && (
+                                    <button
+                                        type="button"
+                                        className="listings-empty__reset"
+                                        onClick={() => setActiveFilter('All')}
+                                    >
+                                        clear your filters
+                                    </button>
+                                )}
+                            </p>
+                        </div>
+                    ) : (
+                        <>
+                            {/* Property Cards Grid */}
+                            <div className="listings-grid" ref={gridRef}>
+                                {filteredProperties.map((prop) => (
+                                    <PropertyCard key={prop.id} property={prop} />
+                                ))}
+                                {isCommercial && filteredBbcPlots.map((plot, i) => (
+                                    <BbcPlotCard
+                                        key={`bbc-${i}`}
+                                        plot={plot}
+                                        onContact={() => navigate('/business-bay-commercial')}
+                                    />
+                                ))}
+                            </div>
+
+                            {/* BBC Size Filter Pills (only for Commercial) */}
+                            {isCommercial && bbcPlots.length > 0 && (
+                                <div className="listings-bbc-filter">
+                                    <div className="listings-bbc-filter__label">
+                                        <VscSettingsCompact size={18} />
+                                        Business Bay Commercial
+                                    </div>
+                                    <div className="listings-bbc-filter__pills">
+                                        {['All', '3.5 Marla', '4 Marla', '5 Marla', '8 Marla'].map((size) => (
+                                            <button
+                                                key={size}
+                                                type="button"
+                                                className={`listings-pill ${bbcSizeFilter === size ? 'listings-pill--active' : ''}`}
+                                                onClick={() => setBbcSizeFilter(size)}
+                                            >
+                                                {size}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </>
+                    )}
+
                     {/* ── Contact Section Instead of Properties ── */}
                     <div className="listings-contact-section">
                         <div className="listings-contact-hero">

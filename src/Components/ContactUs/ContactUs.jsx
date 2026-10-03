@@ -122,7 +122,6 @@ function ContactUs() {
                                         </svg>
                                     </div>
                                     <h3 className="contact-card__title">Phone</h3>
-                                    <p className="contact-card__text">+92 3214754689</p>
                                     <p className="contact-card__text">+92 3219607863</p>
                                     <p className="contact-card__text">+92 3214340004</p>
                                 </div>
@@ -139,8 +138,7 @@ function ContactUs() {
                                         </svg>
                                     </div>
                                     <h3 className="contact-card__title">Email</h3>
-                                    <p className="contact-card__text">info@ijestates.com</p>
-                                    <p className="contact-card__text">sales@ijestates.com</p>
+                                    <p className="contact-card__text">ijestateandbuilders@gmail.com</p>
                                 </div>
 
                                 <div className="contact-card">
