@@ -92,23 +92,32 @@
 .landing-page__hero--bahriatown .landing-page__hero-bg-img {
   background-image: url('../../Assets/images/background3.jpeg');
 }
+
 .landing-page__hero--dharaya .landing-page__hero-bg-img {
   background-image: url('../../Assets/images/dha.jpg');
 }
+
 .landing-page__hero--etihadtown .landing-page__hero-bg-img {
   background-image: url('../../Assets/images/eithad.png');
 }
+
 .landing-page__hero--uniontown .landing-page__hero-bg-img {
   background-image: url('../../Assets/images/union.jpg');
 }
+
 .landing-page__hero--blurred .landing-page__hero-bg-img {
   filter: saturate(0.3) brightness(0.8) blur(15px);
   opacity: 0.2;
 }
 
 @keyframes heroZoom {
-  0% { transform: scale(1); }
-  100% { transform: scale(1.06); }
+  0% {
+    transform: scale(1);
+  }
+
+  100% {
+    transform: scale(1.06);
+  }
 }
 
 /* Hero overlay */
@@ -186,13 +195,29 @@
 }
 
 @keyframes pulseDot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.7); }
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.4;
+    transform: scale(0.7);
+  }
 }
 
 @keyframes badgeFadeIn {
-  0% { opacity: 0; transform: translateY(-15px); }
-  100% { opacity: 1; transform: translateY(0); }
+  0% {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -261,6 +286,7 @@
 }
 
 @media (max-width: 1024px) {
+
   /* Two small, tilted social-proof pills tucked into the top corners of the
      hero on tablet/phone — one top-left, one slightly lower on the right,
      both pinned to the screen edges so they read as light accents and never
@@ -272,19 +298,31 @@
     border-radius: 11px;
     z-index: 7;
   }
+
   .hero-floating-pill--left {
     left: 1.5%;
     top: 12.5%;
-    transform: rotate(-7deg) !important;   /* !important beats the pop-in keyframe's scale(1) so the tilt sticks */
+    transform: rotate(-7deg) !important;
+    /* !important beats the pop-in keyframe's scale(1) so the tilt sticks */
   }
+
   .hero-floating-pill--right {
     right: 1.5%;
     top: 18%;
     transform: rotate(6deg) !important;
   }
-  .floating-pill-icon { font-size: 0.9rem; }
-  .floating-pill-title { font-size: 0.65rem; }
-  .floating-pill-sub { font-size: 0.5rem; }
+
+  .floating-pill-icon {
+    font-size: 0.9rem;
+  }
+
+  .floating-pill-title {
+    font-size: 0.65rem;
+  }
+
+  .floating-pill-sub {
+    font-size: 0.5rem;
+  }
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -553,8 +591,15 @@
 }
 
 @keyframes fadeUpIn {
-  0% { opacity: 0; transform: translateY(20px); }
-  100% { opacity: 1; transform: translateY(0); }
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ── Tab Sparkle ───────────────────────────────────────────── */
@@ -580,15 +625,41 @@
 
 /* ── Validation shake ──────────────────────────────────────── */
 @keyframes searchShake {
-  0% { transform: translateX(0); }
-  12% { transform: translateX(-8px); }
-  25% { transform: translateX(7px); }
-  37% { transform: translateX(-6px); }
-  50% { transform: translateX(5px); }
-  62% { transform: translateX(-4px); }
-  75% { transform: translateX(3px); }
-  87% { transform: translateX(-2px); }
-  100% { transform: translateX(0); }
+  0% {
+    transform: translateX(0);
+  }
+
+  12% {
+    transform: translateX(-8px);
+  }
+
+  25% {
+    transform: translateX(7px);
+  }
+
+  37% {
+    transform: translateX(-6px);
+  }
+
+  50% {
+    transform: translateX(5px);
+  }
+
+  62% {
+    transform: translateX(-4px);
+  }
+
+  75% {
+    transform: translateX(3px);
+  }
+
+  87% {
+    transform: translateX(-2px);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
 }
 
 .landing-page__search--shake {
@@ -625,10 +696,25 @@
 }
 
 @keyframes toastSlideDown {
-  0% { opacity: 0; transform: translateX(-50%) translateY(-14px) scale(0.94); }
-  8% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
-  88% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
-  100% { opacity: 0; transform: translateX(-50%) translateY(-14px) scale(0.94); }
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-14px) scale(0.94);
+  }
+
+  8% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+
+  88% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-14px) scale(0.94);
+  }
 }
 
 /* ── Tabs (Light Theme) ────────────────────────────────────── */
@@ -805,7 +891,7 @@
   left: 0;
   right: 0;
   min-width: 200px;
-  z-index: 1000;
+  z-index: 10000;
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(20px);
@@ -929,41 +1015,100 @@
 }
 
 @keyframes marqueeScroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 /* ══════════════════════════════════════════════════════════
    TRANSITION ANIMATIONS
    ══════════════════════════════════════════════════════════ */
 @keyframes fadeScaleOut {
-  0% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0px); }
-  100% { opacity: 0; transform: scale(0.92) translateY(25px); filter: blur(4px); }
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0px);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(0.92) translateY(25px);
+    filter: blur(4px);
+  }
 }
 
 @keyframes fadeScaleOutTitle {
-  0% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0px); }
-  100% { opacity: 0; transform: scale(0.9) translateY(35px); filter: blur(6px); }
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0px);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(0.9) translateY(35px);
+    filter: blur(6px);
+  }
 }
 
 @keyframes fadeScaleOutNavbar {
-  0% { opacity: 1; transform: translateY(0); filter: blur(0px); }
-  100% { opacity: 0; transform: translateY(-25px); filter: blur(5px); }
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0px);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-25px);
+    filter: blur(5px);
+  }
 }
 
 @keyframes fadeScaleIn {
-  0% { opacity: 0; transform: scale(0.92) translateY(25px); filter: blur(4px); }
-  100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0px); }
+  0% {
+    opacity: 0;
+    transform: scale(0.92) translateY(25px);
+    filter: blur(4px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0px);
+  }
 }
 
 @keyframes fadeScaleInTitle {
-  0% { opacity: 0; transform: scale(0.9) translateY(35px); filter: blur(6px); }
-  100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0px); }
+  0% {
+    opacity: 0;
+    transform: scale(0.9) translateY(35px);
+    filter: blur(6px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0px);
+  }
 }
 
 @keyframes fadeScaleInNavbar {
-  0% { opacity: 0; transform: translateY(-25px); filter: blur(5px); }
-  100% { opacity: 1; transform: translateY(0); filter: blur(0px); }
+  0% {
+    opacity: 0;
+    transform: translateY(-25px);
+    filter: blur(5px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0px);
+  }
 }
 
 .landing-page--pretransition .landing-page__hero-content {
@@ -1143,9 +1288,17 @@
     position: relative;
   }
 
-  .landing-page__dropdown:nth-of-type(1) { z-index: 300; }
-  .landing-page__dropdown:nth-of-type(2) { z-index: 200; }
-  .landing-page__dropdown:nth-of-type(3) { z-index: 100; }
+  .landing-page__dropdown:nth-of-type(1) {
+    z-index: 300;
+  }
+
+  .landing-page__dropdown:nth-of-type(2) {
+    z-index: 200;
+  }
+
+  .landing-page__dropdown:nth-of-type(3) {
+    z-index: 100;
+  }
 
   .landing-page__dropdown-panel {
     left: 0;
@@ -1172,10 +1325,12 @@
   .landing-page__search-field {
     justify-content: flex-start;
   }
+
   .landing-page__field-body {
     align-items: flex-start;
     text-align: left;
   }
+
   .landing-page__field-label {
     text-align: left;
   }
@@ -1411,10 +1566,12 @@
     opacity: 0;
     transform: scale(0.12);
   }
+
   60% {
     opacity: 1;
     transform: scale(1.06);
   }
+
   100% {
     opacity: 1;
     transform: scale(1);
@@ -1426,10 +1583,12 @@
     opacity: 0;
     transform: scale(0.2);
   }
+
   65% {
     opacity: 1;
     transform: scale(1.04);
   }
+
   100% {
     opacity: 1;
     transform: scale(1);
@@ -1441,10 +1600,12 @@
     opacity: 0;
     transform: scale(0.25);
   }
+
   65% {
     opacity: 1;
     transform: scale(1.04);
   }
+
   100% {
     opacity: 1;
     transform: scale(1);
@@ -1470,18 +1631,23 @@
 .hero-landmark-badge--eiffel {
   animation: heroPopOutSnappy 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) 0.52s both;
 }
+
 .hero-landmark-badge--building {
   animation: heroPopOutSnappy 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) 0.58s both;
 }
+
 .hero-floating-pill--left {
   animation: heroPopOutSnappy 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) 0.64s both;
 }
+
 .hero-floating-pill--right {
   animation: heroPopOutSnappy 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) 0.70s both;
 }
+
 .hero-landmark-badge--mosque {
   animation: heroPopOutSnappy 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) 0.76s both;
 }
+
 /* ══════════════════════════════════════════════════════════════════
    PERFORMANCE & MOBILE READABILITY PASS
    Calmer, faster hero on phones + low-end devices.
@@ -1491,6 +1657,7 @@
    stay pinned to the top corners as light social-proof accents, and the 3D
    jelly (sized up in JS) sits behind the readable content. */
 @media (max-width: 768px) {
+
   /* Bulky image landmark badges stay hidden on phones; the two compact pills
      (styled in the max-width:1024px block above) remain as light accents. */
   .hero-landmark-badge {
@@ -1507,6 +1674,7 @@
     color: #0f172a;
     text-shadow: 0 1px 10px rgba(255, 255, 255, 0.6);
   }
+
   .landing-page__hero--dark .landing-page__hero-statement {
     color: #e2e8f0;
     text-shadow: 0 1px 12px rgba(2, 6, 23, 0.7);
@@ -1515,6 +1683,7 @@
 
 /* Accessibility + battery: honour the OS "reduce motion" setting everywhere. */
 @media (prefers-reduced-motion: reduce) {
+
   .landing-grain-overlay,
   .landing-marquee-track,
   .kinetic-char-wrap .char-primary,
@@ -1525,6 +1694,7 @@
     animation: none !important;
     transition: none !important;
   }
+
   html {
     scroll-behavior: auto !important;
   }

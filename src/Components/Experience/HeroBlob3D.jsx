@@ -26,12 +26,12 @@ gsap.registerPlugin(ScrollTrigger);
  * On scroll the whole cosmos gently spins + drifts upward (parallax).
  */
 
-// Light per-location jelly palettes (core / edge / glow).
+// Light per-location jelly palettes (core / edge / glow / rim).
 const PALETTES = {
-  bahriatown: { core: 0x93c5fd, edge: 0x67e8f9, glow: 0xbae6fd }, // aqua/blue
-  dharaya:    { core: 0xa7f3d0, edge: 0x6ee7b7, glow: 0xd1fae5 }, // light green
-  etihadtown: { core: 0xc4b5fd, edge: 0xa78bfa, glow: 0xede9fe }, // light violet
-  uniontown:  { core: 0xfda4af, edge: 0xfb7185, glow: 0xffe4e6 }, // light rose
+  bahriatown: { core: 0x93c5fd, edge: 0x67e8f9, glow: 0xbae6fd, rim: 0x67e8f9 }, // aqua/blue
+  dharaya: { core: 0xb8b8b8, edge: 0x9ca3af, glow: 0xd1d5db, rim: 0xa8a8a8 }, // pure silver/gray
+  etihadtown: { core: 0x6ee7b7, edge: 0x34d399, glow: 0xa7f3d0, rim: 0x10b981 }, // lighter emerald green
+  uniontown: { core: 0x7dd3fc, edge: 0x38bdf8, glow: 0xbae6fd, rim: 0x0ea5e9 }, // sky blue
 };
 
 // Optimised quality presets (leaner than the home page's).
@@ -111,6 +111,7 @@ export default function HeroBlob3D({ location = 'bahriatown' }) {
       uniform vec3 uColorCore;
       uniform vec3 uColorEdge;
       uniform vec3 uColorGlow;
+      uniform vec3 uColorRim;
       uniform float uBaseAlpha;
       uniform float uGlowIntensity;
       varying vec3 vNormal;
@@ -125,10 +126,10 @@ export default function HeroBlob3D({ location = 'bahriatown' }) {
         float colorCycle = sin(vUv.x * 6.28 + uTime * 0.6) * 0.5 + 0.5;
         vec3 baseJelly = mix(uColorCore, uColorEdge, colorCycle);
         vec3 internalGlow = uColorGlow * (0.25 + vDisplacement * 1.5) * uGlowIntensity;
-        vec3 rimColor = vec3(0.4, 0.85, 1.0) * fresnel * uGlowIntensity;
+        vec3 rimColor = uColorRim * fresnel * uGlowIntensity;
         vec3 specularHighlight = vec3(1.0) * pow(max(dot(reflect(-viewDir, normal), vec3(0.1, 0.9, 0.5)), 0.0), 28.0) * (uGlowIntensity * 0.4);
         vec3 finalColor = baseJelly * 0.7 + internalGlow + rimColor + specularHighlight;
-        float alpha = clamp(uBaseAlpha + fresnel * 0.4 + innerFresnel * 0.2, 0.08, 0.95);
+        float alpha = clamp(uBaseAlpha + fresnel * 0.25 + innerFresnel * 0.15, 0.04, 0.35);
         gl_FragColor = vec4(finalColor, alpha);
       }
     `;
@@ -151,11 +152,12 @@ export default function HeroBlob3D({ location = 'bahriatown' }) {
       uTime: { value: 0 },
       uMouse: { value: new THREE.Vector2(0, 0) },
       uDistort: { value: 0.25 },
-      uBaseAlpha: { value: 0.14 },
-      uGlowIntensity: { value: 0.4 },
+      uBaseAlpha: { value: 0.04 },
+      uGlowIntensity: { value: 0.2 },
       uColorCore: { value: new THREE.Color(pal.core) },
       uColorEdge: { value: new THREE.Color(pal.edge) },
       uColorGlow: { value: new THREE.Color(pal.glow) },
+      uColorRim: { value: new THREE.Color(pal.rim) },
     };
     const ribbonGeo = new THREE.TorusKnotGeometry(4.2, 0.85, q.knot[0], q.knot[1], 2, 3);
     const ribbonMat = makeJelly(ribbonUniforms);
@@ -172,11 +174,12 @@ export default function HeroBlob3D({ location = 'bahriatown' }) {
         uTime: { value: 10 },
         uMouse: { value: new THREE.Vector2(0, 0) },
         uDistort: { value: 0.28 },
-        uBaseAlpha: { value: 0.12 },
-        uGlowIntensity: { value: 0.35 },
+        uBaseAlpha: { value: 0.04 },
+        uGlowIntensity: { value: 0.2 },
         uColorCore: { value: new THREE.Color(pal.glow) },
         uColorEdge: { value: new THREE.Color(pal.core) },
         uColorGlow: { value: new THREE.Color(pal.edge) },
+        uColorRim: { value: new THREE.Color(pal.rim) },
       };
       const g = new THREE.TorusGeometry(3.0, 0.55, q.ring[0], q.ring[1]);
       const m = makeJelly(leftRingUniforms);
@@ -200,11 +203,12 @@ export default function HeroBlob3D({ location = 'bahriatown' }) {
         uTime: { value: cfg.phase },
         uMouse: { value: new THREE.Vector2(0, 0) },
         uDistort: { value: cfg.distort },
-        uBaseAlpha: { value: 0.14 },
-        uGlowIntensity: { value: 0.35 },
+        uBaseAlpha: { value: 0.04 },
+        uGlowIntensity: { value: 0.2 },
         uColorCore: { value: new THREE.Color(pal.core) },
         uColorEdge: { value: new THREE.Color(pal.edge) },
         uColorGlow: { value: new THREE.Color(pal.glow) },
+        uColorRim: { value: new THREE.Color(pal.rim) },
       };
       const g = new THREE.IcosahedronGeometry(cfg.size, q.blobDetail);
       const m = makeJelly(u);
@@ -423,6 +427,7 @@ export default function HeroBlob3D({ location = 'bahriatown' }) {
       u.uColorCore.value.set(pal.core);
       u.uColorEdge.value.set(pal.edge);
       u.uColorGlow.value.set(pal.glow);
+      u.uColorRim.value.set(pal.rim);
     });
   }, [location]);
 

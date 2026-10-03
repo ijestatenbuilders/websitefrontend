@@ -7,10 +7,13 @@ import 'lenis/dist/lenis.css';
 import HeroSearch from './HeroSearch';
 import { prefersReducedMotion, getDeviceTier, isTouch } from '../../utils/perf';
 import './Experience.css';
-
 import eiffelImg from '../../Assets/images/eiffletower.png';
 import mosqueImg from '../../Assets/images/background.jpeg';
 import res1 from '../../Assets/images/upcoming-project-1.jpg';
+import bahriaTownLogo from '../../Assets/images/btllogo.png';
+import dhaLogo from '../../Assets/images/dhalogo.png';
+import etihadLogo from '../../Assets/images/etihadlogo.png';
+import unionLogo from '../../Assets/images/unionlogo.png';
 
 // Decorative WebGL jelly — lazy so three.js (~150 kB gzip) splits into its own
 // chunk and loads AFTER first paint instead of blocking the main thread on
@@ -20,9 +23,16 @@ gsap.registerPlugin(ScrollTrigger);
 
 const LOC_NAMES = {
   bahriatown: 'Bahria Town Lahore',
-  dharaya: 'DHA Raya Lahore',
+  dharaya: 'DHA Lahore',
   etihadtown: 'Etihad Town Lahore',
   uniontown: 'Union Town Lahore',
+};
+
+const LOC_LOGOS = {
+  bahriatown: bahriaTownLogo,
+  dharaya: dhaLogo,
+  etihadtown: etihadLogo,
+  uniontown: unionLogo,
 };
 
 /* Each character = two stacked copies (primary + secondary) that slide
@@ -247,6 +257,9 @@ export default function ExperienceHero({ onLocationSwitch, location = 'bahriatow
   useLayoutEffect(() => {
     if (reduce) return;
     const ctx = gsap.context(() => {
+      gsap.from('.xp-hero__logo-container', {
+        y: -20, opacity: 0, duration: 0.9, ease: 'power3.out', delay: 0.2,
+      });
       gsap.from('.xp-hero__title .xp-split', {
         yPercent: 60, opacity: 0,
         stagger: 0.12, duration: 1, ease: 'power4.out', delay: 0.35,
@@ -348,6 +361,9 @@ export default function ExperienceHero({ onLocationSwitch, location = 'bahriatow
       </div>
 
       <motion.div className="xp-hero__content" style={{ y: heroTitleY }}>
+        <div className="xp-hero__logo-container">
+          <img src={LOC_LOGOS[location] || bahriaTownLogo} alt={`${LOC_NAMES[location]} Logo`} className="xp-hero__logo" />
+        </div>
         <div className="xp-hero__loc xp-hero__meta">
           <span className="xp-hero__loc-dot" />
           Exploring <strong>{LOC_NAMES[location] || LOC_NAMES.bahriatown}</strong>
@@ -356,7 +372,7 @@ export default function ExperienceHero({ onLocationSwitch, location = 'bahriatow
           <SplitHeadline text="IJ ESTATE" className="xp-hero__line1" logoI />
           <SplitHeadline text="& BUILDERS" className="xp-hero__line2" />
         </h1>
-        <HeroSearch onLocationSwitch={onLocationSwitch} />
+        <HeroSearch onLocationSwitch={onLocationSwitch} currentLocation={location} />
       </motion.div>
 
       <button

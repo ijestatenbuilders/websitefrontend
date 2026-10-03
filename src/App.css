@@ -11,30 +11,34 @@
   --brand-deep: #0d4dbb;
   --brand-soft: #38bdf8;
   --brand-rgb: 30, 111, 255;
-  --brand-text: #0284c7;   /* Bahria: the original sky-blue for headings */
+  --brand-text: #0284c7;
+  /* Bahria: the original sky-blue for headings */
   --brand-text-rgb: 2, 132, 199;
 }
+
 :root[data-loc="dharaya"] {
-  --brand: #10b981;
-  --brand-deep: #059669;
-  --brand-soft: #34d399;
-  --brand-rgb: 16, 185, 129;
-  --brand-text: #10b981;
-  --brand-text-rgb: 16, 185, 129;
+  --brand: #94a3b8;
+  --brand-deep: #64748b;
+  --brand-soft: #cbd5e1;
+  --brand-rgb: 148, 163, 184;
+  --brand-text: #64748b;
+  --brand-text-rgb: 100, 116, 139;
 }
+
 :root[data-loc="etihadtown"] {
-  --brand: #7c3aed;
-  --brand-deep: #6d28d9;
-  --brand-soft: #a78bfa;
-  --brand-rgb: 124, 58, 237;
-  --brand-text: #7c3aed;
-  --brand-text-rgb: 124, 58, 237;
+  --brand: #059669;
+  --brand-deep: #047857;
+  --brand-soft: #10b981;
+  --brand-rgb: 5, 150, 105;
+  --brand-text: #047857;
+  --brand-text-rgb: 4, 120, 87;
 }
+
 :root[data-loc="uniontown"] {
-  --brand: #f43f5e;
-  --brand-deep: #be123c;
-  --brand-soft: #fb7185;
-  --brand-rgb: 244, 63, 94;
-  --brand-text: #f43f5e;
-  --brand-text-rgb: 244, 63, 94;
+  --brand: #0ea5e9;
+  --brand-deep: #0284c7;
+  --brand-soft: #38bdf8;
+  --brand-rgb: 14, 165, 233;
+  --brand-text: #0284c7;
+  --brand-text-rgb: 2, 132, 199;
 }

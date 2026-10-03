@@ -19,12 +19,40 @@ export default function PagePreloader({ onComplete, theme }) {
 
   const activeTheme = theme || (typeof window !== 'undefined' ? localStorage.getItem('heroTheme') || 'light' : 'light');
 
+  // Skip preloader if navigating between pages (not a full reload).
+  // Use sessionStorage to detect if this is a navigation vs full page load.
+  const shouldSkip = (() => {
+    if (typeof window === 'undefined') return false;
+    try {
+      const hasNavigated = sessionStorage.getItem('ij-navigated');
+      if (hasNavigated) {
+        // Already navigated during this session - skip preloader
+        return true;
+      }
+      // First visit or full reload - mark as navigated for future visits
+      sessionStorage.setItem('ij-navigated', 'true');
+      return false;
+    } catch (e) {
+      return false;
+    }
+  })();
+
+  // If we should skip, immediately mark as done
+  useEffect(() => {
+    if (shouldSkip) {
+      setIsDone(true);
+      if (onComplete) onComplete();
+    }
+  }, [shouldSkip, onComplete]);
+
   // The BAR itself is animated purely in CSS (transform: scaleX on the compositor
   // thread) so it glides at a perfectly constant speed and can NEVER stall — even
   // while the main thread is busy booting the app behind this screen. This rAF
   // loop only drives the % number, using a strictly LINEAR, wall-clock-based
   // value so the digits climb at the same constant rate as the bar.
   useEffect(() => {
+    if (shouldSkip) return; // Skip animation if navigating between pages
+
     const animate = (timestamp) => {
       if (!startTimeRef.current) startTimeRef.current = timestamp;
       const elapsed = timestamp - startTimeRef.current;
@@ -45,12 +73,13 @@ export default function PagePreloader({ onComplete, theme }) {
 
     animFrameRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(animFrameRef.current);
-  }, []);
+  }, [shouldSkip]);
 
 
 
   // Trigger fade-out once at 100%
   useEffect(() => {
+    if (shouldSkip) return; // Skip if navigating
     if (progress === 100) {
       const t1 = setTimeout(() => setIsFading(true), 100);
       const t2 = setTimeout(() => {
@@ -59,7 +88,7 @@ export default function PagePreloader({ onComplete, theme }) {
       }, 700);
       return () => { clearTimeout(t1); clearTimeout(t2); };
     }
-  }, [progress, onComplete]);
+  }, [progress, onComplete, shouldSkip]);
 
   if (isDone) return null;
 

@@ -14,6 +14,10 @@ import { fetchProperties, fetchFilterOptions } from '../../services/api';
 import { FaMapMarkerAlt, FaPhone, FaRuler } from 'react-icons/fa';
 import { VscSettingsCompact } from "react-icons/vsc";
 import { bbcPlots } from '../../data/bbcPlots';
+import dhaImg from '../../Assets/images/dha.jpg';
+import etihadImg from '../../Assets/images/etihad.png';
+import unionImg from '../../Assets/images/union.jpg';
+import bahriaTownImg from '../../Assets/images/bahriamap.png';
 import './PropertyListings.css';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -412,7 +416,7 @@ function PropertyListings() {
 
     const LOCATION_LABELS = {
         bahriatown: 'Bahria Town Lahore',
-        dharaya: 'DHA Raya Lahore',
+        dharaya: 'DHA Lahore',
         etihadtown: 'Etihad Town Lahore',
         uniontown: 'Union Town Lahore',
     };
@@ -442,6 +446,10 @@ function PropertyListings() {
             : mode === 'size'
                 ? `Showing ${propertyType && propertyType !== 'All' ? propertyType.toLowerCase() : 'available'} properties for ${selected}. Filter by block below.`
                 : `Browsing ${selected} properties across all sizes. Filter by size below.`;
+
+    // ── Determine current location for "Other Areas" filtering ──
+    // Use searchLocation if available, otherwise default to showing all except Bahria
+    const currentAreaLocation = searchLocation || 'bahriatown';
 
     return (
         <>
@@ -490,89 +498,180 @@ function PropertyListings() {
                 {/* ── Body ── */}
                 <div className="listings-body">
 
-                    {/* ── Filter pills ── */}
-                    <div className="listings-filter">
-                        <p className="listings-filter__label">
-                            Filter <VscSettingsCompact className="settings-icon" size={16} />
-                        </p>
-                        <div className="listings-filter__pills">
-                            {pills.map((pill) => (
-                                <button
-                                    key={pill}
-                                    type="button"
-                                    className={`listings-filter__pill ${activeFilter === pill ? 'listings-filter__pill--active' : ''}`}
-                                    onClick={() => setActiveFilter(pill)}
-                                >
-                                    {pill}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* ── Price range slider ── */}
-                    {!loading && properties.length > 0 && (
-                        <PriceRangeSlider
-                            min={priceBounds[0]}
-                            max={priceBounds[1]}
-                            values={priceRange}
-                            onChange={setPriceRange}
-                        />
-                    )}
-
-                    {/* ── Results count ── */}
-                    <div className="listings-meta">
-                        <p className="listings-meta__count">
-                            {loading ? 'Loading properties…' : (
-                                <>
-                                    Showing <strong>{filteredProperties.length}</strong> {filteredProperties.length === 1 ? 'property' : 'properties'}
-                                    {activeFilter !== 'All' && <> for <strong>{activeFilter}</strong></>}
-                                    {isPriceFiltered && <> · <span style={{ color: '#1E90FF' }}>price filtered</span></>}
-                                </>
-                            )}
-                        </p>
-                    </div>
-
-                    {error && !loading && (
-                        <div className="listings-empty">
-                            <div className="listings-empty__icon">⚠️</div>
-                            <p className="listings-empty__text">{error}</p>
-                        </div>
-                    )}
-
-                    {/* ── Cards grid ── */}
-                    <div className="listings-grid" ref={gridRef}>
-                        {loading ? (
-                            <div className="listings-empty">
-                                <div className="listings-empty__icon">⏳</div>
-                                <p className="listings-empty__text">Loading properties…</p>
+                    {/* ── Contact Section Instead of Properties ── */}
+                    <div className="listings-contact-section">
+                        <div className="listings-contact-hero">
+                            <div className="listings-contact-hero__icon">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                                    <path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" stroke="url(#phone-grad)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                    <defs>
+                                        <linearGradient id="phone-grad" x1="3" y1="3" x2="21" y2="21">
+                                            <stop stopColor="#1e90ff" /><stop offset="1" stopColor="#0d5bb5" />
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
                             </div>
-                        ) : (
-                            <>
-                                {/* BBC plot cards first — only for Commercial */}
-                                {isCommercial && filteredBbcPlots.map((plot) => (
-                                    <BbcPlotCard
-                                        key={plot.id}
-                                        plot={plot}
-                                        onContact={() => navigate('/commercial/business-bay')}
-                                    />
-                                ))}
+                            <h2 className="listings-contact-hero__title">
+                                Get in Touch with Our Expert Agents
+                            </h2>
+                            <p className="listings-contact-hero__subtitle">
+                                Interested in properties in this area? Our experienced real estate consultants are ready to help you find your perfect property.
+                            </p>
+                        </div>
 
-                                {/* Backend property cards */}
-                                {filteredProperties.map((property) => (
-                                    <PropertyCard key={property.id} property={property} />
-                                ))}
+                        <div className="listings-contact-cards">
+                            <div className="listings-contact-card">
+                                <div className="listings-contact-card__icon">
+                                    <svg viewBox="0 0 24 24" fill="none">
+                                        <path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
+                                </div>
+                                <h3 className="listings-contact-card__title">Call Us Directly</h3>
+                                <p className="listings-contact-card__subtitle">Speak with our agents now</p>
+                                <div className="listings-contact-card__numbers">
+                                    <a href="tel:+923219607863" className="listings-contact-card__number">
+                                        <FaPhone size={14} />
+                                        +92 321 9607863
+                                    </a>
+                                    <a href="tel:+923214340004" className="listings-contact-card__number">
+                                        <FaPhone size={14} />
+                                        +92 321 4340004
+                                    </a>
+                                </div>
+                            </div>
 
-                                {/* Empty state — only if no BBC cards AND no backend cards */}
-                                {filteredProperties.length === 0 && !isCommercial && (
-                                    <div className="listings-empty">
-                                        <div className="listings-empty__icon">🏠</div>
-                                        <p className="listings-empty__text">No properties found</p>
-                                        <p className="listings-empty__sub">Try adjusting the price range or filter above.</p>
-                                    </div>
-                                )}
-                            </>
-                        )}
+                            <div className="listings-contact-card">
+                                <div className="listings-contact-card__icon">
+                                    <svg viewBox="0 0 24 24" fill="none">
+                                        <path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                        <path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
+                                </div>
+                                <h3 className="listings-contact-card__title">Visit Our Office</h3>
+                                <p className="listings-contact-card__subtitle">Meet us in person</p>
+                                <div className="listings-contact-card__address">
+                                    <FaMapMarkerAlt size={14} />
+                                    <p>Tulip Block Sector C, 257 Commercial Zone, 2nd Floor, Bahria Town Lahore</p>
+                                </div>
+                                <p className="listings-contact-card__hours">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
+                                        <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                                    </svg>
+                                    Mon - Sun: 10:00 AM - 10:00 PM
+                                </p>
+                            </div>
+
+                            <div className="listings-contact-card">
+                                <div className="listings-contact-card__icon">
+                                    <svg viewBox="0 0 24 24" fill="none">
+                                        <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
+                                </div>
+                                <h3 className="listings-contact-card__title">Send an Email</h3>
+                                <p className="listings-contact-card__subtitle">Get a detailed response</p>
+                                <div className="listings-contact-card__emails">
+                                    <a href="mailto:ijestateandbuilders@gmail.com" className="listings-contact-card__email">
+                                        ijestateandbuilders@gmail.com
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="listings-contact-cta">
+                            <p className="listings-contact-cta__text">
+                                Our consultants specialize in {isCommercial ? 'commercial' : 'residential'} properties and can provide personalized recommendations based on your requirements.
+                            </p>
+                            <button
+                                type="button"
+                                className="listings-contact-cta__btn"
+                                onClick={() => navigate('/contact')}
+                            >
+                                Fill Contact Form
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                    <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                            </button>
+                        </div>
                     </div>
+
+                    {/* ── Our Other Areas Section ── */}
+                    <div className="listings-other-areas">
+                        <div className="listings-other-areas__header">
+                            <h2 className="listings-other-areas__title">Explore Other Areas</h2>
+                            <p className="listings-other-areas__subtitle">
+                                Discover premium properties in Lahore's most sought-after locations
+                            </p>
+                        </div>
+
+                        <div className="listings-other-areas__grid">
+                            {/* Show different areas based on current location */}
+                            {currentAreaLocation !== 'bahriatown' && (
+                                <div
+                                    className="area-card"
+                                    onClick={() => navigate('/', { state: { scrollTo: 'hero' } })}
+                                >
+                                    <div className="area-card__image-wrapper">
+                                        <img src={bahriaTownImg} alt="Bahria Town Lahore" className="area-card__image" />
+                                        <div className="area-card__overlay" />
+                                    </div>
+                                    <div className="area-card__content">
+                                        <h3 className="area-card__name">Bahria Town</h3>
+                                        <p className="area-card__location">Lahore</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {currentAreaLocation !== 'dharaya' && (
+                                <div
+                                    className="area-card"
+                                    onClick={() => navigate('/', { state: { scrollTo: 'hero' } })}
+                                >
+                                    <div className="area-card__image-wrapper">
+                                        <img src={dhaImg} alt="DHA Raya Lahore" className="area-card__image" />
+                                        <div className="area-card__overlay" />
+                                    </div>
+                                    <div className="area-card__content">
+                                        <h3 className="area-card__name">DHA Raya</h3>
+                                        <p className="area-card__location">Lahore</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {currentAreaLocation !== 'etihadtown' && (
+                                <div
+                                    className="area-card"
+                                    onClick={() => navigate('/', { state: { scrollTo: 'hero' } })}
+                                >
+                                    <div className="area-card__image-wrapper">
+                                        <img src={etihadImg} alt="Etihad Town Lahore" className="area-card__image" />
+                                        <div className="area-card__overlay" />
+                                    </div>
+                                    <div className="area-card__content">
+                                        <h3 className="area-card__name">Etihad Town</h3>
+                                        <p className="area-card__location">Lahore</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {currentAreaLocation !== 'uniontown' && (
+                                <div
+                                    className="area-card"
+                                    onClick={() => navigate('/', { state: { scrollTo: 'hero' } })}
+                                >
+                                    <div className="area-card__image-wrapper">
+                                        <img src={unionImg} alt="Union Town Lahore" className="area-card__image" />
+                                        <div className="area-card__overlay" />
+                                    </div>
+                                    <div className="area-card__content">
+                                        <h3 className="area-card__name">Union Town</h3>
+                                        <p className="area-card__location">Lahore</p>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
                 </div>
 
                 <Footer />
@@ -665,3 +764,5 @@ function BbcPlotCard({ plot, onContact }) {
 }
 
 export default PropertyListings;
+
+

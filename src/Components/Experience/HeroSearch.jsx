@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 /**
@@ -32,12 +32,17 @@ const PRICE_RANGE_MAP = {
   '10crore+': [1000, 99999],
 };
 
-export default function HeroSearch({ onLocationSwitch }) {
+export default function HeroSearch({ onLocationSwitch, currentLocation = 'bahriatown' }) {
   const navigate = useNavigate();
   const [activeDropdown, setActiveDropdown] = useState(null);
-  const [searchValues, setSearchValues] = useState({ type: 'all', location: 'bahriatown', price: 'anybudget' });
+  const [searchValues, setSearchValues] = useState({ type: 'all', location: currentLocation, price: 'anybudget' });
   const [searchError, setSearchError] = useState('');
   const [searchShake, setSearchShake] = useState(false);
+
+  // Sync search location when parent location changes
+  useEffect(() => {
+    setSearchValues((prev) => ({ ...prev, location: currentLocation }));
+  }, [currentLocation]);
 
   const toggleDropdown = (name) => setActiveDropdown((c) => (c === name ? null : name));
   const handleDropdownSelect = (name, value) => {

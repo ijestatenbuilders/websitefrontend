@@ -22,7 +22,14 @@ const LocationTransition = lazy(() => import('../LocationTransition/LocationTran
 function LandingPage() {
   const location = useLocation();
   // Location drives the sections' content; switching it plays the 3D transition.
-  const [currentLocation, setCurrentLocation] = useState('bahriatown');
+  // Initialize from localStorage if available (persist selected area on reload)
+  const [currentLocation, setCurrentLocation] = useState(() => {
+    try {
+      return localStorage.getItem('ij-loc') || 'bahriatown';
+    } catch (e) {
+      return 'bahriatown';
+    }
+  });
   const [pendingLocation, setPendingLocation] = useState(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
@@ -89,7 +96,7 @@ function LandingPage() {
             <div className="xp-marquee__track">
               {Array.from({ length: 2 }).map((_, k) => (
                 <div className="xp-marquee__group" key={k}>
-                  {['Bahria Town', '✦', 'DHA Raya', '✦', 'Etihad Town', '✦', 'Union Town', '✦', 'Golf City', '✦', 'Country Club', '✦'].map((w, i) => (
+                  {['Bahria Town', '✦', 'DHA', '✦', 'Etihad Town', '✦', 'Union Town', '✦', 'Golf City', '✦', 'Country Club', '✦'].map((w, i) => (
                     <span key={i} className="xp-marquee__item">{w}</span>
                   ))}
                 </div>
