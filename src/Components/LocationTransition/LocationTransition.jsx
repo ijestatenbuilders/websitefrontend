@@ -33,7 +33,7 @@ function LocationTransition({ isActive, onCovered, onComplete }) {
     const navLogo = document.querySelector('.xnav__brand-logo');
     const rect = navLogo?.getBoundingClientRect();
 
-    if (rect) {
+    if (rect && rect.width > 0) {
       const centerX = window.innerWidth / 2;
       const centerY = window.innerHeight / 2;
       const logoCenterX = rect.left + rect.width / 2;
@@ -43,6 +43,13 @@ function LocationTransition({ isActive, onCovered, onComplete }) {
         x: logoCenterX - centerX,
         y: logoCenterY - centerY,
         scale: rect.width / 200 // 200px is our center logo size
+      });
+    } else {
+      // Fallback: assume logo is in top-left
+      setLogoPosition({
+        x: -window.innerWidth / 2 + 80,
+        y: -window.innerHeight / 2 + 50,
+        scale: 0.25
       });
     }
 
@@ -119,7 +126,7 @@ function LocationTransition({ isActive, onCovered, onComplete }) {
       </div>
 
       {/* Logo that flies from navbar to center */}
-      <div className="lt-logo-wrapper" style={logoStyle}>
+      <div className="lt-logo-container" style={logoStyle}>
         <div className={`lt-logo ${logoZooming ? 'lt-logo--zooming' : ''}`}>
           <img src={logo} alt="IJ Estates" />
         </div>

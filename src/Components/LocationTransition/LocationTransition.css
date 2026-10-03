@@ -14,6 +14,7 @@
 .lt-overlay {
   position: absolute;
   inset: 0;
+  z-index: 1;
   /* Start as a small circle at top-right */
   clip-path: circle(0% at 100% 0%);
   transition: clip-path 0.8s cubic-bezier(0.65, 0, 0.35, 1);
@@ -84,13 +85,14 @@
 }
 
 /* ── Logo wrapper: flies from navbar to center ── */
-.lt-logo-wrapper {
-  position: absolute;
+.lt-logo-container {
+  position: fixed;
   top: 50%;
   left: 50%;
-  z-index: 10;
+  z-index: 2000010;
   transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1);
   backface-visibility: hidden;
+  pointer-events: none;
 }
 
 /* ── Logo: zooms in and out at center ── */
