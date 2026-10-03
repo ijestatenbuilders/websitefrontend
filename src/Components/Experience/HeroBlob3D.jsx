@@ -34,11 +34,11 @@ const PALETTES = {
   uniontown: { core: 0x7dd3fc, edge: 0x38bdf8, glow: 0xbae6fd, rim: 0x0ea5e9 }, // sky blue
 };
 
-// Optimised quality presets (leaner than the home page's).
+// Optimised quality presets (further optimized for 60+ fps smooth scrolling).
 const Q = {
-  high: { dpr: 1.6, aa: true, knot: [118, 22], ring: [24, 64], showRing: true, blobs: 4, blobDetail: 6, spores: 90 },
-  mid: { dpr: 1.35, aa: true, knot: [96, 18], ring: [18, 48], showRing: true, blobs: 3, blobDetail: 5, spores: 40 },
-  low: { dpr: 1, aa: false, knot: [72, 14], ring: null, showRing: false, blobs: 2, blobDetail: 4, spores: 0 },
+  high: { dpr: 1.4, aa: true, knot: [100, 20], ring: [22, 56], showRing: true, blobs: 3, blobDetail: 5, spores: 60 },
+  mid: { dpr: 1.2, aa: true, knot: [84, 16], ring: [16, 44], showRing: true, blobs: 2, blobDetail: 4, spores: 30 },
+  low: { dpr: 1, aa: false, knot: [64, 12], ring: null, showRing: false, blobs: 1, blobDetail: 3, spores: 0 },
 };
 
 export default function HeroBlob3D({ location = 'bahriatown' }) {
@@ -68,12 +68,22 @@ export default function HeroBlob3D({ location = 'bahriatown' }) {
     const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
     camera.position.set(0, 0, 15);
 
-    const renderer = new THREE.WebGLRenderer({ antialias: q.aa, alpha: true, powerPreference: 'high-performance' });
+    const renderer = new THREE.WebGLRenderer({
+      antialias: q.aa,
+      alpha: true,
+      powerPreference: 'high-performance',
+      // Additional performance optimizations
+      stencil: false,
+      depth: true,
+      logarithmicDepthBuffer: false
+    });
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, q.dpr));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.1;
+    // Performance: skip unnecessary render passes
+    renderer.sortObjects = false;
     mount.appendChild(renderer.domElement);
 
     // ── EXACT home-page jelly shaders ──
@@ -291,9 +301,10 @@ export default function HeroBlob3D({ location = 'bahriatown' }) {
       if (!visibleRef.current) return;
       const time = clock.getElapsedTime();
 
-      currRot.x += (targetRot.x - currRot.x) * 0.07;
-      currRot.y += (targetRot.y - currRot.y) * 0.07;
-      currP += (targetP - currP) * 0.08;
+      // Smoother interpolation for better 60fps performance
+      currRot.x += (targetRot.x - currRot.x) * 0.06;
+      currRot.y += (targetRot.y - currRot.y) * 0.06;
+      currP += (targetP - currP) * 0.06;
 
       const rx = currRot.x, ry = currRot.y;
       const scrollOffset = currP * 5.0;   // parallax drift range

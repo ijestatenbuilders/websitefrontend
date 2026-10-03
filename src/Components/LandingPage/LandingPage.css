@@ -25,6 +25,11 @@
   position: relative;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Performance: Force GPU compositing for smooth scrolling */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  /* Create stacking context for better performance */
+  isolation: isolate;
 }
 
 /* ── Film Grain Noise Overlay (asaram.dev) ─────────────────── */
@@ -84,8 +89,11 @@
   filter: saturate(0.5) brightness(1.1) blur(3px);
   opacity: 0.5;
   transform: scale(1);
+  /* Optimized animation for smooth 60fps */
   animation: heroZoom 20s ease-in-out infinite alternate;
-  will-change: transform;
+  backface-visibility: hidden;
+  transform: translateZ(0) scale(1);
+  /* Only animate transform during animation */
 }
 
 /* Location-specific backgrounds */
@@ -112,11 +120,11 @@
 
 @keyframes heroZoom {
   0% {
-    transform: scale(1);
+    transform: translate3d(0, 0, 0) scale(1);
   }
 
   100% {
-    transform: scale(1.06);
+    transform: translate3d(0, 0, 0) scale(1.06);
   }
 }
 
@@ -1697,5 +1705,46 @@
 
   html {
     scroll-behavior: auto !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   PERFORMANCE OPTIMIZATIONS FOR 60+ FPS SMOOTH SCROLLING
+   ══════════════════════════════════════════════════════════ */
+
+/* Force hardware acceleration on all animated elements */
+.landing-page__hero,
+.landing-page__search-panel,
+.landing-page__dropdown-panel,
+.landing-page__hero-bg-img {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Optimize transitions to use only transform and opacity */
+.landing-page__dropdown-panel,
+.landing-page__search-panel {
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+}
+
+/* Create independent compositing layers for smooth scrolling */
+.landing-page>* {
+  contain: layout style;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .landing-page__hero-bg-img {
+    animation: none !important;
+    transform: translate3d(0, 0, 0) scale(1) !important;
+  }
+}
+
+/* Optimize for mobile devices */
+@media (max-width: 768px) {
+
+  /* Reduce animation complexity on mobile */
+  .landing-page__hero-bg-img {
+    animation-duration: 30s !important;
   }
 }

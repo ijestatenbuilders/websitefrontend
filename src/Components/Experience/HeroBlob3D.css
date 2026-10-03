@@ -4,14 +4,30 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  z-index: 1;              /* behind hero content (z-index 2), above bg (0) */
+  z-index: 1;
+  /* behind hero content (z-index 2), above bg (0) */
   pointer-events: none;
   display: flex;
+  /* Performance: Force GPU compositing for smooth rendering */
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  contain: layout style paint;
 }
-.xp-hero3d canvas { display: block; margin: auto; }
+
+.xp-hero3d canvas {
+  display: block;
+  margin: auto;
+  /* Optimize canvas rendering */
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+}
 
 @media (max-width: 720px) {
+
   /* Shift the jelly up out of dead-centre so it peeks around the headline
      instead of sitting hidden behind it. */
-  .xp-hero3d { opacity: 0.7; transform: translateY(-15%); }
+  .xp-hero3d {
+    opacity: 0.7;
+    transform: translate3d(0, -15%, 0);
+  }
 }

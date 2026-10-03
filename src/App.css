@@ -14,6 +14,28 @@
   --brand-text: #0284c7;
   /* Bahria: the original sky-blue for headings */
   --brand-text-rgb: 2, 132, 199;
+
+  /* Performance optimizations for smooth 60fps scrolling */
+  scroll-behavior: auto;
+}
+
+/* Force hardware acceleration and smooth scrolling globally */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  /* Optimize scroll performance */
+  overflow-x: hidden;
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
+}
+
+body {
+  /* Force GPU compositing for smooth scrolling */
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 :root[data-loc="dharaya"] {

@@ -64,8 +64,9 @@
      while the 3D canvas + magnetic loop + Lenis are busy). */
   overflow: hidden;
   line-height: 1.1;
-  transform: translateZ(0);
-  contain: paint;
+  /* Optimized GPU compositing */
+  transform: translate3d(0, 0, 0);
+  contain: layout style paint;
 }
 
 .xp-split__char {
@@ -76,13 +77,13 @@
 .xp-split__prim,
 .xp-split__sec {
   display: block;
-  transform: translateZ(0);
+  transform: translate3d(0, 0, 0);
   /* transform-only + a gentle overshoot "jiggle" */
   transition: transform 0.55s cubic-bezier(0.34, 1.28, 0.5, 1);
   transition-delay: calc(var(--i, 0) * 0.022s);
   /* subtle cascade from letter 1 */
   backface-visibility: hidden;
-  will-change: transform;
+  /* Only declare will-change on hover for better performance */
 }
 
 .xp-split__sec {
@@ -192,10 +193,13 @@
 .xp-hero__aurora {
   position: absolute;
   border-radius: 50%;
-  /* 60px reads as soft as 90px on a 600px blob but is markedly cheaper to
-     rasterize — these three blobs animate continuously behind the hero. */
-  filter: blur(60px);
+  /* Optimized blur for better performance - reduced from 60px to 40px */
+  filter: blur(40px);
   opacity: 0.7;
+  /* Force GPU compositing for smooth animations */
+  transform: translateZ(0);
+  will-change: transform;
+  contain: layout style paint;
 }
 
 .xp-hero__aurora--1 {
@@ -227,19 +231,19 @@
 
 @keyframes xpDrift1 {
   to {
-    transform: translate(80px, 60px) scale(1.15);
+    transform: translate3d(80px, 60px, 0) scale(1.15);
   }
 }
 
 @keyframes xpDrift2 {
   to {
-    transform: translate(-70px, -50px) scale(1.1);
+    transform: translate3d(-70px, -50px, 0) scale(1.1);
   }
 }
 
 @keyframes xpDrift3 {
   to {
-    transform: translate(-50px, 40px) scale(1.2);
+    transform: translate3d(-50px, 40px, 0) scale(1.2);
   }
 }
 
@@ -265,7 +269,9 @@
 
 .xp-float {
   position: absolute;
-  will-change: transform;
+  /* Only use will-change during animations, not constantly */
+  backface-visibility: hidden;
+  transform: translate3d(0, 0, 0);
 }
 
 .xp-float--cube {
@@ -323,7 +329,8 @@
   height: 66px;
   background: linear-gradient(135deg, rgba(var(--brand-rgb, 30, 111, 255), 0.16), rgba(255, 255, 255, 0.5));
   border: 1.5px solid rgba(var(--brand-rgb, 30, 111, 255), 0.4);
-  backdrop-filter: blur(4px);
+  /* Use simpler blur or remove backdrop-filter for performance */
+  backface-visibility: hidden;
 }
 
 .xp-cube__f--front {
@@ -409,8 +416,10 @@
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.85), rgba(233, 243, 255, 0.7));
   border: 1.5px solid rgba(255, 255, 255, 0.9);
   box-shadow: 0 18px 40px -14px rgba(13, 40, 90, 0.4);
-  backdrop-filter: blur(6px);
+  /* Removed backdrop-filter for better scroll performance */
   animation: xpBob 6s ease-in-out infinite 0.5s;
+  backface-visibility: hidden;
+  transform: translate3d(0, 0, 0);
 }
 
 .xp-glasscard__row {
@@ -523,8 +532,11 @@
   background: rgba(var(--brand-rgb, 30, 111, 255), 0.1);
   border: 1px solid rgba(var(--brand-rgb, 30, 111, 255), 0.3);
   box-shadow: 0 10px 26px -14px rgba(var(--brand-rgb, 30, 111, 255), 0.5);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  /* Optimized backdrop-filter only on supported browsers */
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  backface-visibility: hidden;
+  transform: translate3d(0, 0, 0);
 }
 
 .xp-hero__loc strong {
@@ -574,6 +586,11 @@
 }
 
 /* Hover: primary slides UP out, secondary rises from below into view */
+.xp-split:hover .xp-split__prim,
+.xp-split:hover .xp-split__sec {
+  will-change: transform;
+}
+
 .xp-split:hover .xp-split__prim {
   transform: translate3d(0, -100%, 0);
 }
@@ -640,6 +657,12 @@
 }
 
 .xp-magnetic {
+  /* Only use will-change during actual interaction */
+  backface-visibility: hidden;
+  transform: translate3d(0, 0, 0);
+}
+
+.xp-magnetic:hover {
   will-change: translate;
 }
 
@@ -703,11 +726,14 @@
   border-radius: 999px;
   border: 2px solid rgba(var(--brand-rgb, 30, 111, 255), 0.55);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.25));
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  /* Reduced backdrop-filter for better performance */
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
   box-shadow: 0 8px 22px -8px rgba(var(--brand-rgb, 30, 111, 255), 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.6);
   display: flex;
   justify-content: center;
+  backface-visibility: hidden;
+  transform: translate3d(0, 0, 0);
 }
 
 .xp-hero__scroll-mouse::before {
@@ -803,6 +829,11 @@
   display: flex;
   width: max-content;
   animation: xpMarquee 26s linear infinite;
+  /* Performance: Force GPU compositing */
+  backface-visibility: hidden;
+  transform: translate3d(0, 0, 0);
+  /* Optimize animation performance */
+  contain: layout style paint;
 }
 
 .xp-marquee__group {
@@ -826,7 +857,7 @@
 
 @keyframes xpMarquee {
   to {
-    transform: translateX(-50%);
+    transform: translate3d(-50%, 0, 0);
   }
 }
 
@@ -861,9 +892,9 @@
   padding: 2.25rem 6vw;
   width: max-content;
   align-items: stretch;
-  will-change: transform;
+  /* Optimized for smooth scrolling */
   backface-visibility: hidden;
-  transform: translateZ(0);
+  transform: translate3d(0, 0, 0);
 }
 
 /* Reduced-motion fallback: no pin / scroll-jacking — plain horizontal swipe. */
@@ -1147,6 +1178,12 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  /* Only use will-change on hover/interaction */
+  backface-visibility: hidden;
+  transform: translate3d(0, 0, 0);
+}
+
+.xp-dev__card:hover .xp-dev__img {
   will-change: transform;
 }
 
@@ -1280,7 +1317,10 @@
   background: radial-gradient(circle, rgba(201, 154, 60, 0.35), transparent 70%);
   top: -160px;
   right: -120px;
-  filter: blur(40px);
+  /* Optimized blur for better performance */
+  filter: blur(30px);
+  backface-visibility: hidden;
+  transform: translate3d(0, 0, 0);
 }
 
 .xp-cta__title {
@@ -1427,4 +1467,62 @@
   .xp-hero__scroll-chevrons svg {
     animation: none !important;
   }
+}
+
+/* ═══════════ PERFORMANCE OPTIMIZATIONS ═══════════ */
+/* Pause animations when elements are off-screen for better scroll performance */
+@media (prefers-reduced-motion: no-preference) {
+
+  /* Optimize aurora animations - pause when hero is out of view */
+  .xp-hero {
+    /* Create stacking context for better compositing */
+    isolation: isolate;
+  }
+
+  /* Reduce animation complexity on lower-end devices */
+  @media (max-width: 768px) {
+
+    .xp-hero__aurora--2,
+    .xp-hero__aurora--3 {
+      display: none;
+    }
+
+    .xp-cube,
+    .xp-ring,
+    .xp-float--orbA,
+    .xp-float--orbB {
+      animation-duration: 20s !important;
+    }
+  }
+}
+
+/* Optimize scroll performance - reduce repaints */
+.xp-hero,
+.xp-rail,
+.xp-dev,
+.xp-journey,
+.xp-stats {
+  /* Create independent compositing layers */
+  will-change: auto;
+  contain: layout style paint;
+}
+
+/* Optimize animated elements */
+@keyframes optimized-float {
+
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: translate3d(0, -12px, 0);
+  }
+}
+
+/* Override expensive animations with optimized versions on scroll */
+.xp-hero__floats {
+  /* Isolate animation repaints to this layer */
+  contain: layout style paint;
+  isolation: isolate;
 }
