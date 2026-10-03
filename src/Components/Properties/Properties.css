@@ -10,14 +10,16 @@
         inset 0 2px 4px rgba(255, 255, 255, 0.9),
         0 24px 60px rgba(2, 132, 199, 0.14),
         0 0 0 1px rgba(56, 189, 248, 0.18);
-    /* Optimized backdrop-filter for better performance */
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    /* Ultra-minimal backdrop-filter for maximum performance */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     perspective: 1200px;
-    /* Performance: GPU acceleration */
+    /* Ultra-performance: GPU acceleration */
     transform: translate3d(0, 0, 0);
     backface-visibility: hidden;
     contain: layout style paint;
+    /* Optimize compositing */
+    isolation: isolate;
 }
 
 .properties-parallax-grid {
@@ -48,12 +50,13 @@
     width: 380px;
     height: 380px;
     background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.95), rgba(56, 189, 248, 0.35) 40%, rgba(2, 132, 199, 0.16) 70%, transparent 80%);
-    /* Optimized blur for better performance */
-    filter: blur(18px);
-    animation: fluidDrift 8s ease-in-out infinite alternate;
-    /* Performance optimizations */
+    /* Ultra-minimal blur for maximum performance */
+    filter: blur(14px);
+    animation: fluidDrift 10s ease-in-out infinite alternate;
+    /* Ultra-performance optimizations */
     backface-visibility: hidden;
     transform: translate3d(0, 0, 0);
+    contain: layout style paint;
 }
 
 .browse-properties::after {
@@ -61,12 +64,13 @@
     width: 380px;
     height: 380px;
     background: radial-gradient(circle at 70% 40%, rgba(255, 255, 255, 0.9), rgba(251, 191, 36, 0.25) 35%, rgba(2, 132, 199, 0.15) 70%, transparent 80%);
-    /* Optimized blur for better performance */
-    filter: blur(16px);
-    animation: fluidDrift 8s ease-in-out infinite alternate-reverse;
-    /* Performance optimizations */
+    /* Ultra-minimal blur for maximum performance */
+    filter: blur(12px);
+    animation: fluidDrift 10s ease-in-out infinite alternate-reverse;
+    /* Ultra-performance optimizations */
     backface-visibility: hidden;
     transform: translate3d(0, 0, 0);
+    contain: layout style paint;
 }
 
 .browse-container {
@@ -178,21 +182,21 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.95),
         0 20px 50px rgba(15, 82, 173, 0.12),
         0 0 0 1px rgba(2, 132, 199, 0.12);
-    /* Optimized backdrop-filter for performance */
-    backdrop-filter: blur(12px) saturate(150%);
-    -webkit-backdrop-filter: blur(12px) saturate(150%);
-    /* Optimized transitions - only transform and opacity */
+    /* Ultra-minimal backdrop-filter for maximum performance */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    /* Ultra-fast transitions */
     transition:
-        transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
-        box-shadow 0.3s ease,
-        border-color 0.3s ease;
+        transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
     cursor: pointer;
     overflow: hidden;
     position: relative;
     display: flex;
     flex-direction: column;
     transform-style: preserve-3d;
-    /* Performance: GPU acceleration */
+    /* Ultra-performance: GPU acceleration */
     backface-visibility: hidden;
     transform: translate3d(0, 0, 0);
     contain: layout style paint;
@@ -336,29 +340,31 @@
     border-radius: 14px;
     padding: 18px 14px;
     text-align: center;
-    /* Optimized transition - only transform properties */
+    /* Ultra-fast transitions */
     transition:
-        transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
-        background 0.25s ease,
-        box-shadow 0.25s ease,
-        border-color 0.25s ease;
+        transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+        background 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
     cursor: pointer;
     min-width: 0;
     overflow: hidden;
-    /* Reduced backdrop-filter for better performance */
-    backdrop-filter: blur(8px) saturate(150%);
-    -webkit-backdrop-filter: blur(8px) saturate(150%);
+    /* Minimal backdrop-filter for maximum performance */
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.8),
         0 4px 16px rgba(30, 144, 255, 0.08),
         0 0 0 1px rgba(255, 255, 255, 0.5);
     position: relative;
-    /* Performance: GPU acceleration without constant will-change */
+    /* Ultra-performance: GPU acceleration */
     transform: translate3d(0, 0, 0) scale(1);
     -webkit-transform: translate3d(0, 0, 0) scale(1);
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
     contain: layout style paint;
+    /* Force hardware compositing */
+    will-change: auto;
 }
 
 .property-item:hover {

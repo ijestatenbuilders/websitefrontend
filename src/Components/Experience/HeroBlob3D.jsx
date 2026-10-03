@@ -34,11 +34,11 @@ const PALETTES = {
   uniontown: { core: 0x7dd3fc, edge: 0x38bdf8, glow: 0xbae6fd, rim: 0x0ea5e9 }, // sky blue
 };
 
-// Optimised quality presets (further optimized for 60+ fps smooth scrolling).
+// Optimised quality presets (ultra-optimized for buttery smooth 60fps+ scrolling).
 const Q = {
-  high: { dpr: 1.4, aa: true, knot: [100, 20], ring: [22, 56], showRing: true, blobs: 3, blobDetail: 5, spores: 60 },
-  mid: { dpr: 1.2, aa: true, knot: [84, 16], ring: [16, 44], showRing: true, blobs: 2, blobDetail: 4, spores: 30 },
-  low: { dpr: 1, aa: false, knot: [64, 12], ring: null, showRing: false, blobs: 1, blobDetail: 3, spores: 0 },
+  high: { dpr: 1.25, aa: true, knot: [88, 18], ring: [20, 48], showRing: true, blobs: 2, blobDetail: 4, spores: 40 },
+  mid: { dpr: 1.1, aa: false, knot: [72, 15], ring: [14, 36], showRing: true, blobs: 2, blobDetail: 3, spores: 20 },
+  low: { dpr: 1, aa: false, knot: [56, 12], ring: null, showRing: false, blobs: 1, blobDetail: 3, spores: 0 },
 };
 
 export default function HeroBlob3D({ location = 'bahriatown' }) {
@@ -301,10 +301,10 @@ export default function HeroBlob3D({ location = 'bahriatown' }) {
       if (!visibleRef.current) return;
       const time = clock.getElapsedTime();
 
-      // Smoother interpolation for better 60fps performance
-      currRot.x += (targetRot.x - currRot.x) * 0.06;
-      currRot.y += (targetRot.y - currRot.y) * 0.06;
-      currP += (targetP - currP) * 0.06;
+      // Ultra-smooth interpolation for buttery 60fps performance
+      currRot.x += (targetRot.x - currRot.x) * 0.05;
+      currRot.y += (targetRot.y - currRot.y) * 0.05;
+      currP += (targetP - currP) * 0.05;
 
       const rx = currRot.x, ry = currRot.y;
       const scrollOffset = currP * 5.0;   // parallax drift range

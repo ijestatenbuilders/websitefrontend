@@ -181,6 +181,11 @@
      hero's vertical overflow VISIBLE so the search dropdown can open downward
      without being clipped. The aurora glow is clipped on its own layer below. */
   overflow: visible;
+  /* Ultra-performance: create isolated layer */
+  contain: layout style;
+  /* Force GPU compositing */
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
 }
 
 .xp-hero__bg {
@@ -193,13 +198,17 @@
 .xp-hero__aurora {
   position: absolute;
   border-radius: 50%;
-  /* Optimized blur for better performance - reduced from 60px to 40px */
-  filter: blur(40px);
-  opacity: 0.7;
+  /* Ultra-optimized blur for maximum performance */
+  filter: blur(30px);
+  opacity: 0.6;
   /* Force GPU compositing for smooth animations */
-  transform: translateZ(0);
-  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
   contain: layout style paint;
+  /* Disable pointer events completely */
+  pointer-events: none;
+  /* Optimize animation performance */
+  animation-timing-function: ease-in-out;
 }
 
 .xp-hero__aurora--1 {
@@ -207,8 +216,8 @@
   height: 640px;
   top: -180px;
   left: -120px;
-  background: radial-gradient(circle, rgba(56, 130, 255, 0.4), transparent 70%);
-  animation: xpDrift1 14s ease-in-out infinite alternate;
+  background: radial-gradient(circle, rgba(56, 130, 255, 0.35), transparent 70%);
+  animation: xpDrift1 16s ease-in-out infinite alternate;
 }
 
 .xp-hero__aurora--2 {
@@ -216,8 +225,8 @@
   height: 560px;
   bottom: -160px;
   right: -100px;
-  background: radial-gradient(circle, rgba(201, 154, 60, 0.28), transparent 70%);
-  animation: xpDrift2 16s ease-in-out infinite alternate;
+  background: radial-gradient(circle, rgba(201, 154, 60, 0.25), transparent 70%);
+  animation: xpDrift2 18s ease-in-out infinite alternate;
 }
 
 .xp-hero__aurora--3 {
@@ -225,8 +234,8 @@
   height: 480px;
   top: 30%;
   left: 55%;
-  background: radial-gradient(circle, rgba(120, 90, 255, 0.22), transparent 70%);
-  animation: xpDrift3 18s ease-in-out infinite alternate;
+  background: radial-gradient(circle, rgba(120, 90, 255, 0.18), transparent 70%);
+  animation: xpDrift3 20s ease-in-out infinite alternate;
 }
 
 @keyframes xpDrift1 {
@@ -823,6 +832,10 @@
   background: #eef5ff;
   position: relative;
   z-index: 9001;
+  /* Ultra-performance optimizations */
+  contain: layout style paint;
+  backface-visibility: hidden;
+  transform: translate3d(0, 0, 0);
 }
 
 .xp-marquee__track {

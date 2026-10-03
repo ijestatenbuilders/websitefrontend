@@ -1,6 +1,11 @@
 .app {
   min-height: 100vh;
   width: 100%;
+  /* Ultra-performance: Force GPU compositing */
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  /* Create isolated rendering context */
+  contain: layout style;
 }
 
 /* ── Location-driven brand accent (set via data-loc on <html>) ──────────
@@ -15,7 +20,7 @@
   /* Bahria: the original sky-blue for headings */
   --brand-text-rgb: 2, 132, 199;
 
-  /* Performance optimizations for smooth 60fps scrolling */
+  /* Ultra-performance optimizations for smooth 60fps+ scrolling */
   scroll-behavior: auto;
 }
 
@@ -30,12 +35,19 @@ html {
   overflow-x: hidden;
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
+  /* Ultra-performance: Force GPU layer */
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
 }
 
 body {
-  /* Force GPU compositing for smooth scrolling */
-  transform: translateZ(0);
+  /* Ultra-performance: Force GPU compositing for buttery smooth scrolling */
+  transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
+  /* Create isolated rendering context */
+  contain: layout style;
+  /* Disable iOS rubber band effect lag */
+  overscroll-behavior-y: none;
 }
 
 :root[data-loc="dharaya"] {
