@@ -2,8 +2,6 @@ import { useEffect, useLayoutEffect, useRef, useState, lazy, Suspense } from 're
 import { motion, useScroll, useTransform } from 'motion/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import Lenis from 'lenis';
-import 'lenis/dist/lenis.css';
 import HeroSearch from './HeroSearch';
 import { prefersReducedMotion, getDeviceTier, isTouch } from '../../utils/perf';
 import './Experience.css';
@@ -100,7 +98,6 @@ function SplitHeadline({ text, className = '', logoI = false }) {
 export default function ExperienceHero({ onLocationSwitch, location = 'bahriatown' }) {
   const heroRef = useRef(null);
   const floatRefs = useRef({});
-  const lenisRef = useRef(null);
   const reduce = prefersReducedMotion();
   const [showHeroBlob, setShowHeroBlob] = useState(false);
 
@@ -137,34 +134,9 @@ export default function ExperienceHero({ onLocationSwitch, location = 'bahriatow
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  useEffect(() => {
-    if (reduce || isTouch() || getDeviceTier() === 'low') return;
-    const lenis = new Lenis({
-      lerp: 0.09,
-      smoothWheel: true,
-      wheelMultiplier: 1,
-      touchMultiplier: 1.5,
-    });
-    lenisRef.current = lenis;
-
-    const syncScrollTrigger = () => ScrollTrigger.update();
-    lenis.on('scroll', syncScrollTrigger);
-    const tick = (time) => lenis.raf(time * 1000);
-    gsap.ticker.add(tick);
-    gsap.ticker.lagSmoothing(0);
-
-    return () => {
-      lenis.off('scroll', syncScrollTrigger);
-      gsap.ticker.remove(tick);
-      lenis.destroy();
-      lenisRef.current = null;
-    };
-  }, [reduce]);
-
   const handleScrollCue = () => {
     const dist = Math.round(window.innerHeight * 0.88);
-    if (lenisRef.current) lenisRef.current.scrollTo(dist);
-    else window.scrollTo({ top: dist, behavior: 'smooth' });
+    window.scrollTo({ top: dist, behavior: 'smooth' });
   };
 
   /* Magnetic repulsion — cursor pushes nearby badges + cubes away (only when the

@@ -1,192 +1,125 @@
-/* ══════════════════════════════════════════════════════════════
-   LOCATION TRANSITION — Circular wipe from top-right with logo animation
-   ══════════════════════════════════════════════════════════════ */
-
-.location-transition {
+/* Background Overlay - Expands from top-right */
+.transition-overlay {
   position: fixed;
-  inset: 0;
-  z-index: 2000000;
-  pointer-events: all;
-  overflow: hidden;
-}
-
-/* ── Circular overlay that expands from top-right corner ── */
-.lt-overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  /* Start as a small circle at top-right */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999998;
+  background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 30%, #e0f2fe 60%, #bae6fd 100%);
   clip-path: circle(0% at 100% 0%);
   transition: clip-path 0.8s cubic-bezier(0.65, 0, 0.35, 1);
-  transform: translate3d(0, 0, 0);
-  backface-visibility: hidden;
+  pointer-events: all;
 }
 
-.lt-overlay--expanded {
-  /* Expand to cover entire screen */
+.transition-overlay.expanded {
   clip-path: circle(150% at 100% 0%);
 }
 
-/* ── Gradient background ── */
-.lt-gradient {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 20% 20%, rgba(147, 197, 253, 0.4) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(196, 181, 253, 0.3) 0%, transparent 50%),
-    linear-gradient(135deg, #ffffff 0%, #f0f9ff 30%, #e0f2fe 60%, #bae6fd 100%);
-  animation: gradientShift 6s ease-in-out infinite alternate;
-}
-
-@keyframes gradientShift {
-  0% {
-    filter: hue-rotate(0deg) brightness(1);
-  }
-
-  100% {
-    filter: hue-rotate(10deg) brightness(1.05);
-  }
-}
-
-/* ── Floating particles ── */
-.lt-particles {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-}
-
-.lt-particle {
-  position: absolute;
-  width: 4px;
-  height: 4px;
-  background: radial-gradient(circle, rgba(59, 130, 246, 0.8), rgba(147, 197, 253, 0.4));
-  border-radius: 50%;
-  left: var(--x);
-  top: var(--y);
-  animation: particleFloat 3s ease-in-out infinite;
-  animation-delay: var(--delay);
-  opacity: 0;
-  transform: translate3d(0, 0, 0);
-  backface-visibility: hidden;
-}
-
-@keyframes particleFloat {
-
-  0%,
-  100% {
-    opacity: 0;
-    transform: translate3d(0, 0, 0) scale(0.5);
-  }
-
-  50% {
-    opacity: 1;
-    transform: translate3d(var(--tx, 20px), var(--ty, -30px), 0) scale(1.2);
-  }
-}
-
-/* ── Logo wrapper: flies from navbar to center ── */
-.lt-logo-container {
+/* Logo Container - Flies from navbar to center */
+.transition-logo {
   position: fixed;
   top: 50%;
   left: 50%;
-  z-index: 2000010;
+  width: 200px;
+  height: 200px;
+  z-index: 9999999;
   transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1);
-  backface-visibility: hidden;
   pointer-events: none;
 }
 
-/* ── Logo: zooms in and out at center ── */
-.lt-logo {
-  width: 200px;
-  height: 200px;
+/* Logo Box - White background with shadow */
+.logo-box {
+  width: 100%;
+  height: 100%;
   background: #ffffff;
-  border-radius: 20px;
-  padding: 16px;
-  box-shadow:
-    0 20px 60px -15px rgba(0, 0, 0, 0.3),
-    0 0 0 1px rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transform: translate3d(0, 0, 0) scale(1);
-  transition: border-radius 0.6s ease;
-  backface-visibility: hidden;
+  box-shadow:
+    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(0, 0, 0, 0.05);
+  transition: all 0.5s ease;
 }
 
-.lt-logo img {
+.logo-box img {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  transform: translate3d(0, 0, 0);
-  backface-visibility: hidden;
+  display: block;
 }
 
-/* ── Logo zoom animation ── */
-.lt-logo--zooming {
-  animation: logoZoom 2.5s cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
+/* Zoom Animation - Logo pulses when centered */
+.logo-box.zooming {
+  animation: pulseZoom 2.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
   border-radius: 50%;
 }
 
-@keyframes logoZoom {
+@keyframes pulseZoom {
   0% {
-    transform: translate3d(0, 0, 0) scale(1);
+    transform: scale(1);
     box-shadow:
-      0 20px 60px -15px rgba(0, 0, 0, 0.3),
-      0 0 0 1px rgba(255, 255, 255, 0.1);
+      0 25px 50px -12px rgba(0, 0, 0, 0.25),
+      0 0 0 1px rgba(0, 0, 0, 0.05);
   }
 
   35% {
-    transform: translate3d(0, 0, 0) scale(1.6);
+    transform: scale(1.5);
     box-shadow:
-      0 40px 100px -20px rgba(59, 130, 246, 0.4),
-      0 0 0 2px rgba(59, 130, 246, 0.2),
-      0 0 60px rgba(147, 197, 253, 0.6);
+      0 50px 100px -20px rgba(59, 130, 246, 0.5),
+      0 0 80px rgba(147, 197, 253, 0.8),
+      0 0 0 2px rgba(59, 130, 246, 0.3);
   }
 
   65% {
-    transform: translate3d(0, 0, 0) scale(0.75);
+    transform: scale(0.8);
     box-shadow:
-      0 15px 40px -10px rgba(0, 0, 0, 0.2),
-      0 0 0 1px rgba(255, 255, 255, 0.1);
+      0 20px 40px -15px rgba(0, 0, 0, 0.2),
+      0 0 0 1px rgba(0, 0, 0, 0.05);
   }
 
   100% {
-    transform: translate3d(0, 0, 0) scale(1);
+    transform: scale(1);
     box-shadow:
-      0 20px 60px -15px rgba(0, 0, 0, 0.3),
-      0 0 0 1px rgba(255, 255, 255, 0.1);
+      0 25px 50px -12px rgba(0, 0, 0, 0.25),
+      0 0 0 1px rgba(0, 0, 0, 0.05);
   }
 }
 
-/* ── Responsive ── */
+/* Responsive */
 @media (max-width: 768px) {
-  .lt-logo {
+  .transition-logo {
     width: 160px;
     height: 160px;
-    padding: 12px;
+  }
+
+  .logo-box {
+    padding: 16px;
+    border-radius: 20px;
   }
 }
 
 @media (max-width: 480px) {
-  .lt-logo {
+  .transition-logo {
     width: 140px;
     height: 140px;
-    padding: 10px;
-    border-radius: 16px;
+  }
+
+  .logo-box {
+    padding: 14px;
+    border-radius: 18px;
   }
 }
 
-/* ── Reduced motion ── */
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
 
-  .lt-overlay,
-  .lt-logo-wrapper,
-  .lt-logo {
-    transition-duration: 0.01ms !important;
+  .transition-overlay,
+  .transition-logo,
+  .logo-box {
+    transition: none !important;
     animation: none !important;
-  }
-
-  .lt-particle {
-    display: none;
   }
 }

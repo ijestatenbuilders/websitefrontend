@@ -228,7 +228,9 @@ function PropertyListings() {
         searchPriceMin = null,
         searchPriceMax = null,
         searchBudgetLabel = '',
+        view = 'properties',
     } = location.state || {};
+    const isContactView = view === 'contact';
 
     const [properties, setProperties] = useState([]);
     const [marlaOptions, setMarlaOptions] = useState([]);
@@ -279,13 +281,14 @@ function PropertyListings() {
     }, []);
 
     useEffect(() => {
+        if (isContactView) return;
         fetchFilterOptions()
             .then(data => {
                 setMarlaOptions(data.marlaOptions || []);
                 setBlockOptions(data.blockOptions || []);
             })
             .catch(() => { setMarlaOptions([]); setBlockOptions([]); });
-    }, []);
+    }, [isContactView]);
 
     // Reset pill filter and price-seed flag whenever the search changes
     useEffect(() => {
@@ -296,6 +299,11 @@ function PropertyListings() {
 
     // Load properties from API
     useEffect(() => {
+        if (isContactView) {
+            setLoading(false);
+            setProperties([]);
+            return;
+        }
         setLoading(true);
         setError('');
         const params = {};
@@ -355,7 +363,7 @@ function PropertyListings() {
             })
             .finally(() => setLoading(false));
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [activeFilter, mode, propertyType, selected, searchLocation, marlaOptions, blockOptions]);
+    }, [activeFilter, mode, propertyType, selected, searchLocation, marlaOptions, blockOptions, isContactView]);
 
     // Client-side price filter
     const filteredProperties = properties.filter(p => {
@@ -421,31 +429,35 @@ function PropertyListings() {
         uniontown: 'Union Town Lahore',
     };
 
-    const heroTitle = isFromSearch
-        ? <>
-            {propertyType && propertyType !== 'All' ? <em>{propertyType}s</em> : 'Properties'}
-            {' '}in{' '}
-            <em>{LOCATION_LABELS[searchLocation] ?? searchLocation}</em>
-        </>
-        : mode === 'all'
-            ? <>Properties — <em>{selected}</em></>
-            : mode === 'size'
-                ? <><em>{selected}</em> — Properties</>
-                : <>Properties — <em>{selected}</em></>;
+    const heroTitle = isContactView
+        ? <>Contact <em>{selected}</em></>
+        : isFromSearch
+            ? <>
+                {propertyType && propertyType !== 'All' ? <em>{propertyType}s</em> : 'Properties'}
+                {' '}in{' '}
+                <em>{LOCATION_LABELS[searchLocation] ?? searchLocation}</em>
+            </>
+            : mode === 'all'
+                ? <>Properties — <em>{selected}</em></>
+                : mode === 'size'
+                    ? <><em>{selected}</em> — Properties</>
+                    : <>Properties — <em>{selected}</em></>;
 
-    const heroSubtitle = isFromSearch
-        ? [
-            propertyType && propertyType !== 'All' ? `${propertyType}s` : 'All properties',
-            searchBudgetLabel && searchBudgetLabel !== 'Any Budget'
-                ? ` · ${searchBudgetLabel}`
-                : '',
-            ` · ${LOCATION_LABELS[searchLocation] ?? searchLocation}`,
-        ].join('')
-        : mode === 'all'
-            ? `Showing all ${propertyType && propertyType !== 'All' ? propertyType.toLowerCase() : 'available'} properties. Filter by size or block below.`
-            : mode === 'size'
-                ? `Showing ${propertyType && propertyType !== 'All' ? propertyType.toLowerCase() : 'available'} properties for ${selected}. Filter by block below.`
-                : `Browsing ${selected} properties across all sizes. Filter by size below.`;
+    const heroSubtitle = isContactView
+        ? `Speak with our expert agents about ${selected}.`
+        : isFromSearch
+            ? [
+                propertyType && propertyType !== 'All' ? `${propertyType}s` : 'All properties',
+                searchBudgetLabel && searchBudgetLabel !== 'Any Budget'
+                    ? ` · ${searchBudgetLabel}`
+                    : '',
+                ` · ${LOCATION_LABELS[searchLocation] ?? searchLocation}`,
+            ].join('')
+            : mode === 'all'
+                ? `Showing all ${propertyType && propertyType !== 'All' ? propertyType.toLowerCase() : 'available'} properties. Filter by size or block below.`
+                : mode === 'size'
+                    ? `Showing ${propertyType && propertyType !== 'All' ? propertyType.toLowerCase() : 'available'} properties for ${selected}. Filter by block below.`
+                    : `Browsing ${selected} properties across all sizes. Filter by size below.`;
 
     // ── Determine current location for "Other Areas" filtering ──
     // Use searchLocation if available, otherwise default to showing all except Bahria
@@ -498,113 +510,116 @@ function PropertyListings() {
                 {/* ── Body ── */}
                 <div className="listings-body">
 
-                    {/* ── Toolbar (filters + price range) ── */}
-                    <div className="listings-toolbar">
-                        <div className="listings-toolbar__pills">
-                            {pills.map((pill) => (
-                                <button
-                                    key={pill}
-                                    type="button"
-                                    className={`listings-pill ${activeFilter === pill ? 'listings-pill--active' : ''}`}
-                                    onClick={() => setActiveFilter(pill)}
-                                >
-                                    {pill}
-                                </button>
-                            ))}
-                        </div>
-                        <PriceRangeSlider
-                            min={priceBounds[0]}
-                            max={priceBounds[1]}
-                            values={priceRange}
-                            onChange={setPriceRange}
-                        />
-                    </div>
-
-                    {/* ── Grid ── */}
-                    {loading ? (
-                        <div className="listings-loading">
-                            <div className="listings-loading__spinner" />
-                            <p>Loading properties...</p>
-                        </div>
-                    ) : error ? (
-                        <div className="listings-error">
-                            <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
-                                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" />
-                                <path d="M12 8v4M12 16h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                            </svg>
-                            <p>{error}</p>
-                        </div>
-                    ) : filteredProperties.length === 0 && (!isCommercial || filteredBbcPlots.length === 0) ? (
-                        <div className="listings-empty">
-                            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                                <path d="M9 22V12h6v10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
-                            <p className="listings-empty__title">No properties found</p>
-                            <p className="listings-empty__subtitle">
-                                Try adjusting your filters or{' '}
-                                {isPriceFiltered && (
+                    {!isContactView && <>
+                        {/* ── Toolbar (filters + price range) ── */}
+                        <div className="listings-toolbar">
+                            <div className="listings-toolbar__pills">
+                                {pills.map((pill) => (
                                     <button
+                                        key={pill}
                                         type="button"
-                                        className="listings-empty__reset"
-                                        onClick={() => setPriceRange(priceBounds)}
+                                        className={`listings-pill ${activeFilter === pill ? 'listings-pill--active' : ''}`}
+                                        onClick={() => setActiveFilter(pill)}
                                     >
-                                        reset your price range
+                                        {pill}
                                     </button>
-                                )}
-                                {!isPriceFiltered && activeFilter !== 'All' && (
-                                    <button
-                                        type="button"
-                                        className="listings-empty__reset"
-                                        onClick={() => setActiveFilter('All')}
-                                    >
-                                        clear your filters
-                                    </button>
-                                )}
-                            </p>
-                        </div>
-                    ) : (
-                        <>
-                            {/* Property Cards Grid */}
-                            <div className="listings-grid" ref={gridRef}>
-                                {filteredProperties.map((prop) => (
-                                    <PropertyCard key={prop.id} property={prop} />
-                                ))}
-                                {isCommercial && filteredBbcPlots.map((plot, i) => (
-                                    <BbcPlotCard
-                                        key={`bbc-${i}`}
-                                        plot={plot}
-                                        onContact={() => navigate('/business-bay-commercial')}
-                                    />
                                 ))}
                             </div>
+                            <PriceRangeSlider
+                                min={priceBounds[0]}
+                                max={priceBounds[1]}
+                                values={priceRange}
+                                onChange={setPriceRange}
+                            />
+                        </div>
 
-                            {/* BBC Size Filter Pills (only for Commercial) */}
-                            {isCommercial && bbcPlots.length > 0 && (
-                                <div className="listings-bbc-filter">
-                                    <div className="listings-bbc-filter__label">
-                                        <VscSettingsCompact size={18} />
-                                        Business Bay Commercial
-                                    </div>
-                                    <div className="listings-bbc-filter__pills">
-                                        {['All', '3.5 Marla', '4 Marla', '5 Marla', '8 Marla'].map((size) => (
-                                            <button
-                                                key={size}
-                                                type="button"
-                                                className={`listings-pill ${bbcSizeFilter === size ? 'listings-pill--active' : ''}`}
-                                                onClick={() => setBbcSizeFilter(size)}
-                                            >
-                                                {size}
-                                            </button>
-                                        ))}
-                                    </div>
+                        {/* ── Grid ── */}
+                        {loading ? (
+                            <div className="listings-loading">
+                                <div className="listings-loading__spinner" />
+                                <p>Loading properties...</p>
+                            </div>
+                        ) : error ? (
+                            <div className="listings-error">
+                                <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" />
+                                    <path d="M12 8v4M12 16h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                                </svg>
+                                <p>{error}</p>
+                            </div>
+                        ) : filteredProperties.length === 0 && (!isCommercial || filteredBbcPlots.length === 0) ? (
+                            <div className="listings-empty">
+                                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                    <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                                    <path d="M9 22V12h6v10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                                <p className="listings-empty__title">No properties found</p>
+                                <p className="listings-empty__subtitle">
+                                    Try adjusting your filters or{' '}
+                                    {isPriceFiltered && (
+                                        <button
+                                            type="button"
+                                            className="listings-empty__reset"
+                                            onClick={() => setPriceRange(priceBounds)}
+                                        >
+                                            reset your price range
+                                        </button>
+                                    )}
+                                    {!isPriceFiltered && activeFilter !== 'All' && (
+                                        <button
+                                            type="button"
+                                            className="listings-empty__reset"
+                                            onClick={() => setActiveFilter('All')}
+                                        >
+                                            clear your filters
+                                        </button>
+                                    )}
+                                </p>
+                            </div>
+                        ) : (
+                            <>
+                                {/* Property Cards Grid */}
+                                <div className="listings-grid" ref={gridRef}>
+                                    {filteredProperties.map((prop) => (
+                                        <PropertyCard key={prop.id} property={prop} />
+                                    ))}
+                                    {isCommercial && filteredBbcPlots.map((plot, i) => (
+                                        <BbcPlotCard
+                                            key={`bbc-${i}`}
+                                            plot={plot}
+                                            onContact={() => navigate('/business-bay-commercial')}
+                                        />
+                                    ))}
                                 </div>
-                            )}
-                        </>
-                    )}
 
-                    {/* ── Contact Section Instead of Properties ── */}
-                    <div className="listings-contact-section">
+                                {/* BBC Size Filter Pills (only for Commercial) */}
+                                {isCommercial && bbcPlots.length > 0 && (
+                                    <div className="listings-bbc-filter">
+                                        <div className="listings-bbc-filter__label">
+                                            <VscSettingsCompact size={18} />
+                                            Business Bay Commercial
+                                        </div>
+                                        <div className="listings-bbc-filter__pills">
+                                            {['All', '3.5 Marla', '4 Marla', '5 Marla', '8 Marla'].map((size) => (
+                                                <button
+                                                    key={size}
+                                                    type="button"
+                                                    className={`listings-pill ${bbcSizeFilter === size ? 'listings-pill--active' : ''}`}
+                                                    onClick={() => setBbcSizeFilter(size)}
+                                                >
+                                                    {size}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </>
+                        )}
+
+                    </>}
+
+                    {/* ── Contact Section ── */}
+                    {isContactView && <div className="listings-contact-section">
                         <div className="listings-contact-hero">
                             <div className="listings-contact-hero__icon">
                                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
@@ -620,7 +635,7 @@ function PropertyListings() {
                                 Get in Touch with Our Expert Agents
                             </h2>
                             <p className="listings-contact-hero__subtitle">
-                                Interested in properties in this area? Our experienced real estate consultants are ready to help you find your perfect property.
+                                Interested in {selected}? Our experienced real estate consultants are ready to help you find your perfect property.
                             </p>
                         </div>
 
@@ -698,7 +713,7 @@ function PropertyListings() {
                                 </svg>
                             </button>
                         </div>
-                    </div>
+                    </div>}
 
                     {/* ── Our Other Areas Section ── */}
                     <div className="listings-other-areas">

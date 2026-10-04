@@ -284,6 +284,8 @@ export default function HeroBlob3D({ location = 'bahriatown' }) {
 
     // ── Motion ──
     let raf;
+    let scrollTimer = null;
+    let scrolling = false;
     const clock = new THREE.Clock();
     const targetRot = { x: 0, y: 0 }, currRot = { x: 0, y: 0 };
     const onMouse = (e) => {
@@ -297,8 +299,8 @@ export default function HeroBlob3D({ location = 'bahriatown' }) {
     const render = () => renderer.render(scene, camera);
 
     const animate = () => {
-      raf = requestAnimationFrame(animate);
-      if (!visibleRef.current) return;
+      raf = 0;
+      if (!visibleRef.current || menuOpenRef.current || document.hidden || scrolling) return;
       const time = clock.getElapsedTime();
 
       // Ultra-smooth interpolation for buttery 60fps performance
@@ -355,6 +357,32 @@ export default function HeroBlob3D({ location = 'bahriatown' }) {
       }
 
       render();
+      raf = requestAnimationFrame(animate);
+    };
+
+    const setVisible = (visible) => {
+      visibleRef.current = visible && !menuOpenRef.current && !document.hidden;
+      if (!visibleRef.current && raf) {
+        cancelAnimationFrame(raf);
+        raf = 0;
+      } else if (visibleRef.current && !reduced && !scrolling && !raf) {
+        raf = requestAnimationFrame(animate);
+      }
+    };
+
+    const onScroll = () => {
+      scrolling = true;
+      if (raf) {
+        cancelAnimationFrame(raf);
+        raf = 0;
+      }
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(() => {
+        scrolling = false;
+        if (visibleRef.current && !menuOpenRef.current && !document.hidden && !reduced && !raf) {
+          raf = requestAnimationFrame(animate);
+        }
+      }, 140);
     };
 
     if (reduced) render();
@@ -363,15 +391,15 @@ export default function HeroBlob3D({ location = 'bahriatown' }) {
     // ── Pause offscreen / hidden ──
     let observer = null;
     if ('IntersectionObserver' in window) {
-      observer = new IntersectionObserver(([e]) => { visibleRef.current = e.isIntersecting && !menuOpenRef.current; }, { threshold: 0.01 });
+      observer = new IntersectionObserver(([e]) => setVisible(e.isIntersecting), { threshold: 0.01 });
       observer.observe(mount);
     }
     const onVisibility = () => {
-      if (menuOpenRef.current || document.hidden) { visibleRef.current = false; return; }
       const r = mount.getBoundingClientRect();
-      visibleRef.current = r.bottom > 0 && r.top < window.innerHeight;
+      setVisible(r.bottom > 0 && r.top < window.innerHeight);
     };
     document.addEventListener('visibilitychange', onVisibility);
+    window.addEventListener('scroll', onScroll, { passive: true });
 
     // Fully stop the hero's WebGL draw loop while the mobile menu is open so it
     // isn't competing with the menu animation for the GPU. We cancel the rAF
@@ -380,11 +408,10 @@ export default function HeroBlob3D({ location = 'bahriatown' }) {
     const onMenu = (e) => {
       menuOpenRef.current = !!(e.detail && e.detail.open);
       if (menuOpenRef.current) {
-        visibleRef.current = false;
+        setVisible(false);
         if (raf) { cancelAnimationFrame(raf); raf = 0; }
       } else {
         onVisibility();
-        if (!raf && !reduced) raf = requestAnimationFrame(animate);
       }
     };
     window.addEventListener('xnav:menu', onMenu);
@@ -419,11 +446,13 @@ export default function HeroBlob3D({ location = 'bahriatown' }) {
       window.removeEventListener('mousemove', onMouse);
       window.removeEventListener('resize', onResize);
       window.removeEventListener('xnav:menu', onMenu);
+      window.removeEventListener('scroll', onScroll);
       document.removeEventListener('visibilitychange', onVisibility);
       if (observer) observer.disconnect();
       if (ro) ro.disconnect();
       st.kill();
       cancelAnimationFrame(raf);
+      clearTimeout(scrollTimer);
       if (renderer.domElement && mount.contains(renderer.domElement)) mount.removeChild(renderer.domElement);
       renderer.dispose();
       disposables.forEach((d) => d.dispose && d.dispose());

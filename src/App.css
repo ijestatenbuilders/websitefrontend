@@ -1,11 +1,6 @@
 .app {
   min-height: 100vh;
   width: 100%;
-  /* Ultra-performance: Force GPU compositing */
-  transform: translate3d(0, 0, 0);
-  backface-visibility: hidden;
-  /* Create isolated rendering context */
-  contain: layout style;
 }
 
 /* ── Location-driven brand accent (set via data-loc on <html>) ──────────
@@ -31,22 +26,12 @@
 }
 
 html {
-  /* Optimize scroll performance */
-  overflow-x: hidden;
-  overflow-y: scroll;
-  -webkit-overflow-scrolling: touch;
-  /* Ultra-performance: Force GPU layer */
-  transform: translate3d(0, 0, 0);
-  backface-visibility: hidden;
+  /* Keep native document scrolling as the single scroll owner. */
+  overflow-x: clip;
 }
 
 body {
-  /* Ultra-performance: Force GPU compositing for buttery smooth scrolling */
-  transform: translate3d(0, 0, 0);
-  backface-visibility: hidden;
-  /* Create isolated rendering context */
-  contain: layout style;
-  /* Disable iOS rubber band effect lag */
+  overflow-x: clip;
   overscroll-behavior-y: none;
 }
 

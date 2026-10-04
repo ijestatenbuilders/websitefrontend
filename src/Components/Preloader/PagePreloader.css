@@ -180,6 +180,7 @@
    composites on the GPU and stays perfectly smooth on any device. */
 .pl-logo {
   position: relative;
+  z-index: 2;
   display: grid;
   place-items: center;
   width: 168px;
@@ -235,6 +236,7 @@
 .pl-logo__img {
   position: relative;
   z-index: 1;
+  display: block;
   width: 132px;
   height: auto;
   object-fit: contain;
@@ -331,11 +333,12 @@
 
 .pl-bar {
   width: 220px;
-  height: 3px;
+  height: 5px;
   margin-top: 6px;
   background: rgba(2, 132, 199, 0.12);
   border-radius: 99px;
   overflow: hidden;
+  flex: 0 0 auto;
 }
 
 .page-preloader--dark .pl-bar {

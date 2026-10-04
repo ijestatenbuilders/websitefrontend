@@ -7,6 +7,7 @@ import logo from '../../Assets/images/logo.jpg';
 // The full 0→100 journey. Shared by the JS % counter and the CSS bar animation
 // (passed to CSS as a custom property) so the two can never drift apart.
 const TOTAL_DURATION = 1000; // ms
+let hasShownPreloader = false;
 
 export default function PagePreloader({ onComplete, theme }) {
   const [progress, setProgress] = useState(0);
@@ -19,23 +20,12 @@ export default function PagePreloader({ onComplete, theme }) {
 
   const activeTheme = theme || (typeof window !== 'undefined' ? localStorage.getItem('heroTheme') || 'light' : 'light');
 
-  // Skip preloader if navigating between pages (not a full reload).
-  // Use sessionStorage to detect if this is a navigation vs full page load.
-  const shouldSkip = (() => {
-    if (typeof window === 'undefined') return false;
-    try {
-      const hasNavigated = sessionStorage.getItem('ij-navigated');
-      if (hasNavigated) {
-        // Already navigated during this session - skip preloader
-        return true;
-      }
-      // First visit or full reload - mark as navigated for future visits
-      sessionStorage.setItem('ij-navigated', 'true');
-      return false;
-    } catch (e) {
-      return false;
-    }
-  })();
+  // Module state resets on a full page load but survives client-side routing.
+  const [shouldSkip] = useState(() => hasShownPreloader);
+
+  useEffect(() => {
+    hasShownPreloader = true;
+  }, []);
 
   // If we should skip, immediately mark as done
   useEffect(() => {

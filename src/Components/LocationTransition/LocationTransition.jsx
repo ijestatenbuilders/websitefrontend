@@ -2,24 +2,13 @@ import { useEffect, useRef, useState } from 'react';
 import './LocationTransition.css';
 import logo from '../../Assets/images/logo.jpg';
 
-const EXPAND_MS = 800;      // Animation expands from top-right to full screen
-const CENTER_MS = 2500;     // Logo zoom in/out at center
-const SHRINK_MS = 800;      // Animation shrinks back to top-right
+const EXPAND_MS = 800;
+const CENTER_MS = 2500;
+const SHRINK_MS = 800;
 
-/**
- * LocationTransition — smooth page transition animation:
- *  1. Circular overlay expands from top-right corner to fill screen
- *  2. Logo flies from navbar position to center
- *  3. Logo zooms in then zooms out smoothly
- *  4. Logo flies back to navbar position
- *  5. Overlay shrinks back to top-right corner
- */
 function LocationTransition({ isActive, onCovered, onComplete }) {
   const [show, setShow] = useState(false);
-  const [expanded, setExpanded] = useState(false);
-  const [logoPosition, setLogoPosition] = useState({ x: 0, y: 0, scale: 0.3 });
-  const [logoCentered, setLogoCentered] = useState(false);
-  const [logoZooming, setLogoZooming] = useState(false);
+  const [phase, setPhase] = useState('start'); // start, expanded, shrinking, done
   const onCompleteRef = useRef(onComplete);
   const onCoveredRef = useRef(onCovered);
 
@@ -29,64 +18,36 @@ function LocationTransition({ isActive, onCovered, onComplete }) {
   useEffect(() => {
     if (!isActive) return;
 
-    // Get navbar logo position
-    const navLogo = document.querySelector('.xnav__brand-logo');
-    const rect = navLogo?.getBoundingClientRect();
-
-    if (rect && rect.width > 0) {
-      const centerX = window.innerWidth / 2;
-      const centerY = window.innerHeight / 2;
-      const logoCenterX = rect.left + rect.width / 2;
-      const logoCenterY = rect.top + rect.height / 2;
-
-      setLogoPosition({
-        x: logoCenterX - centerX,
-        y: logoCenterY - centerY,
-        scale: rect.width / 200 // 200px is our center logo size
-      });
-    } else {
-      // Fallback: assume logo is in top-left
-      setLogoPosition({
-        x: -window.innerWidth / 2 + 80,
-        y: -window.innerHeight / 2 + 50,
-        scale: 0.25
-      });
-    }
-
-    // Lock scroll during animation
+    // Lock scroll
     document.body.style.overflow = 'hidden';
     const preventScroll = (e) => e.preventDefault();
     window.addEventListener('wheel', preventScroll, { passive: false });
     window.addEventListener('touchmove', preventScroll, { passive: false });
 
-    // Start animation sequence
     setShow(true);
+    setPhase('start');
 
-    // Step 1: Expand overlay from top-right (50ms delay for smooth start)
+    // Phase 1: Expand (logo moves to center)
     const t1 = setTimeout(() => {
-      setExpanded(true);
-      setLogoCentered(true);
-    }, 50);
+      setPhase('expanded');
+    }, 100);
 
-    // Step 2: Start logo zoom animation when centered
+    // Phase 2: Content change happens
     const t2 = setTimeout(() => {
-      setLogoZooming(true);
-      // Trigger content change behind the overlay
       if (onCoveredRef.current) onCoveredRef.current();
-    }, EXPAND_MS);
+    }, EXPAND_MS + 100);
 
-    // Step 3: Shrink back to top-right
+    // Phase 3: Start shrinking (logo moves back)
     const t3 = setTimeout(() => {
-      setLogoZooming(false);
-      setExpanded(false);
-      setLogoCentered(false);
+      setPhase('shrinking');
     }, EXPAND_MS + CENTER_MS);
 
-    // Step 4: Complete and cleanup
+    // Phase 4: Complete
     const t4 = setTimeout(() => {
       setShow(false);
+      setPhase('done');
       document.body.style.overflow = '';
-      window.scrollTo(0, 0); // Reset scroll to top
+      window.scrollTo(0, 0);
       if (onCompleteRef.current) onCompleteRef.current();
     }, EXPAND_MS + CENTER_MS + SHRINK_MS);
 
@@ -103,35 +64,46 @@ function LocationTransition({ isActive, onCovered, onComplete }) {
 
   if (!show) return null;
 
-  const logoStyle = {
-    transform: logoCentered
-      ? 'translate(-50%, -50%)'
-      : `translate(-50%, -50%) translate(${logoPosition.x}px, ${logoPosition.y}px) scale(${logoPosition.scale})`
+  // Calculate logo position based on navbar
+  const getLogoTransform = () => {
+    if (phase === 'expanded') {
+      return 'translate(-50%, -50%) scale(1)';
+    }
+
+    const navLogo = document.querySelector('.xnav__brand-logo');
+    if (navLogo) {
+      const rect = navLogo.getBoundingClientRect();
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
+      const logoX = rect.left + rect.width / 2;
+      const logoY = rect.top + rect.height / 2;
+      const offsetX = logoX - centerX;
+      const offsetY = logoY - centerY;
+      const scale = rect.width / 200;
+      return `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px)) scale(${scale})`;
+    }
+
+    return 'translate(-50%, -50%) scale(0.3)';
   };
 
-  return (
-    <div className="location-transition">
-      {/* Circular overlay that expands from top-right */}
-      <div className={`lt-overlay ${expanded ? 'lt-overlay--expanded' : ''}`}>
-        <div className="lt-gradient" />
-        <div className="lt-particles">
-          {[...Array(20)].map((_, i) => (
-            <div key={i} className="lt-particle" style={{
-              '--delay': `${i * 0.1}s`,
-              '--x': `${Math.random() * 100}%`,
-              '--y': `${Math.random() * 100}%`
-            }} />
-          ))}
-        </div>
-      </div>
+  const isExpanded = phase === 'expanded';
+  const isZooming = phase === 'expanded';
 
-      {/* Logo that flies from navbar to center */}
-      <div className="lt-logo-container" style={logoStyle}>
-        <div className={`lt-logo ${logoZooming ? 'lt-logo--zooming' : ''}`}>
+  return (
+    <>
+      {/* Background Overlay */}
+      <div className={`transition-overlay ${isExpanded ? 'expanded' : ''}`} />
+
+      {/* Logo Animation */}
+      <div
+        className="transition-logo"
+        style={{ transform: getLogoTransform() }}
+      >
+        <div className={`logo-box ${isZooming ? 'zooming' : ''}`}>
           <img src={logo} alt="IJ Estates" />
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

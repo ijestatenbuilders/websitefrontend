@@ -283,8 +283,8 @@ function PopularAreas({ currentLocation = 'bahriatown' }) {
     const handleExplore = (area) => {
         navigate('/listings', {
             state: {
-                mode: 'block',
-                selected: area.block,
+                view: 'contact',
+                selected: area.name,
                 propertyType: 'All',
             }
         });
