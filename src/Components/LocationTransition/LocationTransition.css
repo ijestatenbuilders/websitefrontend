@@ -33,8 +33,8 @@
   width: 100%;
   height: 100%;
   background: #ffffff;
-  border-radius: 24px;
-  padding: 20px;
+  border-radius: 50%;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -47,7 +47,8 @@
 .logo-box img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  border-radius: 50%;
+  object-fit: cover;
   display: block;
 }
 
@@ -95,10 +96,6 @@
     height: 160px;
   }
 
-  .logo-box {
-    padding: 16px;
-    border-radius: 20px;
-  }
 }
 
 @media (max-width: 480px) {
@@ -107,10 +104,6 @@
     height: 140px;
   }
 
-  .logo-box {
-    padding: 14px;
-    border-radius: 18px;
-  }
 }
 
 /* Reduced motion */

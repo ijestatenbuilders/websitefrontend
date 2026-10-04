@@ -15,6 +15,14 @@ import img9 from '../../Assets/images/dha.jpg';
 import img10 from '../../Assets/images/etihad.png';
 import img11 from '../../Assets/images/union.jpg';
 import img12 from '../../Assets/images/dolmenwebp.webp';
+import img13 from '../../Assets/images/dharaya.jpg';
+import img14 from '../../Assets/images/dhaclub.jpg';
+import img15 from '../../Assets/images/phase4.jpeg';
+import img16 from '../../Assets/images/phase5.jpg';
+import img17 from '../../Assets/images/sports.jpg';
+import img18 from '../../Assets/images/phase2.jpeg';
+import img19 from '../../Assets/images/phase3.webp';
+import img20 from '../../Assets/images/phase4.webp';
 
 // Location-specific areas data
 // Each area has a `block` field — the nearest real block in the backend
@@ -83,50 +91,78 @@ const areasByLocation = {
             image: img12,
             description: "Dolmen Malls is a premier chain of modern shopping centers in Pakistan operated by the Dolmen Group.",
             tags: ['Premium', 'Luxury', 'Sports'],
-            block: 'Overseas A',
+            block: 'dolmen mall',
         },
         {
-            name: 'Golf & Country Club',
-            image: img9,
+            name: 'DHA Raya',
+            image: img13,
             description: "DHA Commercial area is the heart of business and shopping, offering modern shops, restaurants, and offices.",
             tags: ['Popular', 'Modern', 'Business'],
-            block: 'BB Block',
+            block: 'dha raya',
         },
         {
-            name: 'DHA Central Park',
+            name: 'DHA Golf & Country Club',
+            image: img14,
+            description: "DHA Central Park provides a peaceful green space for families to enjoy outdoor activities and relaxation.",
+            tags: ['Family', 'Modern', 'Recreation'],
+            block: 'dha country club',
+        },
+        {
+            name: 'DHA Phase 4',
+            image: img15,
+            description: "DHA Central Park provides a peaceful green space for families to enjoy outdoor activities and relaxation.",
+            tags: ['Family', 'Modern', 'Recreation'],
+            block: 'dha phase 4',
+        },
+        {
+            name: 'DHA Phase 5',
+            image: img16,
+            description: "DHA Central Park provides a peaceful green space for families to enjoy outdoor activities and relaxation.",
+            tags: ['Family', 'Modern', 'Recreation'],
+            block: 'dha phase 5',
+        },
+        {
+            name: 'DHA Phase 6',
             image: img9,
             description: "DHA Central Park provides a peaceful green space for families to enjoy outdoor activities and relaxation.",
             tags: ['Family', 'Modern', 'Recreation'],
-            block: 'Hussain Block',
+            block: 'dha phase 6',
         },
         {
             name: 'DHA Sports Complex',
-            image: img9,
+            image: img17,
             description: "DHA Sports Complex features state-of-the-art facilities for various sports including cricket, football, and tennis.",
             tags: ['Sports', 'Modern', 'Premium'],
-            block: 'Sikandar Block',
+            block: 'dha sports complex',
         },
     ],
     etihadtown: [
         {
-            name: 'Etihad Mall',
+            name: 'Etihad Town Phase 1',
             image: img10,
             description: "Etihad Mall is a modern shopping destination offering a wide range of brands, dining, and entertainment options.",
-            tags: ['Shopping', 'Modern', 'Popular'],
+            tags: ['Modern', 'Family', 'Popular'],
             block: 'Alamgir Block',
         },
         {
-            name: 'Etihad Town Park',
-            image: img10,
+            name: 'Etihad Phase 2',
+            image: img18,
+            description: "Etihad Town Phase 2 is a modern area offering a wide range of brands, dining, and entertainment options.",
+            tags: ['Family', 'Modern', 'Popular'],
+            block: 'Alamgir Block',
+        },
+        {
+            name: 'Etihad Phase 3',
+            image: img19,
             description: "Etihad Town Park offers beautiful landscapes and recreational facilities for families and fitness enthusiasts.",
             tags: ['Family', 'Recreation', 'Modern'],
             block: 'Alamgir Ext',
         },
         {
-            name: 'Etihad Commercial Hub',
-            image: img10,
-            description: "Etihad Commercial Hub is a bustling business center with offices, shops, and restaurants.",
-            tags: ['Business', 'Modern', 'Growing'],
+            name: 'Etihad Phase 4',
+            image: img20,
+            description: "Etihad Phase 4 is newly launched Phase which has a great potential and top places for investments.",
+            tags: ['New', 'Modern', 'Growing'],
             block: 'New Shaheen Block',
         },
     ],
@@ -172,7 +208,7 @@ function PopularAreas({ currentLocation = 'bahriatown' }) {
     // Get location display name
     const locationNames = {
         bahriatown: 'Bahria Town Lahore',
-        dharaya: 'DHA Raya Lahore',
+        dharaya: 'DHA Lahore',
         etihadtown: 'Etihad Town Lahore',
         uniontown: 'Union Town Lahore',
     };
