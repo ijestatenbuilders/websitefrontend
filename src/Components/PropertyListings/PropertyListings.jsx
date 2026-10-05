@@ -2,8 +2,6 @@ import { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react
 import { useLocation, useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import Lenis from 'lenis';
-import 'lenis/dist/lenis.css';
 import SEO from '../SEO/SEO';
 import { seo } from '../../seo/seoConfig';
 import SiteNav from '../SiteNav/SiteNav';
@@ -247,38 +245,6 @@ function PropertyListings() {
     const gridRef = useRef(null);
 
     useEffect(() => { window.scrollTo(0, 0); }, []);
-
-    /* Buttery-smooth inertial scrolling (Lenis), synced to GSAP's ticker +
-       ScrollTrigger so the card-reveal batches stay perfectly in step.
-       Gated to capable, non-touch hardware — phones and low-end laptops get
-       the OS's own native inertial scroll, which is smoother than fighting it
-       with a JS smooth-scroll (see the landing hero for the same reasoning). */
-    useEffect(() => {
-        if (prefersReducedMotion() || isTouch() || getDeviceTier() === 'low') return;
-        const lenis = new Lenis({
-            // lerp-based (not duration-based) interpolation gives that heavy,
-            // continuously-gliding "parallax" feel of the home page rather than
-            // snapping to the wheel. Lower = smoother/slower glide. Paired with a
-            // sub-1 wheel multiplier so each notch travels less → never too fast.
-            lerp: 0.07,
-            smoothWheel: true,
-            wheelMultiplier: 0.8,
-            touchMultiplier: 1.5,
-        });
-
-        const onLenisScroll = () => ScrollTrigger.update();
-        lenis.on('scroll', onLenisScroll);
-
-        const tick = (time) => lenis.raf(time * 1000);
-        gsap.ticker.add(tick);
-        gsap.ticker.lagSmoothing(0);
-
-        return () => {
-            lenis.off('scroll', onLenisScroll);
-            gsap.ticker.remove(tick);
-            lenis.destroy();
-        };
-    }, []);
 
     useEffect(() => {
         if (isContactView) return;

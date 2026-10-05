@@ -1,6 +1,10 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { lazy, Suspense, useEffect } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import Lenis from 'lenis';
+import 'lenis/dist/lenis.css';
 import './App.css';
 import LandingPage from './Components/LandingPage/LandingPage';
 import PropertyListings from './Components/PropertyListings/PropertyListings';
@@ -17,6 +21,9 @@ import NotFound from './Components/NotFound/NotFound';
 // import ProjectPromo from './Components/ProjectPromo/ProjectPromo'; // Business Bay floating ad — removed for now
 import AIChat from './Components/AIChat/AIChat';
 import { useAiraOpen, airaStore } from './utils/airaStore';
+import { prefersReducedMotion, getDeviceTier, isTouch } from './utils/perf';
+
+gsap.registerPlugin(ScrollTrigger);
 
 // Lazy load new flagship 3D Showcase (Inspired by asaram.dev & Aether Shoes)
 const Showcase3D = lazy(() => import('./Components/Showcase3D/Showcase3D'));
@@ -33,6 +40,29 @@ function App() {
       const loc = localStorage.getItem('ij-loc');
       if (loc) document.documentElement.setAttribute('data-loc', loc);
     } catch (e) { /* ignore */ }
+  }, []);
+
+  useEffect(() => {
+    if (prefersReducedMotion() || isTouch() || getDeviceTier() === 'low') return;
+
+    const lenis = new Lenis({
+      lerp: 0.075,
+      smoothWheel: true,
+      wheelMultiplier: 0.78,
+      touchMultiplier: 1.5,
+    });
+    const onLenisScroll = () => ScrollTrigger.update();
+    const tick = (time) => lenis.raf(time * 1000);
+
+    lenis.on('scroll', onLenisScroll);
+    gsap.ticker.add(tick);
+    gsap.ticker.lagSmoothing(0);
+
+    return () => {
+      lenis.off('scroll', onLenisScroll);
+      gsap.ticker.remove(tick);
+      lenis.destroy();
+    };
   }, []);
 
   return (

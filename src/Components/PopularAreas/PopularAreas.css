@@ -140,6 +140,88 @@
     perspective: 1200px;
 }
 
+.popular-areas__development {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 0.42fr);
+    align-items: center;
+    gap: 48px;
+    padding: 38px 0 18px;
+    border-top: 1px solid rgba(2, 132, 199, 0.2);
+}
+
+.popular-areas__development::before {
+    content: '';
+    position: absolute;
+    top: 38px;
+    bottom: 18px;
+    left: 0;
+    width: 3px;
+    border-radius: 3px;
+    background: linear-gradient(180deg, #38bdf8, #0284c7 72%, #fbbf24);
+}
+
+.popular-areas__development-copy {
+    padding-left: 26px;
+    max-width: 780px;
+}
+
+.popular-areas__development-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    color: #0369a1;
+    font-size: 0.76rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.popular-areas__development-label span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #0ea5e9;
+    box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.12);
+}
+
+.popular-areas__development-title {
+    margin: 12px 0 10px;
+    color: #0f2744;
+    font-family: 'Outfit', 'Inter', sans-serif;
+    font-size: clamp(1.75rem, 3vw, 2.65rem);
+    font-weight: 850;
+    line-height: 1.1;
+    text-wrap: balance;
+}
+
+.popular-areas__development-description {
+    max-width: 62ch;
+    margin: 0;
+    color: #475569;
+    font-size: 1rem;
+    line-height: 1.75;
+}
+
+.popular-areas__development-action {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+}
+
+.popular-areas__development-action p {
+    margin: 0;
+    color: #475569;
+    font-size: 0.9rem;
+    line-height: 1.55;
+}
+
+.popular-areas__development-action .popular-areas__link {
+    width: auto;
+    align-self: flex-start;
+    min-width: 155px;
+}
+
 /* ── Card reveal wrapper for spring zoom-in ── */
 .popular-areas__card-reveal {
     display: flex;
@@ -348,9 +430,11 @@
     0% {
         transform: translate3d(0, 0, 0) scale(1);
     }
+
     50% {
         transform: translate3d(24px, -20px, 0) scale(1.08);
     }
+
     100% {
         transform: translate3d(-18px, 16px, 0) scale(0.96);
     }
@@ -397,6 +481,21 @@
         gap: 16px;
     }
 
+    .popular-areas__development {
+        grid-template-columns: 1fr;
+        gap: 24px;
+        padding-top: 30px;
+    }
+
+    .popular-areas__development::before {
+        top: 30px;
+        bottom: 0;
+    }
+
+    .popular-areas__development-action {
+        padding-left: 26px;
+    }
+
     .popular-areas__card-name {
         font-size: 1rem;
     }
@@ -433,6 +532,10 @@
 
     .popular-areas__title {
         font-size: 1.35rem;
+    }
+
+    .popular-areas__development-title {
+        font-size: 1.75rem;
     }
 }
 

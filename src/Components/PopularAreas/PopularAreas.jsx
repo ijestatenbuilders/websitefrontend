@@ -13,7 +13,6 @@ import img7 from '../../Assets/images/countryclub.jpg';
 import img8 from '../../Assets/images/talwar.png';
 import img9 from '../../Assets/images/dha.jpg';
 import img10 from '../../Assets/images/etihad.png';
-import img11 from '../../Assets/images/union.jpg';
 import img12 from '../../Assets/images/dolmenwebp.webp';
 import img13 from '../../Assets/images/dharaya.jpg';
 import img14 from '../../Assets/images/dhaclub.jpg';
@@ -166,29 +165,6 @@ const areasByLocation = {
             block: 'New Shaheen Block',
         },
     ],
-    uniontown: [
-        {
-            name: 'Union Town Market',
-            image: img11,
-            description: "Union Town Market is a vibrant shopping area offering local and branded stores for everyday needs.",
-            tags: ['Shopping', 'Affordable', 'Popular'],
-            block: 'Tipu Extension',
-        },
-        {
-            name: 'Union Town Mosque',
-            image: img11,
-            description: "Union Town Mosque is a beautiful place of worship serving the community with modern facilities.",
-            tags: ['Religious', 'Modern', 'Community'],
-            block: 'Tipu Extension',
-        },
-        {
-            name: 'Union Town School System',
-            image: img11,
-            description: "Union Town School System provides quality education with modern teaching methods and facilities.",
-            tags: ['Education', 'Modern', 'Growing'],
-            block: 'Tipu Extension',
-        },
-    ],
 };
 
 function PopularAreas({ currentLocation = 'bahriatown' }) {
@@ -326,6 +302,16 @@ function PopularAreas({ currentLocation = 'bahriatown' }) {
         });
     };
 
+    const handleUnionTownContact = () => {
+        navigate('/listings', {
+            state: {
+                view: 'contact',
+                selected: 'Union Town',
+                searchLocation: 'uniontown',
+            },
+        });
+    };
+
     return (
         <section className="popular-areas" id="areas" ref={revealRef}>
             {/* Parallax Blueprint Grid */}
@@ -339,68 +325,98 @@ function PopularAreas({ currentLocation = 'bahriatown' }) {
                 <div className="popular-header-wrap" ref={headerRef} data-reveal="fade-up">
                     <h2 className="popular-areas__title">Popular Areas in {locationDisplayName}</h2>
                     <p className="popular-areas__subtitle">
-                        Explore iconic architectural wonders, vibrant commercial squares, and high-yield lifestyle communities.
+                        {currentLocation === 'uniontown'
+                            ? 'Discover the area\'s progress and speak with our team about what is taking shape.'
+                            : 'Explore iconic architectural wonders, vibrant commercial squares, and high-yield lifestyle communities.'}
                     </p>
                 </div>
 
-                <div className="popular-areas__grid" ref={gridRef}>
-                    {areas.map((area, index) => (
-                        <div
-                            key={area.name}
-                            className="popular-areas__card-reveal"
-                            data-reveal="pop-scale"
-                            data-delay={index % 8}
-                        >
-                            <div
-                                className="popular-areas__card"
-                                ref={(el) => { cardInnerRefs.current[index] = el; }}
-                                onMouseMove={(e) => handleCardMouseMove(index, e)}
-                                onMouseLeave={() => handleCardMouseLeave(index)}
-                            >
-                                {/* Image with parallax viewport translation & floating tag */}
-                                <div className="popular-areas__img-wrap">
-                                    <span className="popular-areas__floating-tag">
-                                        ✦ {area.tags[0] || 'Prime'}
-                                    </span>
-                                    <img
-                                        src={area.image}
-                                        alt={area.name}
-                                        className="popular-areas__img"
-                                        loading="lazy"
-                                        decoding="async"
-                                        ref={(el) => { imgRefs.current[index] = el; }}
-                                    />
-                                    <div className="popular-areas__img-overlay" />
-                                </div>
-
-                                {/* Icon + Name */}
-                                <div className="popular-areas__card-icon">
-                                    <FaMapMarkerAlt size={18} />
-                                    <h3 className="popular-areas__card-name">{area.name}</h3>
-                                </div>
-
-                                <p className="popular-areas__card-desc">{area.description}</p>
-
-                                <div className="popular-areas__tags">
-                                    {area.tags.map((tag) => (
-                                        <span key={tag} className="popular-areas__tag">{tag}</span>
-                                    ))}
-                                </div>
-
-                                <button
-                                    type="button"
-                                    className="popular-areas__link"
-                                    onClick={() => handleExplore(area)}
-                                >
-                                    <span>Contact Us</span>
-                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                        <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-                                    </svg>
-                                </button>
-                            </div>
+                {currentLocation === 'uniontown' ? (
+                    <div className="popular-areas__development" data-reveal="fade-up">
+                        <div className="popular-areas__development-copy">
+                            <span className="popular-areas__development-label">
+                                <span aria-hidden="true" /> Early opportunities
+                            </span>
+                            <h3 className="popular-areas__development-title">Union Town is still developing</h3>
+                            <p className="popular-areas__development-description">
+                                Be part of an emerging community. Contact our team for the latest development updates,
+                                availability, and investment opportunities in Union Town.
+                            </p>
                         </div>
-                    ))}
-                </div>
+                        <div className="popular-areas__development-action">
+                            <p>Get details directly from our property team.</p>
+                            <button
+                                type="button"
+                                className="popular-areas__link"
+                                onClick={handleUnionTownContact}
+                            >
+                                <span>Contact Us</span>
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                    <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="popular-areas__grid" ref={gridRef}>
+                        {areas.map((area, index) => (
+                            <div
+                                key={area.name}
+                                className="popular-areas__card-reveal"
+                                data-reveal="pop-scale"
+                                data-delay={index % 8}
+                            >
+                                <div
+                                    className="popular-areas__card"
+                                    ref={(el) => { cardInnerRefs.current[index] = el; }}
+                                    onMouseMove={(e) => handleCardMouseMove(index, e)}
+                                    onMouseLeave={() => handleCardMouseLeave(index)}
+                                >
+                                    {/* Image with parallax viewport translation & floating tag */}
+                                    <div className="popular-areas__img-wrap">
+                                        <span className="popular-areas__floating-tag">
+                                            ✦ {area.tags[0] || 'Prime'}
+                                        </span>
+                                        <img
+                                            src={area.image}
+                                            alt={area.name}
+                                            className="popular-areas__img"
+                                            loading="lazy"
+                                            decoding="async"
+                                            ref={(el) => { imgRefs.current[index] = el; }}
+                                        />
+                                        <div className="popular-areas__img-overlay" />
+                                    </div>
+
+                                    {/* Icon + Name */}
+                                    <div className="popular-areas__card-icon">
+                                        <FaMapMarkerAlt size={18} />
+                                        <h3 className="popular-areas__card-name">{area.name}</h3>
+                                    </div>
+
+                                    <p className="popular-areas__card-desc">{area.description}</p>
+
+                                    <div className="popular-areas__tags">
+                                        {area.tags.map((tag) => (
+                                            <span key={tag} className="popular-areas__tag">{tag}</span>
+                                        ))}
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        className="popular-areas__link"
+                                        onClick={() => handleExplore(area)}
+                                    >
+                                        <span>Contact Us</span>
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                            <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </section>
     );
