@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { smoothScrollTo } from '../../utils/scrollBehavior';
 import './ScrollToTop.css';
 
 function ScrollToTop() {
@@ -11,7 +12,7 @@ function ScrollToTop() {
     }, []);
 
     const handleClick = () => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        smoothScrollTo(0, 1600);
     };
 
     return (

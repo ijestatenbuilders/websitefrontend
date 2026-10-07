@@ -4,6 +4,7 @@ import logo from '../../Assets/images/logo.jpg';
 import { FaFacebookF, FaInstagram, FaWhatsapp, FaYoutube } from 'react-icons/fa';
 import { FaMapLocationDot, FaPhone, FaEnvelope } from 'react-icons/fa6';
 import { useReveal } from '../../utils/useReveal';
+import { smoothScrollToElement } from '../../utils/scrollBehavior';
 
 const quickLinks = [
     { label: 'Home', href: '#home' },
@@ -85,7 +86,7 @@ function Footer() {
         const id = href.replace('#', '');
         const el = document.getElementById(id);
         if (el) {
-            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            smoothScrollToElement(el, { offset: -80, duration: 1500 });
             window.history.pushState(null, '', href);
         }
     };

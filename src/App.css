@@ -15,8 +15,8 @@
   /* Bahria: the original sky-blue for headings */
   --brand-text-rgb: 2, 132, 199;
 
-  /* Ultra-performance optimizations for smooth 60fps+ scrolling */
-  scroll-behavior: auto;
+  /* Keep smooth scrolling enabled with a slower, controlled feel. */
+  scroll-behavior: smooth;
 }
 
 /* Force hardware acceleration and smooth scrolling globally */
@@ -27,6 +27,8 @@
 
 html {
   /* Keep native document scrolling as the single scroll owner. */
+  scroll-behavior: smooth;
+  scroll-padding-top: 96px;
   overflow-x: clip;
 }
 

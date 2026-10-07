@@ -12,6 +12,7 @@ import PagePreloader from '../Preloader/PagePreloader';
 import SiteNav from '../SiteNav/SiteNav';
 import ExperienceHero from '../Experience/ExperienceHero';
 import JourneyRail from '../Experience/JourneyRail';
+import { smoothScrollToElement } from '../../utils/scrollBehavior';
 import './LandingPage.css';
 
 // Lazy — the 3D location-switch loader pulls in three.js, but it's only used
@@ -61,7 +62,7 @@ function LandingPage() {
     if (!id) return;
     const t = setTimeout(() => {
       const el = document.getElementById(id);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (el) smoothScrollToElement(el, { offset: -80, duration: 1500 });
     }, 450);
     return () => clearTimeout(t);
   }, [location]);

@@ -13,6 +13,7 @@
 html {
   /* Native smooth anchor-link scrolling */
   scroll-behavior: smooth;
+  scroll-padding-top: 96px;
   /* Promote the html layer so the GPU handles compositing */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
