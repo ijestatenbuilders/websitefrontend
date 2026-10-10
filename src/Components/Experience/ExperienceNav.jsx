@@ -40,7 +40,7 @@ const AiraIcon = () => (
 export default function ExperienceNav({ links = DEFAULT_LINKS, secondary, primary }) {
   const navigate = useNavigate();
   const location = useLocation();
-  const [active, setActive] = useState(links[0]?.id || '');
+  const [active, setActive] = useState(location.state?.activeNavId || links[0]?.id || '');
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const listRef = useRef(null);
@@ -118,7 +118,7 @@ export default function ExperienceNav({ links = DEFAULT_LINKS, secondary, primar
     // webfonts load — otherwise the first measurement can be 0-width and the
     // active pill never appears on a fresh page load.
     let r1 = requestAnimationFrame(() => { r1 = requestAnimationFrame(restPill); });
-    if (document.fonts?.ready) document.fonts.ready.then(restPill).catch(() => {});
+    if (document.fonts?.ready) document.fonts.ready.then(restPill).catch(() => { });
     const onResize = () => restPill();
     window.addEventListener('resize', onResize);
     return () => { cancelAnimationFrame(r1); window.removeEventListener('resize', onResize); };
@@ -135,7 +135,7 @@ export default function ExperienceNav({ links = DEFAULT_LINKS, secondary, primar
     const el = document.getElementById(link.id);
     if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
     // Section isn't on this page → go to the home page and scroll to it there.
-    navigate('/', { state: { scrollTo: link.id } });
+    navigate('/', { state: { scrollTo: link.id, activeNavId: link.id } });
   };
 
   // Tell the hero's 3D jelly canvas to fully drop off the compositor while the
@@ -147,114 +147,122 @@ export default function ExperienceNav({ links = DEFAULT_LINKS, secondary, primar
     window.dispatchEvent(new CustomEvent('xnav:menu', { detail: { open } }));
   }, [open]);
 
-  const isLinkActive = (link) =>
-    link.to ? location.pathname === link.to : active === link.id;
+  const isLinkActive = (link) => {
+    const matchesPath = (path) =>
+      location.pathname === path || location.pathname.startsWith(`${path}/`);
+
+    if (link.to) return matchesPath(link.to);
+    if (location.pathname !== '/' && links.some((item) => item.to)) {
+      return link.activePaths?.some(matchesPath) || false;
+    }
+    return active === link.id;
+  };
 
   const secondaryAction = secondary || { label: 'Main Site', onClick: () => navigate('/') };
   const primaryAction = primary || { label: 'Book a Viewing', onClick: () => go({ id: 'contact' }) };
 
   return (
     <>
-    <motion.header
-      className={`xnav ${scrolled ? 'xnav--scrolled' : ''}`}
-      initial={{ y: -80, opacity: 0, scale: 1 }}
-      animate={{ y: 0, opacity: 1, scale: scrolled ? 0.94 : 1 }}
-      transition={{
-        duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.15,
-        // the shrink runs on its own quick, delay-free compositor tween
-        scale: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
-      }}
-    >
-      <div className="xnav__inner">
-        {/* Brand */}
-        <button className="xnav__brand" onClick={() => go({ id: links[0]?.id || 'hero' })} aria-label="IJ Estate & Builders">
-          <span className="xnav__brand-logo">
-            <img src={logo} alt="IJ Estate & Builders" />
-          </span>
-        </button>
+      <motion.header
+        className={`xnav ${scrolled ? 'xnav--scrolled' : ''}`}
+        initial={{ y: -80, opacity: 0, scale: 1 }}
+        animate={{ y: 0, opacity: 1, scale: scrolled ? 0.94 : 1 }}
+        transition={{
+          duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.15,
+          // the shrink runs on its own quick, delay-free compositor tween
+          scale: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+        }}
+      >
+        <div className="xnav__inner">
+          {/* Brand */}
+          <button className="xnav__brand" onClick={() => go({ id: links[0]?.id || 'hero' })} aria-label="IJ Estate & Builders">
+            <span className="xnav__brand-logo">
+              <img src={logo} alt="IJ Estate & Builders" />
+            </span>
+          </button>
 
-        {/* Desktop links with sliding pill */}
-        <nav className="xnav__links" ref={listRef} onMouseLeave={restPill}>
-          <span
-            className="xnav__pill"
-            style={{ transform: `translateX(${pill.x}px)`, width: pill.w, opacity: pill.opacity }}
-            aria-hidden="true"
-          />
+          {/* Desktop links with sliding pill */}
+          <nav className="xnav__links" ref={listRef} onMouseLeave={restPill}>
+            <span
+              className="xnav__pill"
+              style={{ transform: `translateX(${pill.x}px)`, width: pill.w, opacity: pill.opacity }}
+              aria-hidden="true"
+            />
+            {links.map((l) => (
+              <button
+                key={l.id || l.to}
+                data-id={l.id || ''}
+                className={`xnav__link ${isLinkActive(l) ? 'is-active' : ''}`}
+                onMouseEnter={(e) => movePill(e.currentTarget)}
+                onClick={() => go(l)}
+              >
+                {l.label}
+              </button>
+            ))}
+          </nav>
+
+          {/* Actions */}
+          <div className="xnav__actions">
+            <button className="xnav__ghost" onClick={secondaryAction.onClick}>
+              {secondaryAction.icon}
+              {secondaryAction.label}
+            </button>
+            <motion.button
+              className="xnav__cta"
+              onMouseMove={onCtaMove}
+              onMouseLeave={onCtaLeave}
+              onClick={primaryAction.onClick}
+              style={{ x: sx, y: sy }}
+              whileTap={{ scale: 0.96 }}
+            >
+              {primaryAction.icon || <span className="xnav__cta-dot" />}
+              {primaryAction.label}
+            </motion.button>
+
+            <button
+              className={`xnav__burger ${open ? 'is-open' : ''}`}
+              onClick={() => setOpen((o) => !o)}
+              aria-label="Menu"
+            >
+              <span /><span /><span />
+            </button>
+          </div>
+        </div>
+      </motion.header>
+
+      {/* Full-screen mobile menu — CSS-only fluid reveal that scales open from the
+        top-right corner. It runs entirely on the compositor (a transform on a
+        solid layer), so it can't lag from the 3D canvas / JS load and can't
+        "fail to show" like the Framer versions did. Always mounted; the whole
+        thing is driven by the .is-open class. Kept a plain sibling of the navbar
+        so it never glitches the bar. */}
+      <div
+        className={`xnav__sheet ${open ? 'is-open' : ''}`}
+        onClick={(e) => { if (e.target === e.currentTarget) setOpen(false); }}
+        aria-hidden={!open}
+      >
+        <span className="xnav__sheet-fill" aria-hidden="true" />
+        <nav className="xnav__sheet-links">
           {links.map((l) => (
             <button
               key={l.id || l.to}
-              data-id={l.id || ''}
-              className={`xnav__link ${isLinkActive(l) ? 'is-active' : ''}`}
-              onMouseEnter={(e) => movePill(e.currentTarget)}
+              className={`xnav__sheet-link ${isLinkActive(l) ? 'is-active' : ''}`}
+              tabIndex={open ? 0 : -1}
               onClick={() => go(l)}
             >
               {l.label}
             </button>
           ))}
         </nav>
-
-        {/* Actions */}
-        <div className="xnav__actions">
-          <button className="xnav__ghost" onClick={secondaryAction.onClick}>
-            {secondaryAction.icon}
-            {secondaryAction.label}
-          </button>
-          <motion.button
-            className="xnav__cta"
-            onMouseMove={onCtaMove}
-            onMouseLeave={onCtaLeave}
-            onClick={primaryAction.onClick}
-            style={{ x: sx, y: sy }}
-            whileTap={{ scale: 0.96 }}
-          >
-            {primaryAction.icon || <span className="xnav__cta-dot" />}
+        <div className="xnav__sheet-actions">
+          <button className="xnav__sheet-cta" tabIndex={open ? 0 : -1} onClick={() => { setOpen(false); primaryAction.onClick(); }}>
             {primaryAction.label}
-          </motion.button>
-
-          <button
-            className={`xnav__burger ${open ? 'is-open' : ''}`}
-            onClick={() => setOpen((o) => !o)}
-            aria-label="Menu"
-          >
-            <span /><span /><span />
+          </button>
+          <button className="xnav__sheet-ghost" tabIndex={open ? 0 : -1} onClick={() => { setOpen(false); secondaryAction.onClick(); }}>
+            {secondaryAction.label}
           </button>
         </div>
       </div>
-    </motion.header>
-
-    {/* Full-screen mobile menu — CSS-only fluid reveal that scales open from the
-        top-right corner. It runs entirely on the compositor (a transform on a
-        solid layer), so it can't lag from the 3D canvas / JS load and can't
-        "fail to show" like the Framer versions did. Always mounted; the whole
-        thing is driven by the .is-open class. Kept a plain sibling of the navbar
-        so it never glitches the bar. */}
-    <div
-      className={`xnav__sheet ${open ? 'is-open' : ''}`}
-      onClick={(e) => { if (e.target === e.currentTarget) setOpen(false); }}
-      aria-hidden={!open}
-    >
-      <span className="xnav__sheet-fill" aria-hidden="true" />
-      <nav className="xnav__sheet-links">
-        {links.map((l) => (
-          <button
-            key={l.id || l.to}
-            className={`xnav__sheet-link ${isLinkActive(l) ? 'is-active' : ''}`}
-            tabIndex={open ? 0 : -1}
-            onClick={() => go(l)}
-          >
-            {l.label}
-          </button>
-        ))}
-      </nav>
-      <div className="xnav__sheet-actions">
-        <button className="xnav__sheet-cta" tabIndex={open ? 0 : -1} onClick={() => { setOpen(false); primaryAction.onClick(); }}>
-          {primaryAction.label}
-        </button>
-        <button className="xnav__sheet-ghost" tabIndex={open ? 0 : -1} onClick={() => { setOpen(false); secondaryAction.onClick(); }}>
-          {secondaryAction.label}
-        </button>
-      </div>
-    </div>
     </>
   );
 }

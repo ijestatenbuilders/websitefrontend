@@ -7,7 +7,7 @@ import { airaStore } from '../../utils/airaStore';
 // page); `to` links are full routes.
 const SITE_LINKS = [
   { id: 'hero', label: 'Home' },
-  { id: 'properties', label: 'Properties' },
+  { id: 'properties', label: 'Properties', activePaths: ['/listings', '/property'] },
   { id: 'new', label: 'New Projects' },
   { to: '/virtual-3d', label: 'Virtual 3D', external: true },
   { to: '/forums', label: 'Forums', external: true },

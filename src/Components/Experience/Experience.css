@@ -188,6 +188,18 @@
   backface-visibility: hidden;
 }
 
+.landing-page>.xp:has(.landing-page__dropdown-panel--open) {
+  z-index: 9999;
+}
+
+.xp-hero:has(.landing-page__dropdown-panel--open) {
+  z-index: 9002;
+}
+
+.xp-hero:has(.landing-page__dropdown-panel--open) .xp-hero__content {
+  z-index: 3;
+}
+
 .xp-hero__bg {
   position: absolute;
   inset: 0;
@@ -1510,7 +1522,6 @@
 }
 
 /* Optimize scroll performance - reduce repaints */
-.xp-hero,
 .xp-rail,
 .xp-dev,
 .xp-journey,
