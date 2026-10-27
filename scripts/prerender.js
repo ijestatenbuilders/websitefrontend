@@ -31,6 +31,7 @@ async function prerender() {
 
     browser = await puppeteerModule.default.launch({
       headless: true,
+      pipe: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
     const page = await browser.newPage();
