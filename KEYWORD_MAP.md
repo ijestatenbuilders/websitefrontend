@@ -108,6 +108,11 @@ HTML returned to search crawlers and social previews. External requests are
 blocked during snapshotting so builds do not depend on analytics, fonts, or the
 backend API.
 
+Some hosting build environments isolate Chromium from the local preview server.
+If Puppeteer reports `net::ERR_CONNECTION_REFUSED`, prerendering is skipped with
+a warning so the production SPA can still deploy; the host's SPA fallback serves
+the routes, but route-specific metadata is not present in the initial HTML.
+
 The prerendered routes are `/`, `/listings`, `/about`, `/contact`,
 `/commercial/business-bay`, `/commercial/generic`, `/virtual-3d`, and `/forums`.
 The 3D demo routes and backend-dependent `/property/:id` pages are not

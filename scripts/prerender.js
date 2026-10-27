@@ -87,6 +87,13 @@ async function prerender() {
 }
 
 prerender().catch((error) => {
+  if (error instanceof Error && error.message.includes('net::ERR_CONNECTION_REFUSED')) {
+    console.warn(
+      'Prerender skipped: Chromium cannot reach the local preview server. The SPA build remains usable via the host fallback.',
+    );
+    return;
+  }
+
   console.error('Prerender failed:', error);
   process.exitCode = 1;
 });
