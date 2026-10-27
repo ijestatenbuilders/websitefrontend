@@ -81,6 +81,7 @@
   },
   "overrides": {
     "minimist": "^1.2.8",
-    "webpack-dev-middleware": "^7.4.6"
+    "webpack-dev-middleware": "^7.4.6",
+    "proxy-addr": "2.0.8"
   }
 }
