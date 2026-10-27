@@ -29,7 +29,7 @@ gsap.registerPlugin(ScrollTrigger);
 const Showcase3D = lazy(() => import('./Components/Showcase3D/Showcase3D'));
 // Cinematic standalone Experience landing page (GSAP + Framer Motion, light theme)
 const Experience = lazy(() => import('./Components/Experience/Experience'));
-// Legacy fallbacks
+// Legacy showcase fallbacks
 const SimpleShowcase = lazy(() => import('./Components/SimpleShowcase/SimpleShowcase'));
 const FixedShowcase = lazy(() => import('./Components/FixedShowcase/FixedShowcase'));
 

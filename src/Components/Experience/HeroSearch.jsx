@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 
 /**
  * HeroSearch — the exact home-page glass search bar, self-contained for the
- * Experience hero. Reuses the global `landing-page__search*` styles (CRA bundles
- * all CSS globally, so no import needed) and carries its own state + handlers.
+ * Experience hero. Reuses the global `landing-page__search*` styles and carries
+ * its own state + handlers.
  */
 const typeOptions = [
   { value: 'all', label: 'All Types' },

@@ -51,8 +51,6 @@
   </noscript>
 
   <!-- Preload critical resources -->
-  <link rel="preload" href="/static/css/main.css" as="style" />
-
   <!-- Neutral fallback title for no-JS scrapers; the <SEO> component sets the
        real per-page title on every route (Helmet replaces this single tag). -->
   <title>IJ Estate & Builders | Real Estate in Bahria Town Lahore</title>
@@ -82,6 +80,7 @@
 <body>
   <noscript>You need to enable JavaScript to run this app.</noscript>
   <div id="root"></div>
+  <script type="module" src="/src/index.jsx"></script>
 </body>
 
 </html>

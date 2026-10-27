@@ -2,21 +2,31 @@
    has no accessible role, so Testing Library's role/text queries don't fit —
    direct container access is intentional here. */
 /* eslint-disable testing-library/no-container, testing-library/no-node-access */
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, waitFor, within } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import BrowseProperties from './Properties';
 
 describe('BrowseProperties dot navigation', () => {
-    it('switches the property card content when a dot is clicked', () => {
-        const { container } = render(<BrowseProperties />);
+    it('switches from popular properties to size options when a dot is clicked', async () => {
+        vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+            ok: true,
+            json: async () => ({ blockOptions: ['All', 'Villas'] }),
+        }));
+        const { container } = render(
+            <MemoryRouter>
+                <BrowseProperties />
+            </MemoryRouter>
+        );
 
+        await waitFor(() => expect(container.querySelector('.category-card')).not.toBeNull());
         const firstCard = container.querySelector('.category-card');
-        const dots = firstCard.querySelectorAll('.dot');
+        const card = within(firstCard);
 
-        expect(firstCard.textContent).toContain('5 Marla');
+        expect(card.getByText('Villas')).toBeInTheDocument();
 
-        fireEvent.click(dots[1]);
+        fireEvent.click(card.getByRole('button', { name: 'Show Size tab' }));
 
-        expect(firstCard.textContent).toContain('Villas');
-        expect(firstCard.textContent).not.toContain('5 Marla');
+        expect(card.getByText('5 Marla')).toBeInTheDocument();
+        expect(card.queryByText('Villas')).not.toBeInTheDocument();
     });
 });

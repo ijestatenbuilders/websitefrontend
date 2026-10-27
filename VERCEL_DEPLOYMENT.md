@@ -14,7 +14,7 @@ npm install -g vercel
 3. Click **"Add New Project"**
 4. Import `ijestatenbuilders/websitefrontend` repository
 5. Configure:
-   - **Framework Preset**: Create React App
+   - **Framework Preset**: Vite
    - **Root Directory**: `./` (leave as default)
    - **Build Command**: `npm run build`
    - **Output Directory**: `build`

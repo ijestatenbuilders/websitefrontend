@@ -100,41 +100,25 @@ To change any page's SEO text, edit **`src/seo/seoConfig.js`** only.
 
 ---
 
-## 6. Pre-rendering (react-snap) — ✅ NOW ACTIVE
+## 6. Pre-rendering with Vite and Puppeteer
 
-Your site is a Create React App SPA (renders via JavaScript). Google *can* render
-JS, but it's slower/less reliable, and Facebook/WhatsApp link previews **don't** run
-JS — so per-page meta wouldn't show. To fix this, **react-snap now pre-renders your
-main pages to static HTML at build time**. `npm run build` automatically runs
-`react-snap` afterwards (the `postbuild` script) and writes real HTML with the
-correct title, description, Open Graph and JSON-LD baked in.
+Vite builds the React SPA, then `scripts/prerender.js` uses Puppeteer to save
+static HTML for the primary routes. This preserves route-level SEO metadata in
+HTML returned to search crawlers and social previews. External requests are
+blocked during snapshotting so builds do not depend on analytics, fonts, or the
+backend API.
 
-**How it's set up (see `reactSnap` in `package.json`):**
-- **Pre-rendered routes:** `/`, `/listings`, `/about`, `/contact`,
-  `/commercial/business-bay`, `/commercial/generic`, `/virtual-3d`, `/forums`.
-- **Deliberately NOT pre-rendered:** the heavy 3D demo routes (`/3d`, `/3d-showcase`,
-  `/experience`) and `/property/:id`. Property pages come from your backend API, which
-  isn't running at build time — pre-rendering them would bake a broken/`noindex` page,
-  so Google renders them live instead (they still get correct meta via JS).
-- **Three.js is protected:** the decorative WebGL jelly (`HeroBlob3D`) detects the
-  `ReactSnap` user-agent via `src/utils/isPrerender.js` and **skips WebGL entirely**
-  during snapshotting — so the build is fast and never hangs on the GPU. The visual
-  still appears normally for real visitors after hydration.
-- **Chrome:** react-snap ships an ancient bundled Chromium, so it's pointed at your
-  installed Google Chrome (`puppeteerExecutablePath` in `package.json`). If you build
-  on another machine, update that path or install Chrome there.
+The prerendered routes are `/`, `/listings`, `/about`, `/contact`,
+`/commercial/business-bay`, `/commercial/generic`, `/virtual-3d`, and `/forums`.
+The 3D demo routes and backend-dependent `/property/:id` pages are not
+prerendered. `HeroBlob3D` detects the prerender browser's `ReactSnap` user-agent
+and skips its decorative WebGL work; normal visitors still get the full scene
+after hydration.
 
-**⚠️ Deployment gotcha (Hostinger / any static host):** react-snap creates a folder
-per route (`build/about/index.html`, etc.). Your host must serve that static file for
-`/about` **before** falling back to the SPA `index.html`. Most hosts do this
-automatically (folder `index.html` wins), but if you have a catch-all rule that
-rewrites *everything* to `/index.html`, it will hide the pre-rendered pages. Rule of
-thumb for the rewrite: "serve the file if it exists, otherwise fall back to
-`/index.html`." Test after deploy by opening `view-source:https://yourdomain.com/about`
-— you should see the About title/description in the raw HTML.
-
-For the ultimate setup you'd migrate to **Next.js** (true server-side rendering), but
-that's a large rewrite and not needed right now — react-snap covers the important pages.
+Each route is written as `build/<route>/index.html`. The host must serve an
+existing route file before falling back to the SPA entry point. Hostinger's
+`.htaccess` is configured for this behavior. After deployment, view the source
+of `/about` to confirm its route-specific metadata is present.
 
 ---
 

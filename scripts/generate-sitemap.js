@@ -19,7 +19,7 @@ const API_URL = process.env.REACT_APP_API_URL || 'https://www.ijestateandbuilder
 const OUT_FILE = path.join(__dirname, '..', 'public', 'sitemap.xml');
 const TODAY = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
 
-// Static routes — keep in sync with your keyword map / react-snap routes.
+// Static routes — keep in sync with the prerender routes and keyword map.
 // [path, changefreq, priority]
 const STATIC_ROUTES = [
   ['/', 'daily', '1.0'],

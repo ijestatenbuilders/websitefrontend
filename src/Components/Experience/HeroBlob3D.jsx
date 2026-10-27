@@ -48,7 +48,7 @@ export default function HeroBlob3D({ location = 'bahriatown' }) {
   const colorUniformsRef = useRef([]);
 
   useEffect(() => {
-    // Never spin up WebGL during react-snap prerendering — the jelly is purely
+    // Never spin up WebGL during prerendering — the jelly is purely
     // decorative (aria-hidden) so its absence doesn't affect the crawled HTML,
     // and running Three.js under headless Chrome only wastes time / risks hangs.
     if (isPrerender()) return;

@@ -1,5 +1,5 @@
-// True only while react-snap's headless Chrome is snapshotting the app.
-// react-snap sets navigator.userAgent to "ReactSnap", which lets us skip
+// True only while the prerender script's headless browser is snapshotting the app.
+// It sets navigator.userAgent to "ReactSnap", which lets us skip
 // anything that shouldn't run at build time — chiefly WebGL/Three.js scenes,
 // which are decorative and would waste time (or hang) during prerendering.
 export const isPrerender = () =>

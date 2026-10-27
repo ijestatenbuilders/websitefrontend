@@ -16,10 +16,7 @@ const app = (
   </React.StrictMode>
 );
 
-// When react-snap has prerendered static HTML into #root, hydrate it instead of
-// throwing it away — this is what makes crawlers see real HTML and keeps the
-// client interactive. On a normal (non-prerendered) load, #root is empty so we
-// render fresh.
+// Hydrate prerendered route snapshots and render normally for SPA routes.
 if (container.hasChildNodes()) {
   ReactDOM.hydrateRoot(container, app);
 } else {
@@ -28,5 +25,5 @@ if (container.hasChildNodes()) {
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+// or send results to an analytics endpoint.
 reportWebVitals();
